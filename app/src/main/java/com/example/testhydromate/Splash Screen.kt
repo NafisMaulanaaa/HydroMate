@@ -55,6 +55,8 @@ fun SplashScreen(onFinished: () -> Unit, modifier: Modifier = Modifier) {
                     fontWeight = FontWeight.Bold
                 )
             )
+
+            Text()
         }
     }
 }
