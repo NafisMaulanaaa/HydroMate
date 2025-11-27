@@ -45,16 +45,6 @@ fun SpalshScreen(onFinished: () -> Unit, modifier: Modifier = Modifier) {
                     .size(145.dp)
             )
             Spacer(modifier = Modifier.height(16.dp))
-
-            Text(
-                text = "HydroMate",
-                color = Color.White,
-                textAlign = TextAlign.Center,
-                style = TextStyle(
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            )
         }
     }
 }
