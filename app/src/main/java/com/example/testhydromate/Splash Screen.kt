@@ -56,7 +56,6 @@ fun SplashScreen(onFinished: () -> Unit, modifier: Modifier = Modifier) {
                 )
             )
 
-            Text()
         }
     }
 }
