@@ -21,7 +21,7 @@ fun AppNavigation() {
             route = Screen.Splash.route,
             exitTransition = { fadeOut(tween(1000)) }
         ) {
-            SpalshScreen(
+            SplashScreen(
                 onFinished = {
                     navController.navigate(Screen.Login.route) {
                         popUpTo(Screen.Splash.route) { inclusive = true }
