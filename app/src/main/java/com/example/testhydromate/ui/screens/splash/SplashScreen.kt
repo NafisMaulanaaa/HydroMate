@@ -1,3 +1,5 @@
+package com.example.testhydromate.ui.screens.splash
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -20,16 +22,18 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.testhydromate.R
+import kotlinx.coroutines.delay
+
 
 @Composable
-fun SplashScreen(onFinished: () -> Unit, modifier: Modifier = Modifier) {
+fun SplashScreen(onFinished: () -> Unit) {
     LaunchedEffect(Unit) {
-        kotlinx.coroutines.delay(1000)
+        delay(1000)
         onFinished()
     }
 
     Box(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
             .background(Color(0xff0e61d1))
     ) {
@@ -55,7 +59,6 @@ fun SplashScreen(onFinished: () -> Unit, modifier: Modifier = Modifier) {
                     fontWeight = FontWeight.Bold
                 )
             )
-
         }
     }
 }

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "514692879832",
+    "project_id": "bismillah-hydromate",
+    "storage_bucket": "bismillah-hydromate.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:514692879832:android:fbad16125fa3413ad78ead",
+        "android_client_info": {
+          "package_name": "com.example.testhydromate"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAk94nCwxYG37ktDx3jno19oPjSnqYIImQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

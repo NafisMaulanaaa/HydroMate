@@ -13,7 +13,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.foundation.shape.RoundedCornerShape
-import com.yourapp.ui.components.CountryItem
+import com.example.testhydromate.data.model.CountryItem
+
 
 @Composable
 fun CountryPickerDialog(

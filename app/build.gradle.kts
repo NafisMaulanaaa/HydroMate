@@ -2,6 +2,10 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.hilt.android)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.google.services)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -58,6 +62,25 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     implementation("androidx.compose.material:material-icons-extended:1.7.5")
-    implementation("androidx.navigation:navigation-compose:2.8.0")
-    implementation("com.google.accompanist:accompanist-navigation-animation:0.34.0")
+//    implementation("androidx.navigation:navigation-compose:2.8.0")
+//    implementation("com.google.accompanist:accompanist-navigation-animation:0.34.0")
+
+    // NAVIGATION
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.kotlinx.serialization.json)
+
+    // HILT
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
+//    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
+
+    // FIREBASE
+    implementation("com.google.firebase:firebase-analytics")
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.firestore)
+
+    // COROUTINES
+    implementation(libs.kotlinx.coroutines.play.services)
 }
