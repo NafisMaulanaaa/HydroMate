@@ -1,12 +1,8 @@
 package com.example.testhydromate.ui.screens.auth
 
-import CountryPickerDialog
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -21,7 +17,6 @@ import com.example.testhydromate.ui.components.AuthTabSelector
 import com.example.testhydromate.ui.components.HydroTextField
 import com.example.testhydromate.ui.components.HydroPrimaryButton
 import com.example.testhydromate.ui.components.HydroPasswordTextField
-import com.example.testhydromate.ui.components.HydroClickableTextField
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.testhydromate.util.Resource
 import androidx.compose.ui.platform.LocalContext
@@ -196,66 +191,66 @@ fun SignUpForm(viewModel: AuthViewModel) {
 
         Spacer(Modifier.height(16.dp))
 
-        // Date Picker
-        HydroClickableTextField(
-            label = "Birth of date",
-            value = birthDate,
-            placeholder = "12/12/2000",
-            onClick = { showDatePicker = true }
-        )
+//        // Date Picker
+//        HydroClickableTextField(
+//            label = "Birth of date",
+//            value = birthDate,
+//            placeholder = "12/12/2000",
+//            onClick = { showDatePicker = true }
+//        )
 
-        if (showDatePicker) {
-            DatePickerDialog(
-                onDismissRequest = { showDatePicker = false },
-                confirmButton = {
-                    TextButton(onClick = {
-                        datePickerState.selectedDateMillis?.let { millis ->
-                            val format = java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault())
-                            birthDate = format.format(java.util.Date(millis))
-                        }
-                        showDatePicker = false
-                    }) { Text("OK") }
-                },
-                dismissButton = { TextButton(onClick = { showDatePicker = false }) { Text("Cancel") } }
-            ) { DatePicker(state = datePickerState) }
-        }
+//        if (showDatePicker) {
+//            DatePickerDialog(
+//                onDismissRequest = { showDatePicker = false },
+//                confirmButton = {
+//                    TextButton(onClick = {
+//                        datePickerState.selectedDateMillis?.let { millis ->
+//                            val format = java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault())
+//                            birthDate = format.format(java.util.Date(millis))
+//                        }
+//                        showDatePicker = false
+//                    }) { Text("OK") }
+//                },
+//                dismissButton = { TextButton(onClick = { showDatePicker = false }) { Text("Cancel") } }
+//            ) { DatePicker(state = datePickerState) }
+//        }
+//
+//        Spacer(Modifier.height(16.dp))
 
-        Spacer(Modifier.height(16.dp))
+//        HydroTextField(
+//            label = "Phone Number",
+//            value = phoneNumber,
+//            onValueChange = { phoneNumber = it },
+//            placeholder = "",
+//            leadingIcon = {
+//                Row(
+//                    modifier = Modifier
+//                        .fillMaxHeight()
+//                        .clickable { showCountryDialog = true }
+//                        .padding(start = 16.dp, end = 6.dp),
+//                    verticalAlignment = Alignment.CenterVertically
+//                ) {
+//                    Text(selectedCountry.flag, fontSize = 18.sp)
+//                    Spacer(Modifier.width(6.dp))
+//                    Text(selectedCountry.code, fontSize = 14.sp)
+//                    Spacer(Modifier.width(4.dp))
+//                    Icon(Icons.Default.ArrowDropDown, null, tint = Color.Gray)
+//                }
+//            }
+//        )
 
-        HydroTextField(
-            label = "Phone Number",
-            value = phoneNumber,
-            onValueChange = { phoneNumber = it },
-            placeholder = "",
-            leadingIcon = {
-                Row(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .clickable { showCountryDialog = true }
-                        .padding(start = 16.dp, end = 6.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(selectedCountry.flag, fontSize = 18.sp)
-                    Spacer(Modifier.width(6.dp))
-                    Text(selectedCountry.code, fontSize = 14.sp)
-                    Spacer(Modifier.width(4.dp))
-                    Icon(Icons.Default.ArrowDropDown, null, tint = Color.Gray)
-                }
-            }
-        )
-
-        // Country Picker Dialog (Diasumsikan sudah ada komponen ini)
-        if (showCountryDialog) {
-            CountryPickerDialog(
-                isOpen = showCountryDialog,
-                countryList = countryList,
-                onDismiss = { showCountryDialog = false },
-                onCountrySelected = {
-                    selectedCountry = it
-                    showCountryDialog = false
-                }
-            )
-        }
+//        // Country Picker Dialog (Diasumsikan sudah ada komponen ini)
+//        if (showCountryDialog) {
+//            CountryPickerDialog(
+//                isOpen = showCountryDialog,
+//                countryList = countryList,
+//                onDismiss = { showCountryDialog = false },
+//                onCountrySelected = {
+//                    selectedCountry = it
+//                    showCountryDialog = false
+//                }
+//            )
+//        }
 
         Spacer(Modifier.height(16.dp))
 
@@ -278,12 +273,13 @@ fun SignUpForm(viewModel: AuthViewModel) {
                     firstName = firstName,
                     lastName = lastName,
                     email = email,
-                    pass = password,
-                    birthDate = birthDate,
-                    phoneNumber = phoneNumber,
-                    countryCode = selectedCountry.code
+                    pass = password
+//                    birthDate = birthDate,
+//                    phoneNumber = phoneNumber,
+//                    countryCode = selectedCountry.code
                 )
-            })
+            }
+        )
     }
 }
 

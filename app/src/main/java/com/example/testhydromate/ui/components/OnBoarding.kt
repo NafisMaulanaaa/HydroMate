@@ -3,6 +3,9 @@ package com.example.testhydromate.ui.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,6 +14,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 //import androidx.compose.material.icons.filled.ArrowBack
@@ -23,7 +28,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -98,6 +106,80 @@ fun OptionButton(
             fontSize = 16.sp,
             fontWeight = FontWeight.Medium,
             color = Color.Black
+        )
+    }
+}
+
+@Composable
+fun TimeInputSection(
+    label: String,
+    hourValue: String,
+    minuteValue: String,
+    amPmLabel: String,
+    onHourChange: (String) -> Unit,
+    onMinuteChange: (String) -> Unit
+) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(
+            text = label,
+            fontSize = 15.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = Color(0xFF424242),
+            modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp)
+        )
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            // Kotak Jam
+            TimeBox(value = hourValue, onValueChange = onHourChange)
+
+            Text(
+                text = ":",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(horizontal = 12.dp)
+            )
+
+            // Kotak Menit
+            TimeBox(value = minuteValue, onValueChange = onMinuteChange)
+
+            Spacer(modifier = Modifier.width(16.dp))
+
+            // Label AM/PM
+            Text(
+                text = amPmLabel,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF424242)
+            )
+        }
+    }
+}
+
+@Composable
+fun TimeBox(value: String, onValueChange: (String) -> Unit) {
+    Box(
+        modifier = Modifier
+            .width(100.dp)
+            .height(56.dp)
+            .background(LightGrayBg, RoundedCornerShape(12.dp)),
+        contentAlignment = Alignment.Center
+    ) {
+        BasicTextField(
+            value = value,
+            onValueChange = onValueChange,
+            textStyle = TextStyle(
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = PrimaryBlue,
+                textAlign = TextAlign.Center
+            ),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
         )
     }
 }

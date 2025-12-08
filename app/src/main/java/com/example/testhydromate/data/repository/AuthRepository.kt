@@ -12,28 +12,23 @@ class AuthRepository @Inject constructor(
     private val firestore: FirebaseFirestore
 ) {
 
-    // --- FUNGSI LOGIN ---
+    // LOGIN
     suspend fun loginUser(email: String, pass: String): Resource<String> {
         return try {
-            // Coba login ke Firebase Auth
             auth.signInWithEmailAndPassword(email, pass).await()
             Resource.Success("Login Berhasil")
         } catch (e: Exception) {
-            Resource.Error(e.message ?: "Login Gagal")
+            Resource.Error("Login Gagal")
         }
     }
 
-    // --- FUNGSI REGISTER ---
+    // REGISTES
     suspend fun registerUser(email: String, pass: String, user: User): Resource<String> {
         return try {
-            // 1. Buat Akun (Email & Pass) di Authentication
             val authResult = auth.createUserWithEmailAndPassword(email, pass).await()
             val userId = authResult.user?.uid ?: throw Exception("Gagal mendapatkan User ID")
-
-            // 2. Siapkan data User dengan ID yang baru didapat
             val newUser = user.copy(id = userId)
 
-            // 3. Simpan Biodata Lengkap ke Firestore di koleksi "users"
             firestore.collection("users")
                 .document(userId)
                 .set(newUser)
@@ -45,13 +40,39 @@ class AuthRepository @Inject constructor(
         }
     }
 
-    // --- FUNGSI CEK STATUS (Untuk Splash Screen) ---
+    // CEK STATUS LOGIN/GA
     fun isUserLoggedIn(): Boolean {
         return auth.currentUser != null
     }
 
-    // --- FUNGSI LOGOUT ---
+    // LOGOUT
     fun logout() {
         auth.signOut()
     }
+
+    suspend fun updateUserProfile(user: User): Resource<Boolean> {
+        return try {
+            val userId = auth.currentUser?.uid ?: throw Exception("User not found")
+
+            firestore.collection("users").document(userId)
+                .update(
+                    mapOf(
+                        "gender" to user.gender,
+                        "height" to user.height,
+                        "weight" to user.weight,
+                        "age" to user.age,
+                        "activityLevel" to user.activityLevel,
+                        "weatherCondition" to user.weatherCondition,
+                        "dailyGoal" to user.dailyGoal,
+//                        "wakeTime" to user.wakeTime,
+//                        "bedTime" to user.bedTime
+                    )
+                ).await()
+
+            Resource.Success(true)
+        } catch (e: Exception) {
+            Resource.Error(e.message ?: "Gagal update profil")
+        }
+    }
+
 }

@@ -5,14 +5,19 @@ import com.example.testhydromate.ui.screens.splash.SplashScreen
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.compose.navigation
 import com.example.testhydromate.ui.screens.auth.LoginScreen
 import com.example.testhydromate.ui.screens.home.HomeScreen
 import com.example.testhydromate.ui.screens.onboarding.InputHabitScreen
+import com.example.testhydromate.ui.screens.onboarding.InputWeatherScreen
+import com.example.testhydromate.ui.screens.onboarding.OnboardingViewModel
 import com.example.testhydromate.ui.screens.splash.SplashViewModel
+
 
 
 @Composable
@@ -53,29 +58,45 @@ fun RouteScreen() {
                 }
             )
         }
+        navigation<OnboardingGraph>(startDestination = PersonalDetails) {
 
-        // INPUT PERSONAL DETAILS
-        composable<PersonalDetails> {
-            InputPersonalScreen(
-                onContinueClicked = {
-                    navController.navigate(HabitsInput)
-                }
-            )
+            composable<PersonalDetails> { entry ->
+
+                val parentEntry = remember(entry) { navController.getBackStackEntry(OnboardingGraph) }
+                val viewModel = hiltViewModel<OnboardingViewModel>(parentEntry)
+
+                InputPersonalScreen(
+                    viewModel = viewModel,
+                    onContinueClicked = { navController.navigate(HabitsInput) }
+                )
+            }
+
+            composable<HabitsInput> { entry ->
+                val parentEntry = remember(entry) { navController.getBackStackEntry(OnboardingGraph) }
+                val viewModel = hiltViewModel<OnboardingViewModel>(parentEntry)
+
+                InputHabitScreen(
+                    viewModel = viewModel,
+                    onContinueClicked = { navController.navigate(WeatherInput) },
+                    onBackClicked = { navController.popBackStack() }
+                )
+            }
+
+            composable<WeatherInput> { entry ->
+                val parentEntry = remember(entry) { navController.getBackStackEntry(OnboardingGraph) }
+                val viewModel = hiltViewModel<OnboardingViewModel>(parentEntry)
+
+                InputWeatherScreen(
+                    viewModel = viewModel,
+                    onContinueClicked = {
+                        navController.navigate(Home) {
+                            popUpTo<OnboardingGraph> { inclusive = true }
+                        }
+                    },
+                    onBackClicked = { navController.popBackStack() }
+                )
+            }
         }
-
-        // INPUT HABITS
-        composable<HabitsInput> {
-            InputHabitScreen(
-                onContinueClicked = {
-                    navController.navigate(WeatherInput)
-                },
-                onBackClicked = {
-                    navController.popBackStack()
-                }
-
-            )
-        }
-
 
         // HOME
         composable<Home> {

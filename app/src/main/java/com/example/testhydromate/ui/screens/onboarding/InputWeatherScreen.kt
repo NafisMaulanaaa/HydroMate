@@ -10,7 +10,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.testhydromate.ui.components.HydroPrimaryButton
@@ -20,16 +19,22 @@ import com.example.testhydromate.ui.components.PrimaryBlue
 import com.example.testhydromate.ui.components.TextGray
 
 @Composable
-fun InputWeatherScreen(onContinueClicked: () -> Unit, onBackClicked:() -> Unit) {
-    // State untuk menyimpan pilihan cuaca
+fun InputWeatherScreen(
+    viewModel: OnboardingViewModel,
+    onContinueClicked: () -> Unit,
+    onBackClicked:() -> Unit) {
     var selectedWeather by remember { mutableStateOf("") }
 
     Scaffold(
         containerColor = Color.White,
         bottomBar = {
-            // Tombol Continue
-            HydroPrimaryButton(text = "Continue", onClick = onContinueClicked)
-
+            HydroPrimaryButton(
+                text = "Generate plan!",
+                onClick = {
+                    viewModel.saveOnboardingData()
+                    onContinueClicked()
+                }
+            )
 
         }
     ) { innerPadding ->
@@ -66,12 +71,11 @@ fun InputWeatherScreen(onContinueClicked: () -> Unit, onBackClicked:() -> Unit) 
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Pilih Weather
             OptionButton(
                 text = "Hot",
                 emoji = "☀️",
-                isSelected = selectedWeather == "Hot",
-                onClick = { selectedWeather = "Hot" }
+                isSelected = viewModel.weather == "Hot",
+                onClick = { viewModel.weather = "Hot" }
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -79,8 +83,8 @@ fun InputWeatherScreen(onContinueClicked: () -> Unit, onBackClicked:() -> Unit) 
             OptionButton(
                 text = "Temperate",
                 emoji = "⛅",
-                isSelected = selectedWeather == "Temperate",
-                onClick = { selectedWeather = "Temperate" }
+                isSelected = viewModel.weather == "Temperate",
+                onClick = { viewModel.weather = "Temperate" }
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -88,8 +92,8 @@ fun InputWeatherScreen(onContinueClicked: () -> Unit, onBackClicked:() -> Unit) 
             OptionButton(
                 text = "Cold",
                 emoji = "🌨️",
-                isSelected = selectedWeather == "Cold",
-                onClick = { selectedWeather = "Cold" }
+                isSelected = viewModel.weather == "Cold",
+                onClick = { viewModel.weather = "Cold" }
             )
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -97,8 +101,8 @@ fun InputWeatherScreen(onContinueClicked: () -> Unit, onBackClicked:() -> Unit) 
     }
 }
 
-@Preview(showBackground = true, widthDp = 390, heightDp = 844)
-@Composable
-fun WeatherInputPreview() {
-    InputWeatherScreen(onContinueClicked = {}, onBackClicked = {})
-}
+//@Preview(showBackground = true, widthDp = 390, heightDp = 844)
+//@Composable
+//fun WeatherInputPreview() {
+//    InputWeatherScreen(onContinueClicked = {}, onBackClicked = {})
+//}

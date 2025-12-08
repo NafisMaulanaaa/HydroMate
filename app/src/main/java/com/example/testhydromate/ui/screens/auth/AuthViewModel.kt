@@ -36,9 +36,9 @@ class AuthViewModel @Inject constructor(
         lastName: String,
         email: String,
         pass: String,
-        birthDate: String,
-        phoneNumber: String,
-        countryCode: String
+//        birthDate: String,
+//        phoneNumber: String,
+//        countryCode: String
     ) {
         viewModelScope.launch {
             authState = Resource.Loading()
@@ -47,10 +47,10 @@ class AuthViewModel @Inject constructor(
             val newUser = User(
                 firstName = firstName,
                 lastName = lastName,
-                email = email,
-                birthDate = birthDate,
-                phoneNumber = phoneNumber,
-                countryCode = countryCode
+                email = email
+//                birthDate = birthDate,
+//                phoneNumber = phoneNumber,
+//                countryCode = countryCode
             )
 
             val result = repository.registerUser(email, pass, newUser)

@@ -21,7 +21,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.testhydromate.ui.components.TopBarOnBoardingPage
@@ -33,17 +32,18 @@ import com.example.testhydromate.ui.components.TextGray
 
 
 @Composable
-fun InputPersonalScreen(onContinueClicked: () -> Unit) {
-    // State untuk menyimpan nilai input
+fun InputPersonalScreen(
+    viewModel: OnboardingViewModel,
+    onContinueClicked: () -> Unit
+) {
     var selectedGender by remember { mutableStateOf("") }
-    var height by remember { mutableStateOf("") }
-    var weight by remember { mutableStateOf("") }
-    var age by remember { mutableStateOf("") }
+//    var height by remember { mutableStateOf("") }
+//    var weight by remember { mutableStateOf("") }
+//    var age by remember { mutableStateOf("") }
 
     Scaffold(
         containerColor = Color.White,
         bottomBar = {
-            // Tombol Continue di bagian bawah
             HydroPrimaryButton(text = "Continue", onClick = onContinueClicked)
         }
     ) { innerPadding ->
@@ -99,7 +99,10 @@ fun InputPersonalScreen(onContinueClicked: () -> Unit) {
                     color = PrimaryBlue,
                     scndColor = Color(0xFFD3EAFF),
                     modifier = Modifier.weight(1f),
-                    onClick = { selectedGender = "Male" }
+                    onClick = {
+                        selectedGender = "Male"
+                        viewModel.gender = "Male"
+                    }
                 )
                 GenderButton(
                     text = "Female",
@@ -108,7 +111,10 @@ fun InputPersonalScreen(onContinueClicked: () -> Unit) {
                     color = FemalePink,
                     scndColor = Color(0xFFFFF1FA),
                     modifier = Modifier.weight(1f),
-                    onClick = { selectedGender = "Female" }
+                    onClick = {
+                        selectedGender = "Female"
+                        viewModel.gender = "Female"
+                    }
                 )
             }
 
@@ -117,27 +123,27 @@ fun InputPersonalScreen(onContinueClicked: () -> Unit) {
             // Input Fields (Height, Weight, Age)
             MeasurementInput(
                 label = "Height",
-                value = height,
+                value = viewModel.height,
                 unit = "cm",
-                onValueChange = { height = it }
+                onValueChange = { viewModel.height = it}
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             MeasurementInput(
                 label = "Weight",
-                value = weight,
+                value = viewModel.weight,
                 unit = "kg",
-                onValueChange = { weight = it }
+                onValueChange = { viewModel.weight = it}
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             MeasurementInput(
                 label = "Age",
-                value = age,
+                value = viewModel.age,
                 unit = "y.o.",
-                onValueChange = { age = it }
+                onValueChange = { viewModel.age = it }
             )
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -233,8 +239,8 @@ fun MeasurementInput(
 }
 
 // --- Preview ---
-@Preview(showBackground = true, widthDp = 390, heightDp = 844)
-@Composable
-fun PersonalDetailScreenPreview() {
-    InputPersonalScreen(onContinueClicked = {})
-}
+//@Preview(showBackground = true, widthDp = 390, heightDp = 844)
+//@Composable
+//fun PersonalDetailScreenPreview() {
+//    InputPersonalScreen(viewModel = {  }, onContinueClicked = {})
+//}
