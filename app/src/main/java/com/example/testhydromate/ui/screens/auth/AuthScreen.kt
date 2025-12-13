@@ -1,5 +1,6 @@
 package com.example.testhydromate.ui.screens.auth
 
+import android.os.Build
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -21,9 +22,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.testhydromate.util.Resource
 import androidx.compose.ui.platform.LocalContext
 import android.widget.Toast
-
+import androidx.compose.foundation.background
+import android.graphics.RenderEffect
+import android.graphics.Shader
+import androidx.compose.ui.graphics.asComposeRenderEffect
+import androidx.compose.ui.graphics.graphicsLayer
 import com.example.testhydromate.data.model.southeastAsiaCountryList
-
+import com.example.testhydromate.ui.components.PrimaryBlue
 
 @Composable
 fun LoginScreen(
@@ -77,11 +82,42 @@ fun LoginScreen(
                 SignUpForm(viewModel)
             }
         }
-        if (state is Resource.Loading){
-            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-        }
-    }
 
+        if (state is Resource.Loading) {
+            Box(modifier = Modifier.fillMaxSize()) {
+
+                // BLUR BACKGROUND
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .graphicsLayer {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                                renderEffect =
+                                    RenderEffect.createBlurEffect(
+                                        80f,
+                                        80f,
+                                        Shader.TileMode.CLAMP
+                                    ).asComposeRenderEffect()
+                            }
+                        }
+                )
+
+                // OVERLAY + LOADING
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .background(Color.White.copy(alpha = 0.4f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(
+                        color = PrimaryBlue,
+                        strokeWidth = 5.dp
+                    )
+                }
+            }
+        }
+
+    }
 }
 
 @Composable
@@ -118,7 +154,15 @@ fun LoginForm(viewModel: AuthViewModel) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Checkbox(checked = rememberMe, onCheckedChange = { rememberMe = it })
+                Checkbox(
+                    checked = rememberMe,
+                    onCheckedChange = { rememberMe = it },
+                    colors = CheckboxDefaults.colors(
+                        checkedColor = PrimaryBlue,
+                        checkmarkColor = Color.White,
+                        uncheckedColor = Color.Gray
+                    )
+                )
                 Text("Remember me", fontSize = 12.sp)
             }
             Text("Forgot Password?", color = Color(0xff1d61e7), fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
@@ -302,6 +346,7 @@ fun isStrongPassword(password: String): Boolean {
     showSystemUi = true,
     device = "id:pixel_9"
 )
+
 @Composable
 fun AuthPreview() {
     MaterialTheme {
