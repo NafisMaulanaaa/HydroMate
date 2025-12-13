@@ -110,7 +110,7 @@ fun HydroPasswordTextField(
     label: String = "Password",
     value: String,
     onValueChange: (String) -> Unit,
-    placeholder: String = "******",
+    placeholder: String = "Password",
     errorMessage: String? = null
 ) {
     var passwordVisible by remember { mutableStateOf(false) }

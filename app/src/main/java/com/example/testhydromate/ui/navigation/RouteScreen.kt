@@ -12,14 +12,14 @@ import androidx.navigation.compose.rememberNavController
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.navigation
 import com.example.testhydromate.ui.screens.auth.LoginScreen
+import com.example.testhydromate.ui.screens.home.DailyGoalMainScreen
 import com.example.testhydromate.ui.screens.home.HomeScreen
+import com.example.testhydromate.ui.screens.home.MainDailyGoalContainer
 import com.example.testhydromate.ui.screens.onboarding.InputHabitScreen
 import com.example.testhydromate.ui.screens.onboarding.InputWeatherScreen
 import com.example.testhydromate.ui.screens.onboarding.LoadingResultScreen
 import com.example.testhydromate.ui.screens.onboarding.OnboardingViewModel
 import com.example.testhydromate.ui.screens.splash.SplashViewModel
-
-
 
 @Composable
 fun RouteScreen() {
@@ -100,7 +100,6 @@ fun RouteScreen() {
                 )
             }
 
-
             //Laoding Screen
             composable<LoadingResult> { entry ->
                 val parentEntry = remember(entry) {
@@ -111,6 +110,15 @@ fun RouteScreen() {
                 LoadingResultScreen(
                     viewModel = viewModel,
                     onFinished = {
+                        navController.navigate(ResultGoal)
+                    }
+                )
+            }
+
+            //Result Screen
+            composable<ResultGoal> {
+                MainDailyGoalContainer(
+                    onContinueToHome = {
                         navController.navigate(Home) {
                             popUpTo<OnboardingGraph> { inclusive = true }
                         }

@@ -99,7 +99,7 @@ fun LoginForm(viewModel: AuthViewModel) {
                 email = it
                 emailError = if (!isValidEmail(it)) "Invalid email format" else null
             },
-            placeholder = "youremail@gmail.com",
+            placeholder = "Email",
             errorMessage = emailError
         )
 
@@ -185,7 +185,7 @@ fun SignUpForm(viewModel: AuthViewModel) {
                 email = it
                 emailError = if (!isValidEmail(it)) "Invalid email format" else null
             },
-            placeholder = "youremail@gmail.com",
+            placeholder = "Email",
             errorMessage = emailError
         )
 
