@@ -1,22 +1,14 @@
 package com.example.testhydromate.ui.navigation
 
-import kotlinx.serialization.Serializable
+object Screen {
+    const val SPLASH = "splash"
+    const val LOGIN = "login"
+    const val HOME = "home"
 
-@Serializable
-object Splash
-@Serializable
-object Login
-@Serializable
-object OnboardingGraph
-@Serializable
-object PersonalDetails
-@Serializable
-object HabitsInput
-@Serializable
-object WeatherInput
-@kotlinx.serialization.Serializable
-object LoadingResult
-@Serializable
-object ResultGoal
-@Serializable
-object Home
+    const val ONBOARDING = "onboarding"
+    const val PERSONAL = "personal_details"
+    const val HABIT = "habits_input"
+    const val WEATHER = "weather_input"
+    const val LOADING = "loading_result"
+    const val RESULT = "result_goal"
+}

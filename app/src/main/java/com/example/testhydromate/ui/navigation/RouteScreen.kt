@@ -1,98 +1,132 @@
 package com.example.testhydromate.ui.navigation
 
-import com.example.testhydromate.ui.screens.onboarding.InputPersonalScreen
-import com.example.testhydromate.ui.screens.splash.SplashScreen
+import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.google.accompanist.navigation.animation.AnimatedNavHost
+import com.google.accompanist.navigation.animation.composable
 import androidx.navigation.compose.navigation
-import com.example.testhydromate.ui.screens.auth.LoginScreen
-import com.example.testhydromate.ui.screens.home.DailyGoalMainScreen
-import com.example.testhydromate.ui.screens.home.HomeScreen
-import com.example.testhydromate.ui.screens.home.MainDailyGoalContainer
-import com.example.testhydromate.ui.screens.onboarding.InputHabitScreen
-import com.example.testhydromate.ui.screens.onboarding.InputWeatherScreen
-import com.example.testhydromate.ui.screens.onboarding.LoadingResultScreen
-import com.example.testhydromate.ui.screens.onboarding.OnboardingViewModel
-import com.example.testhydromate.ui.screens.splash.SplashViewModel
+import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 
+import com.example.testhydromate.ui.screens.splash.*
+import com.example.testhydromate.ui.screens.auth.*
+import com.example.testhydromate.ui.screens.home.*
+import com.example.testhydromate.ui.screens.onboarding.*
+
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun RouteScreen() {
-    val navController = rememberNavController()
 
-    NavHost(
+    val navController = rememberAnimatedNavController()
+
+    AnimatedNavHost(
         navController = navController,
-        startDestination = Splash
-    ){
+        startDestination = Screen.SPLASH
+    ) {
 
-        // SPLASH SCREEN
-        composable <Splash>(
-            exitTransition = { fadeOut(tween(1000)) }
-        ){
-            val viewModel = hiltViewModel<SplashViewModel>()
+        //Spalsh
+        composable(
+            route = Screen.SPLASH,
+            exitTransition = {
+                fadeOut(animationSpec = tween(600))
+            }
+        ) {
+            val vm = hiltViewModel<SplashViewModel>()
+
             SplashScreen(
                 onFinished = {
-                    val destination = if (viewModel.isUserLoggedIn()) Home else Login
+                    val dest =
+                        if (vm.isUserLoggedIn()) Screen.HOME else Screen.LOGIN
 
-                    navController.navigate(destination) {
-                        popUpTo<Splash> { inclusive = true }
+                    navController.navigate(dest) {
+                        popUpTo(Screen.SPLASH) { inclusive = true }
                     }
                 }
             )
         }
 
-        // LOGIN
-        composable<Login> {
+        //Login
+        composable(
+            route = Screen.LOGIN,
+            enterTransition = {
+                slideInHorizontally(
+                    initialOffsetX = { it },
+                    animationSpec = tween(400)
+                )
+            },
+            exitTransition = {
+                slideOutHorizontally(
+                    targetOffsetX = { -it },
+                    animationSpec = tween(400)
+                )
+            }
+        ) {
             LoginScreen(
                 onLoginSuccess = {
-                    navController.navigate(Home) {
-                        popUpTo<Login> { inclusive = true }
+                    navController.navigate(Screen.HOME) {
+                        popUpTo(Screen.LOGIN) { inclusive = true }
                     }
                 },
                 onRegisterSuccess = {
-                    navController.navigate(PersonalDetails)
+                    navController.navigate(Screen.ONBOARDING)
                 }
             )
         }
-        navigation<OnboardingGraph>(startDestination = PersonalDetails) {
 
-            composable<PersonalDetails> { entry ->
+        //Onboarding
+        navigation(
+            route = Screen.ONBOARDING,
+            startDestination = Screen.PERSONAL
+        ) {
 
-                val parentEntry = remember(entry) { navController.getBackStackEntry(OnboardingGraph) }
-                val viewModel = hiltViewModel<OnboardingViewModel>(parentEntry)
+            composable(
+                route = Screen.PERSONAL,
+                enterTransition = {
+                    slideInHorizontally(
+                        initialOffsetX = { it },
+                        animationSpec = tween(300)
+                    )
+                }
+            ) { entry ->
+                val parent = remember(entry) {
+                    navController.getBackStackEntry(Screen.ONBOARDING)
+                }
+                val vm = hiltViewModel<OnboardingViewModel>(parent)
 
                 InputPersonalScreen(
-                    viewModel = viewModel,
-                    onContinueClicked = { navController.navigate(HabitsInput) }
+                    viewModel = vm,
+                    onContinueClicked = {
+                        navController.navigate(Screen.HABIT)
+                    }
                 )
             }
 
-            composable<HabitsInput> { entry ->
-                val parentEntry = remember(entry) { navController.getBackStackEntry(OnboardingGraph) }
-                val viewModel = hiltViewModel<OnboardingViewModel>(parentEntry)
+            composable(
+                route = Screen.HABIT,
+                enterTransition = {
+                    slideInHorizontally(
+                        initialOffsetX = { it },
+                        animationSpec = tween(300)
+                    )
+                },
+                popExitTransition = {
+                    slideOutHorizontally(
+                        targetOffsetX = { it },
+                        animationSpec = tween(300)
+                    )
+                }
+            ) { entry ->
+                val parent = remember(entry) {
+                    navController.getBackStackEntry(Screen.ONBOARDING)
+                }
+                val vm = hiltViewModel<OnboardingViewModel>(parent)
 
                 InputHabitScreen(
-                    viewModel = viewModel,
-                    onContinueClicked = { navController.navigate(WeatherInput) },
-                    onBackClicked = { navController.popBackStack() }
-                )
-            }
-
-            composable<WeatherInput> { entry ->
-                val parentEntry = remember(entry) {
-                    navController.getBackStackEntry(OnboardingGraph)
-                }
-                val viewModel = hiltViewModel<OnboardingViewModel>(parentEntry)
-
-                InputWeatherScreen(
-                    viewModel = viewModel,
+                    viewModel = vm,
                     onContinueClicked = {
-                        navController.navigate(LoadingResult)
+                        navController.navigate(Screen.WEATHER)
                     },
                     onBackClicked = {
                         navController.popBackStack()
@@ -100,45 +134,95 @@ fun RouteScreen() {
                 )
             }
 
-            //Laoding Screen
-            composable<LoadingResult> { entry ->
-                val parentEntry = remember(entry) {
-                    navController.getBackStackEntry(OnboardingGraph)
+            composable(
+                route = Screen.WEATHER,
+                enterTransition = {
+                    slideInHorizontally(
+                        initialOffsetX = { it },
+                        animationSpec = tween(300)
+                    )
+                },
+                popExitTransition = {
+                    slideOutHorizontally(
+                        targetOffsetX = { it },
+                        animationSpec = tween(300)
+                    )
                 }
-                val viewModel = hiltViewModel<OnboardingViewModel>(parentEntry)
+            ) { entry ->
+                val parent = remember(entry) {
+                    navController.getBackStackEntry(Screen.ONBOARDING)
+                }
+                val vm = hiltViewModel<OnboardingViewModel>(parent)
 
-                LoadingResultScreen(
-                    viewModel = viewModel,
-                    onFinished = {
-                        navController.navigate(ResultGoal)
+                InputWeatherScreen(
+                    viewModel = vm,
+                    onContinueClicked = {
+                        navController.navigate(Screen.LOADING)
+                    },
+                    onBackClicked = {
+                        navController.popBackStack()
                     }
                 )
             }
 
-            //Result Screen
-            composable<ResultGoal> {
+            composable(
+                route = Screen.LOADING,
+                enterTransition = {
+                    fadeIn(animationSpec = tween(300))
+                },
+                exitTransition = {
+                    fadeOut(animationSpec = tween(300))
+                }
+            ) { entry ->
+                val parent = remember(entry) {
+                    navController.getBackStackEntry(Screen.ONBOARDING)
+                }
+                val vm = hiltViewModel<OnboardingViewModel>(parent)
+
+                LoadingResultScreen(
+                    viewModel = vm,
+                    onFinished = {
+                        navController.navigate(Screen.RESULT)
+                    }
+                )
+            }
+
+            composable(
+                route = Screen.RESULT,
+                enterTransition = {
+                    scaleIn(
+                        initialScale = 0.9f,
+                        animationSpec = tween(300)
+                    ) + fadeIn(animationSpec = tween(300))
+                }
+            ) {
                 MainDailyGoalContainer(
                     onContinueToHome = {
-                        navController.navigate(Home) {
-                            popUpTo<OnboardingGraph> { inclusive = true }
+                        navController.navigate(Screen.HOME) {
+                            popUpTo(Screen.ONBOARDING) { inclusive = true }
                         }
                     }
                 )
             }
-
         }
 
-        // HOME
-        composable<Home> {
+        //Home
+        composable(
+            route = Screen.HOME,
+            enterTransition = {
+                slideInHorizontally(
+                    initialOffsetX = { it },
+                    animationSpec = tween(400)
+                )
+            }
+        ) {
             HomeScreen(
                 onLogout = {
-                    // Kalau logout, kembali ke Login dan hapus history
-                    navController.navigate(Login) {
+                    navController.navigate(Screen.LOGIN) {
                         popUpTo(0) { inclusive = true }
                     }
                 }
             )
         }
     }
-
 }

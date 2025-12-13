@@ -83,4 +83,7 @@ dependencies {
 
     // COROUTINES
     implementation(libs.kotlinx.coroutines.play.services)
+
+    //Screen Animation Transition
+    implementation("com.google.accompanist:accompanist-navigation-animation:0.34.0")
 }
