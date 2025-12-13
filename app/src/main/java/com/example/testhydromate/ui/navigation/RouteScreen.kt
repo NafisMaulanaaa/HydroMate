@@ -15,6 +15,7 @@ import com.example.testhydromate.ui.screens.auth.LoginScreen
 import com.example.testhydromate.ui.screens.home.HomeScreen
 import com.example.testhydromate.ui.screens.onboarding.InputHabitScreen
 import com.example.testhydromate.ui.screens.onboarding.InputWeatherScreen
+import com.example.testhydromate.ui.screens.onboarding.LoadingResultScreen
 import com.example.testhydromate.ui.screens.onboarding.OnboardingViewModel
 import com.example.testhydromate.ui.screens.splash.SplashViewModel
 
@@ -83,19 +84,40 @@ fun RouteScreen() {
             }
 
             composable<WeatherInput> { entry ->
-                val parentEntry = remember(entry) { navController.getBackStackEntry(OnboardingGraph) }
+                val parentEntry = remember(entry) {
+                    navController.getBackStackEntry(OnboardingGraph)
+                }
                 val viewModel = hiltViewModel<OnboardingViewModel>(parentEntry)
 
                 InputWeatherScreen(
                     viewModel = viewModel,
                     onContinueClicked = {
+                        navController.navigate(LoadingResult)
+                    },
+                    onBackClicked = {
+                        navController.popBackStack()
+                    }
+                )
+            }
+
+
+            //Laoding Screen
+            composable<LoadingResult> { entry ->
+                val parentEntry = remember(entry) {
+                    navController.getBackStackEntry(OnboardingGraph)
+                }
+                val viewModel = hiltViewModel<OnboardingViewModel>(parentEntry)
+
+                LoadingResultScreen(
+                    viewModel = viewModel,
+                    onFinished = {
                         navController.navigate(Home) {
                             popUpTo<OnboardingGraph> { inclusive = true }
                         }
-                    },
-                    onBackClicked = { navController.popBackStack() }
+                    }
                 )
             }
+
         }
 
         // HOME

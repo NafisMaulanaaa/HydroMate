@@ -285,7 +285,6 @@ fun EditGoalSheetContent(
     }
 }
 
-
 @Preview(showBackground = true, widthDp = 390, heightDp = 844)
 @Composable
 fun MainContainerPreview() {

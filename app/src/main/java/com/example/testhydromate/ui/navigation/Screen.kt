@@ -14,6 +14,8 @@ object PersonalDetails
 object HabitsInput
 @Serializable
 object WeatherInput
+@kotlinx.serialization.Serializable
+object LoadingResult
 @Serializable
 object ResultGoal
 @Serializable

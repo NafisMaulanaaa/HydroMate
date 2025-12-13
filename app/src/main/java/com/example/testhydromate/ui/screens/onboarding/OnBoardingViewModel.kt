@@ -133,4 +133,10 @@ class OnboardingViewModel @Inject constructor(
             saveState = result
         }
     }
+
+    fun submitOnboarding() {
+        if (saveState is Resource.Loading) return
+        saveOnboardingData()
+    }
+
 }
