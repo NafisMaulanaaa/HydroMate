@@ -1,35 +1,87 @@
 package com.example.testhydromate.ui.screens.home
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.testhydromate.ui.components.*
 
 @Composable
 fun HomeScreen(
     onLogout: () -> Unit,
-    viewModel: HomeViewModel = hiltViewModel() // Nanti kita buat ViewModel ini
+    viewModel: HomeViewModel = hiltViewModel()
 ) {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(text = "Selamat Datang di HydroMate!")
-            Text(text = "Anda berhasil Login 🎉")
+    val total by viewModel.totalDrink.collectAsState()
+    val history by viewModel.history.collectAsState()
 
-            Spacer(modifier = Modifier.height(24.dp))
+    // 1. Tambahkan state scroll
+    val scrollState = rememberScrollState()
 
-            Button(onClick = {
-                viewModel.logout()
-                onLogout()
-            }) {
-                Text(text = "Logout (Tes)")
+    Box(modifier = Modifier.fillMaxSize()) {
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                // 2. Aktifkan scroll agar konten bisa naik turun
+                .verticalScroll(scrollState)
+                .padding(
+                    top = 12.dp,
+                    start = 16.dp,
+                    end = 16.dp,
+                    bottom = 0.dp
+                ),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+
+            // --- 1. Spacer Atas ---
+            Spacer(modifier = Modifier.height(72.dp))
+
+            // ===== TITLE =====
+            Text(
+                text = "Home",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                color = PrimaryBlue
+            )
+
+            // --- 2. Spacer Tengah ---
+            Spacer(modifier = Modifier.height(64.dp))
+
+            WaterProgress(
+                current = total,
+                target = viewModel.dailyTarget
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // ===== DRINK BUTTON =====
+            DrinkButton(
+                text = "Drink 100 mL",
+                onClick = { viewModel.drink(100) },
+            )
+
+            // Spacer pendorong ke bawah
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // ===== TODAY HISTORY =====
+            // HAPUS .weight(1f) agar tidak memaksa ukuran
+            // Biarkan ukurannya menyesuaikan konten (wrap content)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(400.dp) // Berikan tinggi fix atau minHeight agar terlihat "card" panjang
+            ) {
+                TodayHistoryCard(
+                    history = history,
+                    modifier = Modifier.fillMaxSize()
+                )
             }
         }
     }
