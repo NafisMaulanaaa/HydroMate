@@ -2,10 +2,13 @@ package com.example.testhydromate.ui.screens.profile
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -22,8 +25,11 @@ import com.example.testhydromate.ui.components.PrimaryBlue
 @Composable
 fun ProfileScreen(
     onLogoutSuccess: () -> Unit,
+    onNavigateToMyProfile: () -> Unit = {},
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
+    var showLogoutDialog by remember { mutableStateOf(false) }
+
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -48,40 +54,6 @@ fun ProfileScreen(
                 modifier = Modifier.padding(bottom = 32.dp)
             )
 
-            // Profile Section
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(20.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 16.dp)
-            ) {
-                // Profile Image Placeholder
-                Box(
-                    modifier = Modifier
-                        .size(73.dp)
-                        .clip(CircleShape)
-                        .background(Color(0xFFD9D9D9))
-                )
-
-                // Profile Info
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    Text(
-                        text = "Cecep Knalpot",
-                        color = Color.Black,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = "Cecepknalpot@gmail.com",
-                        color = Color(0xFF333333),
-                        fontSize = 14.sp
-                    )
-                }
-            }
-
             Spacer(modifier = Modifier.height(24.dp))
 
             // Menu Items
@@ -95,7 +67,12 @@ fun ProfileScreen(
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(32.dp),
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null
+                        ) { onNavigateToMyProfile() }
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.icon_profile),
@@ -113,7 +90,12 @@ fun ProfileScreen(
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(32.dp),
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null
+                        ) { /* Navigate to Notifications */ }
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.icon_notif),
@@ -131,7 +113,12 @@ fun ProfileScreen(
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(32.dp),
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null
+                        ) { /* Navigate to About App */ }
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.icon_info),
@@ -149,7 +136,12 @@ fun ProfileScreen(
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(32.dp),
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null
+                        ) { showLogoutDialog = true }
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.icon_logout),
@@ -165,6 +157,51 @@ fun ProfileScreen(
             }
 
             Spacer(modifier = Modifier.weight(1f))
+        }
+
+        // Logout Confirmation Dialog
+        if (showLogoutDialog) {
+            AlertDialog(
+                onDismissRequest = { showLogoutDialog = false },
+                title = {
+                    Text(
+                        text = "Logout",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp
+                    )
+                },
+                text = {
+                    Text(
+                        text = "Apakah Anda yakin ingin logout?",
+                        fontSize = 16.sp
+                    )
+                },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            showLogoutDialog = false
+                            onLogoutSuccess()
+                        },
+                        colors = ButtonDefaults.textButtonColors(
+                            contentColor = Color.Red
+                        )
+                    ) {
+                        Text("Logout", fontWeight = FontWeight.Bold)
+                    }
+                },
+                dismissButton = {
+                    TextButton(
+                        onClick = { showLogoutDialog = false },
+                        colors = ButtonDefaults.textButtonColors(
+                            contentColor = Color.Gray
+                        )
+                    ) {
+                        Text("Batal")
+                    }
+                },
+                shape = RoundedCornerShape(16.dp),
+                containerColor = Color.White
+            )
         }
     }
 }

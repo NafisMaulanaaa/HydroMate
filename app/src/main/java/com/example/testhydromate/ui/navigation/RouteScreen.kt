@@ -18,6 +18,7 @@ import com.example.testhydromate.ui.screens.home.HomeScreen
 import com.example.testhydromate.ui.screens.home.MainDailyGoalContainer
 import com.example.testhydromate.ui.screens.onboarding.*
 import com.example.testhydromate.ui.screens.profile.ProfileScreen
+import com.example.testhydromate.ui.screens.profile.MyProfile
 import com.example.testhydromate.ui.screens.splash.SplashScreen
 import com.example.testhydromate.ui.screens.splash.SplashViewModel
 
@@ -25,11 +26,9 @@ import com.example.testhydromate.ui.screens.splash.SplashViewModel
 fun RouteScreen() {
     val navController = rememberNavController()
 
-    // 1. Ambil rute saat ini untuk menentukan Index Navbar
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    // 2. Tentukan kapan Navbar harus muncul (Hanya di Home, History, Profile)
     val showBottomBar = currentRoute in listOf(
         Screen.HOME.route,
         Screen.HISTORY.route,
@@ -38,9 +37,7 @@ fun RouteScreen() {
 
     Scaffold(
         bottomBar = {
-            // 3. Pasang Navbar di sini agar statis & animasinya jalan
             if (showBottomBar) {
-                // Tentukan index berdasarkan route
                 val selectedIndex = when (currentRoute) {
                     Screen.HOME.route -> 0
                     Screen.HISTORY.route -> 1
@@ -81,15 +78,11 @@ fun RouteScreen() {
             }
         }
     ) { innerPadding ->
-        // innerPadding dipakai agar konten tidak tertutup navbar
-
         NavHost(
             navController = navController,
             startDestination = Screen.SPLASH.route,
-            modifier = Modifier.padding(innerPadding) // Penting!
+            modifier = Modifier.padding(innerPadding)
         ) {
-            // ... (Kode composable SPLASH, LOGIN, ONBOARDING tetap sama) ...
-
             composable(Screen.SPLASH.route) {
                 val vm = hiltViewModel<SplashViewModel>()
                 SplashScreen(
@@ -115,7 +108,6 @@ fun RouteScreen() {
                 )
             }
 
-            // ONBOARDING FLOW (Tetap sama, disingkat biar rapi)
             navigation(route = Screen.ONBOARDING.route, startDestination = Screen.PERSONAL.route) {
                 composable(Screen.PERSONAL.route) {
                     val vm = hiltViewModel<OnboardingViewModel>()
@@ -140,11 +132,6 @@ fun RouteScreen() {
                 }
             }
 
-            // --- PERHATIKAN BAGIAN INI: Hapus parameter onHome, onHistory, onProfile ---
-            // Karena Navbarnya sudah diurus Scaffold di atas
-
-            // ... inside NavHost
-
             composable(Screen.HOME.route) {
                 HomeScreen(
                     onLogout = {
@@ -161,18 +148,24 @@ fun RouteScreen() {
                         navController.navigate(Screen.LOGIN.route) {
                             popUpTo(0) { inclusive = true }
                         }
+                    },
+                    onNavigateToMyProfile = {
+                        navController.navigate(Screen.MY_PROFILE.route)
                     }
-                    // DELETED: onHome = {},
-                    // DELETED: onHistory = {}
+                )
+            }
+
+            // Tambahkan route untuk My Profile
+            composable(Screen.MY_PROFILE.route) {
+                MyProfile(
+                    onBackClick = {
+                        navController.popBackStack()
+                    }
                 )
             }
 
             composable(Screen.HISTORY.route) {
-                HistoryScreen(
-                    // DELETED: onHome = {},
-                    // DELETED: onProfile = {}
-                    // Pass any other necessary parameters here, or leave empty if none
-                )
+                HistoryScreen()
             }
         }
     }
