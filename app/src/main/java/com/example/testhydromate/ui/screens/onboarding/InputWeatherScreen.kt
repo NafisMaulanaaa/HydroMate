@@ -22,8 +22,8 @@ import com.example.testhydromate.ui.components.TextGray
 fun InputWeatherScreen(
     viewModel: OnboardingViewModel,
     onContinueClicked: () -> Unit,
-    onBackClicked:() -> Unit) {
-    var selectedWeather by remember { mutableStateOf("") }
+    onBackClicked:() -> Unit
+) {
 
     Scaffold(
         containerColor = Color.White,
@@ -31,7 +31,7 @@ fun InputWeatherScreen(
             HydroPrimaryButton(
                 text = "Generate plan!",
                 onClick = {
-                    viewModel.saveOnboardingData()
+//                    viewModel.saveOnboardingData()
                     onContinueClicked()
                 }
             )

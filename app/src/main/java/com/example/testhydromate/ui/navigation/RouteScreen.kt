@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
@@ -15,7 +16,7 @@ import com.example.testhydromate.ui.components.HydroBottomBar
 import com.example.testhydromate.ui.screens.auth.LoginScreen
 import com.example.testhydromate.ui.screens.history.HistoryScreen
 import com.example.testhydromate.ui.screens.home.HomeScreen
-import com.example.testhydromate.ui.screens.home.MainDailyGoalContainer
+import com.example.testhydromate.ui.screens.home.ResultScreen
 import com.example.testhydromate.ui.screens.onboarding.*
 import com.example.testhydromate.ui.screens.profile.ProfileScreen
 import com.example.testhydromate.ui.screens.profile.MyProfile
@@ -29,6 +30,7 @@ fun RouteScreen() {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
+    // Logika menampilkan BottomBar hanya di screen tertentu
     val showBottomBar = currentRoute in listOf(
         Screen.HOME.route,
         Screen.HISTORY.route,
@@ -83,6 +85,7 @@ fun RouteScreen() {
             startDestination = Screen.SPLASH.route,
             modifier = Modifier.padding(innerPadding)
         ) {
+            // --- SPLASH ---
             composable(Screen.SPLASH.route) {
                 val vm = hiltViewModel<SplashViewModel>()
                 SplashScreen(
@@ -95,6 +98,7 @@ fun RouteScreen() {
                 )
             }
 
+            // --- LOGIN ---
             composable(Screen.LOGIN.route) {
                 LoginScreen(
                     onLoginSuccess = {
@@ -108,30 +112,87 @@ fun RouteScreen() {
                 )
             }
 
+            // --- ONBOARDING GRAPH (Disini perubahannya) ---
             navigation(route = Screen.ONBOARDING.route, startDestination = Screen.PERSONAL.route) {
-                composable(Screen.PERSONAL.route) {
-                    val vm = hiltViewModel<OnboardingViewModel>()
-                    InputPersonalScreen(vm) { navController.navigate(Screen.HABIT.route) }
-                }
-                composable(Screen.HABIT.route) {
-                    val vm = hiltViewModel<OnboardingViewModel>()
-                    InputHabitScreen(vm, { navController.navigate(Screen.WEATHER.route) }, { navController.popBackStack() })
-                }
-                composable(Screen.WEATHER.route) {
-                    val vm = hiltViewModel<OnboardingViewModel>()
-                    InputWeatherScreen(vm, { navController.navigate(Screen.LOADING.route) }, { navController.popBackStack() })
-                }
-                composable(Screen.LOADING.route) {
-                    val vm = hiltViewModel<OnboardingViewModel>()
-                    LoadingResultScreen(vm) { navController.navigate(Screen.RESULT.route) }
-                }
-                composable(Screen.RESULT.route) {
-                    MainDailyGoalContainer {
-                        navController.navigate(Screen.HOME.route) { popUpTo(Screen.ONBOARDING.route) { inclusive = true } }
+
+                composable(Screen.PERSONAL.route) { entry ->
+                    // 1. Ambil Entry milik Parent (Screen.ONBOARDING)
+                    val parentEntry = remember(entry) {
+                        navController.getBackStackEntry(Screen.ONBOARDING.route)
                     }
+                    // 2. Init ViewModel menggunakan scope parentEntry
+                    val vm = hiltViewModel<OnboardingViewModel>(parentEntry)
+
+                    InputPersonalScreen(
+                        viewModel = vm,
+                        onContinueClicked = { navController.navigate(Screen.HABIT.route) }
+                    )
+                }
+
+                composable(Screen.HABIT.route) { entry ->
+                    val parentEntry = remember(entry) {
+                        navController.getBackStackEntry(Screen.ONBOARDING.route)
+                    }
+                    val vm = hiltViewModel<OnboardingViewModel>(parentEntry)
+
+                    InputHabitScreen(
+                        viewModel = vm,
+                        onContinueClicked = { navController.navigate(Screen.WEATHER.route) },
+                        onBackClicked = { navController.popBackStack() }
+                    )
+                }
+
+                composable(Screen.WEATHER.route) { entry ->
+                    val parentEntry = remember(entry) {
+                        navController.getBackStackEntry(Screen.ONBOARDING.route)
+                    }
+                    val vm = hiltViewModel<OnboardingViewModel>(parentEntry)
+
+                    InputWeatherScreen(
+                        viewModel = vm,
+                        onContinueClicked = { navController.navigate(Screen.LOADING.route) },
+                        onBackClicked = { navController.popBackStack() }
+                    )
+                }
+
+                composable(Screen.LOADING.route) { entry ->
+                    val parentEntry = remember(entry) {
+                        navController.getBackStackEntry(Screen.ONBOARDING.route)
+                    }
+                    val vm = hiltViewModel<OnboardingViewModel>(parentEntry)
+
+                    LoadingResultScreen(
+                        viewModel = vm,
+                        onFinished = {
+                            navController.navigate(Screen.RESULT.route) {
+                                // Hapus loading biar gak bisa diback
+                                popUpTo(Screen.LOADING.route) { inclusive = true }
+                            }
+                        }
+                    )
+                }
+
+                composable(Screen.RESULT.route) { entry ->
+                    // Di sini kita masih butuh VM untuk nampilin data hasil kalkulasi
+                    val parentEntry = remember(entry) {
+                        navController.getBackStackEntry(Screen.ONBOARDING.route)
+                    }
+                    val vm = hiltViewModel<OnboardingViewModel>(parentEntry)
+
+                    ResultScreen(
+                        // Asumsi MainDailyGoalContainer menerima viewModel atau state dari VM
+                        viewModel = vm,
+                        onContinueToHome = {
+                            navController.navigate(Screen.HOME.route) {
+                                // Hapus seluruh graph onboarding dari backstack
+                                popUpTo(Screen.ONBOARDING.route) { inclusive = true }
+                            }
+                        }
+                    )
                 }
             }
 
+            // --- MAIN APP ---
             composable(Screen.HOME.route) {
                 HomeScreen(
                     onLogout = {
@@ -155,7 +216,6 @@ fun RouteScreen() {
                 )
             }
 
-            // Tambahkan route untuk My Profile
             composable(Screen.MY_PROFILE.route) {
                 MyProfile(
                     onBackClick = {

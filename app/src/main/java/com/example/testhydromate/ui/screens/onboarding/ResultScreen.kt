@@ -26,17 +26,21 @@ import androidx.compose.ui.unit.sp
 import com.example.testhydromate.R
 import com.example.testhydromate.ui.components.PrimaryBlue
 import com.example.testhydromate.ui.components.TextGray
+import com.example.testhydromate.ui.screens.onboarding.OnboardingViewModel
 
 private val InputBgGray = Color(0xFFF5F5F5)
 private val ButtonCancelBg = Color(0xFFE3F2FD)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainDailyGoalContainer(onContinueToHome: () -> Unit) {
+fun ResultScreen(
+    viewModel: OnboardingViewModel, // <-- TERIMA VIEWMODEL
+    onContinueToHome: () -> Unit
+) {
 
     var showBottomSheet by remember { mutableStateOf(false) }
 
-    var goalValue by remember { mutableStateOf("2000") }
+    var goalValue by remember(viewModel.dailyGoal) { mutableStateOf(viewModel.dailyGoal.toString()) }
     var tempGoalValue by remember { mutableStateOf(goalValue) }
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -171,9 +175,6 @@ fun DailyGoalMainScreen(
     }
 }
 
-// ==============================
-// BOTTOM SHEET
-// ==============================
 @Composable
 fun EditGoalSheetContent(
     tempValue: String,
@@ -280,7 +281,7 @@ fun EditGoalSheetContent(
 @Preview(showBackground = true, widthDp = 390, heightDp = 844)
 @Composable
 fun MainDailyGoalPreview() {
-    MainDailyGoalContainer(
-        onContinueToHome = {}
-    )
+//    ResultScreen(
+//        onContinueToHome = {}
+//    )
 }
