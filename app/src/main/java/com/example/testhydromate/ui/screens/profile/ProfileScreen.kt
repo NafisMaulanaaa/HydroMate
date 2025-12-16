@@ -1,17 +1,14 @@
 package com.example.testhydromate.ui.screens.profile
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -19,13 +16,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.testhydromate.R
-import com.example.testhydromate.ui.components.HydroBottomBar
 import com.example.testhydromate.ui.components.PrimaryBlue
 
 @Composable
 fun ProfileScreen(
-    onLogoutSuccess: () -> Unit,
-    onNavigateToMyProfile: () -> Unit = {},
+    onLogoutSuccess: () -> Unit = {},          // ✅ FIX
+    onNavigateToMyProfile: () -> Unit = {},    // ✅ FIX
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
     var showLogoutDialog by remember { mutableStateOf(false) }
@@ -42,10 +38,9 @@ fun ProfileScreen(
                 ),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Spacer Atas
-            Spacer(modifier = Modifier.height(32.dp))
 
-            // Title Settings
+            Spacer(modifier = Modifier.height(62.dp))
+
             Text(
                 text = "Settings",
                 fontSize = 24.sp,
@@ -56,16 +51,15 @@ fun ProfileScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Menu Items
             Column(
                 verticalArrangement = Arrangement.spacedBy(48.dp),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 32.dp)
             ) {
-                // My Profile
+
+                // ===== MY PROFILE =====
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(32.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -75,66 +69,44 @@ fun ProfileScreen(
                         ) { onNavigateToMyProfile() }
                 ) {
                     Image(
-                        painter = painterResource(id = R.drawable.icon_profile),
-                        contentDescription = "My Profile",
+                        painter = painterResource(R.drawable.icon_profile),
+                        contentDescription = null,
                         modifier = Modifier.size(24.dp)
                     )
-                    Text(
-                        text = "My Profile",
-                        color = Color.Black,
-                        fontSize = 16.sp
-                    )
+                    Spacer(Modifier.width(24.dp))
+                    Text("My Profile", fontSize = 16.sp)
                 }
 
-                // Notifications
+                // ===== NOTIFICATIONS =====
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(32.dp),
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable(
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = null
-                        ) { /* Navigate to Notifications */ }
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     Image(
-                        painter = painterResource(id = R.drawable.icon_notif),
-                        contentDescription = "Notifications",
+                        painter = painterResource(R.drawable.icon_notif),
+                        contentDescription = null,
                         modifier = Modifier.size(24.dp)
                     )
-                    Text(
-                        text = "Notifications",
-                        color = Color.Black,
-                        fontSize = 16.sp
-                    )
+                    Spacer(Modifier.width(24.dp))
+                    Text("Notifications", fontSize = 16.sp)
                 }
 
-                // About App
+                // ===== ABOUT =====
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(32.dp),
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable(
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = null
-                        ) { /* Navigate to About App */ }
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     Image(
-                        painter = painterResource(id = R.drawable.icon_info),
-                        contentDescription = "About App",
+                        painter = painterResource(R.drawable.icon_info),
+                        contentDescription = null,
                         modifier = Modifier.size(24.dp)
                     )
-                    Text(
-                        text = "About App",
-                        color = Color.Black,
-                        fontSize = 16.sp
-                    )
+                    Spacer(Modifier.width(24.dp))
+                    Text("About App", fontSize = 16.sp)
                 }
 
-                // Logout
+                // ===== LOGOUT =====
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(32.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -144,37 +116,28 @@ fun ProfileScreen(
                         ) { showLogoutDialog = true }
                 ) {
                     Image(
-                        painter = painterResource(id = R.drawable.icon_logout),
-                        contentDescription = "Logout",
+                        painter = painterResource(R.drawable.icon_logout),
+                        contentDescription = null,
                         modifier = Modifier.size(24.dp)
                     )
-                    Text(
-                        text = "Logout",
-                        color = Color.Black,
-                        fontSize = 16.sp
-                    )
+                    Spacer(Modifier.width(24.dp))
+                    Text("Logout", fontSize = 16.sp)
                 }
             }
-
-            Spacer(modifier = Modifier.weight(1f))
         }
 
-        // Logout Confirmation Dialog
+        // ===== LOGOUT DIALOG =====
         if (showLogoutDialog) {
             AlertDialog(
                 onDismissRequest = { showLogoutDialog = false },
                 title = {
                     Text(
-                        text = "Logout From HydroMate",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp
+                        "Logout From HydroMate",
+                        fontWeight = FontWeight.Bold
                     )
                 },
                 text = {
-                    Text(
-                        text = "Are you sure want to logout?",
-                        fontSize = 16.sp
-                    )
+                    Text("Are you sure want to logout?")
                 },
                 confirmButton = {
                     TextButton(
@@ -190,17 +153,11 @@ fun ProfileScreen(
                     }
                 },
                 dismissButton = {
-                    TextButton(
-                        onClick = { showLogoutDialog = false },
-                        colors = ButtonDefaults.textButtonColors(
-                            contentColor = Color.Gray
-                        )
-                    ) {
+                    TextButton(onClick = { showLogoutDialog = false }) {
                         Text("Cancel")
                     }
                 },
-                shape = RoundedCornerShape(16.dp),
-                containerColor = Color.White
+                shape = RoundedCornerShape(16.dp)
             )
         }
     }

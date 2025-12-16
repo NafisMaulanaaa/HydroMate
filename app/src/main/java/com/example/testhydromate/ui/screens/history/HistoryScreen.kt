@@ -45,7 +45,7 @@ fun HistoryScreen(
     ) {
 
         // --- 1. Spacer Atas ---
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(62.dp))
 
         // ===== TITLE =====
         Text(

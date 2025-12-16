@@ -1,16 +1,16 @@
 package com.example.testhydromate.ui.navigation
 
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.example.testhydromate.ui.components.HydroBottomBar
 import com.example.testhydromate.ui.screens.auth.LoginScreen
@@ -18,19 +18,18 @@ import com.example.testhydromate.ui.screens.history.HistoryScreen
 import com.example.testhydromate.ui.screens.home.HomeScreen
 import com.example.testhydromate.ui.screens.home.ResultScreen
 import com.example.testhydromate.ui.screens.onboarding.*
-import com.example.testhydromate.ui.screens.profile.ProfileScreen
 import com.example.testhydromate.ui.screens.profile.MyProfile
+import com.example.testhydromate.ui.screens.profile.ProfileScreen
 import com.example.testhydromate.ui.screens.splash.SplashScreen
 import com.example.testhydromate.ui.screens.splash.SplashViewModel
 
 @Composable
 fun RouteScreen() {
+
     val navController = rememberNavController()
+    val backStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = backStackEntry?.destination?.route
 
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route
-
-    // Logika menampilkan BottomBar hanya di screen tertentu
     val showBottomBar = currentRoute in listOf(
         Screen.HOME.route,
         Screen.HISTORY.route,
@@ -47,58 +46,61 @@ fun RouteScreen() {
                     else -> 0
                 }
 
-                HydroBottomBar(
-                    selectedIndex = selectedIndex,
-                    onHome = {
-                        if (currentRoute != Screen.HOME.route) {
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    HydroBottomBar(
+                        selectedIndex = selectedIndex,
+                        onHome = {
                             navController.navigate(Screen.HOME.route) {
-                                popUpTo(Screen.HOME.route) { saveState = true }
                                 launchSingleTop = true
                                 restoreState = true
                             }
-                        }
-                    },
-                    onHistory = {
-                        if (currentRoute != Screen.HISTORY.route) {
+                        },
+                        onHistory = {
                             navController.navigate(Screen.HISTORY.route) {
-                                popUpTo(Screen.HOME.route) { saveState = true }
                                 launchSingleTop = true
                                 restoreState = true
                             }
-                        }
-                    },
-                    onProfile = {
-                        if (currentRoute != Screen.PROFILE.route) {
+                        },
+                        onProfile = {
                             navController.navigate(Screen.PROFILE.route) {
-                                popUpTo(Screen.HOME.route) { saveState = true }
                                 launchSingleTop = true
                                 restoreState = true
                             }
                         }
-                    }
-                )
+                    )
+                }
             }
         }
-    ) { innerPadding ->
+    ) {
+
         NavHost(
             navController = navController,
-            startDestination = Screen.SPLASH.route,
-            modifier = Modifier.padding(innerPadding)
+            startDestination = Screen.SPLASH.route
         ) {
-            // --- SPLASH ---
+
+            // ================= SPLASH =================
             composable(Screen.SPLASH.route) {
                 val vm = hiltViewModel<SplashViewModel>()
+
                 SplashScreen(
                     onFinished = {
-                        val dest = if (vm.isUserLoggedIn()) Screen.HOME.route else Screen.LOGIN.route
-                        navController.navigate(dest) {
+                        val destination = if (vm.isUserLoggedIn()) {
+                            Screen.HOME.route
+                        } else {
+                            Screen.LOGIN.route
+                        }
+
+                        navController.navigate(destination) {
                             popUpTo(Screen.SPLASH.route) { inclusive = true }
                         }
                     }
                 )
             }
 
-            // --- LOGIN ---
+            // ================= AUTH =================
             composable(Screen.LOGIN.route) {
                 LoginScreen(
                     onLoginSuccess = {
@@ -107,111 +109,92 @@ fun RouteScreen() {
                         }
                     },
                     onRegisterSuccess = {
-                        navController.navigate(Screen.ONBOARDING.route)
+                        navController.navigate(Screen.INPUT_PERSONAL.route) {
+                            popUpTo(Screen.LOGIN.route) { inclusive = true }
+                        }
                     }
                 )
             }
 
-            // --- ONBOARDING GRAPH (Disini perubahannya) ---
-            navigation(route = Screen.ONBOARDING.route, startDestination = Screen.PERSONAL.route) {
-
-                composable(Screen.PERSONAL.route) { entry ->
-                    // 1. Ambil Entry milik Parent (Screen.ONBOARDING)
-                    val parentEntry = remember(entry) {
-                        navController.getBackStackEntry(Screen.ONBOARDING.route)
+            // ================= ONBOARDING =================
+            composable(Screen.INPUT_PERSONAL.route) {
+                val vm = hiltViewModel<OnboardingViewModel>()
+                InputPersonalScreen(
+                    viewModel = vm,
+                    onContinueClicked = {
+                        navController.navigate(Screen.INPUT_HABIT.route)
                     }
-                    // 2. Init ViewModel menggunakan scope parentEntry
-                    val vm = hiltViewModel<OnboardingViewModel>(parentEntry)
-
-                    InputPersonalScreen(
-                        viewModel = vm,
-                        onContinueClicked = { navController.navigate(Screen.HABIT.route) }
-                    )
-                }
-
-                composable(Screen.HABIT.route) { entry ->
-                    val parentEntry = remember(entry) {
-                        navController.getBackStackEntry(Screen.ONBOARDING.route)
-                    }
-                    val vm = hiltViewModel<OnboardingViewModel>(parentEntry)
-
-                    InputHabitScreen(
-                        viewModel = vm,
-                        onContinueClicked = { navController.navigate(Screen.WEATHER.route) },
-                        onBackClicked = { navController.popBackStack() }
-                    )
-                }
-
-                composable(Screen.WEATHER.route) { entry ->
-                    val parentEntry = remember(entry) {
-                        navController.getBackStackEntry(Screen.ONBOARDING.route)
-                    }
-                    val vm = hiltViewModel<OnboardingViewModel>(parentEntry)
-
-                    InputWeatherScreen(
-                        viewModel = vm,
-                        onContinueClicked = { navController.navigate(Screen.LOADING.route) },
-                        onBackClicked = { navController.popBackStack() }
-                    )
-                }
-
-                composable(Screen.LOADING.route) { entry ->
-                    val parentEntry = remember(entry) {
-                        navController.getBackStackEntry(Screen.ONBOARDING.route)
-                    }
-                    val vm = hiltViewModel<OnboardingViewModel>(parentEntry)
-
-                    LoadingResultScreen(
-                        viewModel = vm,
-                        onFinished = {
-                            navController.navigate(Screen.RESULT.route) {
-                                // Hapus loading biar gak bisa diback
-                                popUpTo(Screen.LOADING.route) { inclusive = true }
-                            }
-                        }
-                    )
-                }
-
-                composable(Screen.RESULT.route) { entry ->
-                    // Di sini kita masih butuh VM untuk nampilin data hasil kalkulasi
-                    val parentEntry = remember(entry) {
-                        navController.getBackStackEntry(Screen.ONBOARDING.route)
-                    }
-                    val vm = hiltViewModel<OnboardingViewModel>(parentEntry)
-
-                    ResultScreen(
-                        // Asumsi MainDailyGoalContainer menerima viewModel atau state dari VM
-                        viewModel = vm,
-                        onContinueToHome = {
-                            navController.navigate(Screen.HOME.route) {
-                                // Hapus seluruh graph onboarding dari backstack
-                                popUpTo(Screen.ONBOARDING.route) { inclusive = true }
-                            }
-                        }
-                    )
-                }
+                )
             }
 
-            // --- MAIN APP ---
+            composable(Screen.INPUT_HABIT.route) {
+                val vm = hiltViewModel<OnboardingViewModel>()
+                InputHabitScreen(
+                    viewModel = vm,
+                    onContinueClicked = {
+                        navController.navigate(Screen.INPUT_WEATHER.route)
+                    },
+                    onBackClicked = {
+                        navController.popBackStack()
+                    }
+                )
+            }
+
+            composable(Screen.INPUT_WEATHER.route) {
+                val vm = hiltViewModel<OnboardingViewModel>()
+                InputWeatherScreen(
+                    viewModel = vm,
+                    onContinueClicked = {
+                        navController.navigate(Screen.LOADING.route)
+                    },
+                    onBackClicked = {
+                        navController.popBackStack()
+                    }
+                )
+            }
+
+            composable(Screen.LOADING.route) {
+                val vm = hiltViewModel<OnboardingViewModel>()
+                LoadingResultScreen(
+                    viewModel = vm,
+                    onFinished = {
+                        navController.navigate(Screen.RESULT.route) {
+                            popUpTo(Screen.INPUT_PERSONAL.route) { inclusive = true }
+                        }
+                    }
+                )
+            }
+
+            composable(Screen.RESULT.route) {
+                val vm = hiltViewModel<OnboardingViewModel>()
+                ResultScreen(
+                    viewModel = vm,
+                    onContinueToHome = {
+                        navController.navigate(Screen.HOME.route) {
+                            popUpTo(Screen.RESULT.route) { inclusive = true }
+                        }
+                    }
+                )
+            }
+
+            // ================= MAIN =================
             composable(Screen.HOME.route) {
-                HomeScreen(
-                    onLogout = {
-                        navController.navigate(Screen.LOGIN.route) {
-                            popUpTo(Screen.HOME.route) { inclusive = true }
-                        }
-                    }
-                )
+                HomeScreen()
+            }
+
+            composable(Screen.HISTORY.route) {
+                HistoryScreen()
             }
 
             composable(Screen.PROFILE.route) {
                 ProfileScreen(
+                    onNavigateToMyProfile = {
+                        navController.navigate(Screen.MY_PROFILE.route)
+                    },
                     onLogoutSuccess = {
                         navController.navigate(Screen.LOGIN.route) {
                             popUpTo(0) { inclusive = true }
                         }
-                    },
-                    onNavigateToMyProfile = {
-                        navController.navigate(Screen.MY_PROFILE.route)
                     }
                 )
             }
@@ -222,10 +205,6 @@ fun RouteScreen() {
                         navController.popBackStack()
                     }
                 )
-            }
-
-            composable(Screen.HISTORY.route) {
-                HistoryScreen()
             }
         }
     }

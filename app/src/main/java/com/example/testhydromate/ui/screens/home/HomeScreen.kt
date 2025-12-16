@@ -15,23 +15,18 @@ import com.example.testhydromate.ui.components.*
 
 @Composable
 fun HomeScreen(
-    onLogout: () -> Unit,
+    onLogout: () -> Unit = {},
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val total by viewModel.totalDrink.collectAsState()
     val history by viewModel.history.collectAsState()
     val target by viewModel.dailyTarget.collectAsState()
 
-    // 1. Tambahkan state scroll
-    val scrollState = rememberScrollState()
-
     Box(modifier = Modifier.fillMaxSize()) {
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                // 2. Aktifkan scroll agar konten bisa naik turun
-                .verticalScroll(scrollState)
                 .padding(
                     top = 12.dp,
                     start = 16.dp,
@@ -42,7 +37,7 @@ fun HomeScreen(
         ) {
 
             // --- 1. Spacer Atas ---
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(62.dp))
 
             // ===== TITLE =====
             Text(
@@ -72,12 +67,10 @@ fun HomeScreen(
             Spacer(modifier = Modifier.height(20.dp))
 
             // ===== TODAY HISTORY =====
-            // HAPUS .weight(1f) agar tidak memaksa ukuran
-            // Biarkan ukurannya menyesuaikan konten (wrap content)
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(400.dp) // Berikan tinggi fix atau minHeight agar terlihat "card" panjang
+                    .height(600.dp) // Berikan tinggi fix atau minHeight agar terlihat "card" panjang
             ) {
                 TodayHistoryCard(
                     history = history,

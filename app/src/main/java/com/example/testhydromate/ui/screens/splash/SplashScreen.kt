@@ -24,7 +24,6 @@ import androidx.compose.ui.unit.sp
 import com.example.testhydromate.R
 import kotlinx.coroutines.delay
 
-
 @Composable
 fun SplashScreen(onFinished: () -> Unit) {
     LaunchedEffect(Unit) {

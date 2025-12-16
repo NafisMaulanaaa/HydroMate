@@ -35,15 +35,15 @@ fun HydroBottomBar(
 ) {
     Surface(
         modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp)
-            .padding(bottom = 35.dp)
-            .height(80.dp),
+            .width(320.dp)
+            .padding(horizontal = 16.dp)
+            .padding(bottom = 25.dp)
+            .height(64.dp),
         shape = RoundedCornerShape(120.dp),
         color = Color(0xffFBFBFB),
         shadowElevation = 12.dp
     ) {
-        // Kita butuh BoxWithConstraints untuk tahu lebar total agar bisa hitung offset gesernya
+
         BoxWithConstraints(
             modifier = Modifier
                 .fillMaxSize()
@@ -76,8 +76,8 @@ fun HydroBottomBar(
             ) {
                 Box(
                     modifier = Modifier
-                        .height(48.dp)
-                        .width(88.dp) // Ukuran fix pill biru
+                        .height(40.dp)
+                        .width(72.dp) // Ukuran fix pill biru
                         .background(
                             color = PrimaryBlue,
                             shape = RoundedCornerShape(24.dp)
@@ -150,14 +150,13 @@ private fun BottomItem(
             ),
         contentAlignment = Alignment.Center
     ) {
-        // HAPUS BACKGROUND DISINI (Sudah dipindah ke parent)
 
         // Icon
         Icon(
             imageVector = icon,
             contentDescription = null,
             tint = iconColor, // Gunakan animasi warna
-            modifier = Modifier.size(25.dp)
+            modifier = Modifier.size(22.dp)
         )
     }
 }

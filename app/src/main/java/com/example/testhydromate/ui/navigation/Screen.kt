@@ -1,15 +1,17 @@
 sealed class Screen(val route: String) {
     object SPLASH : Screen("splash")
     object LOGIN : Screen("login")
-    object ONBOARDING : Screen("onboarding")
-    object PERSONAL : Screen("personal")
-    object HABIT : Screen("habit")
-    object WEATHER : Screen("weather")
+
+    // onboarding
+    object INPUT_PERSONAL : Screen("input_personal")
+    object INPUT_HABIT : Screen("input_habit")
+    object INPUT_WEATHER : Screen("input_weather")
     object LOADING : Screen("loading")
     object RESULT : Screen("result")
-    object HOME : Screen("home")
-    object PROFILE : Screen("profile")
-    object HISTORY : Screen("history")
-    object MY_PROFILE : Screen("my_profile")
 
+    // main
+    object HOME : Screen("home")
+    object HISTORY : Screen("history")
+    object PROFILE : Screen("profile")
+    object MY_PROFILE : Screen("my_profile")
 }

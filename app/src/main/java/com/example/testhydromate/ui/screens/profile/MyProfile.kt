@@ -51,6 +51,9 @@ fun MyProfile(
                 ),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+
+            Spacer(modifier = Modifier.height(32.dp))
+
             // Top Bar with Back Button
             Row(
                 modifier = Modifier
@@ -69,7 +72,7 @@ fun MyProfile(
             }
 
             // Spacer Atas
-            Spacer(modifier = Modifier.height(32.dp))
+            //Spacer(modifier = Modifier.height(16.dp))
 
             // Title My Profile
             Text(
@@ -87,29 +90,12 @@ fun MyProfile(
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
             ) {
-                // Profile Image
-                item {
-                    Box(
-                        modifier = Modifier
-                            .size(73.dp)
-                            .clip(CircleShape)
-                            .background(Color(0xFFD9D9D9))
-                    )
-                }
-
                 // Basic Detail Section
                 item {
                     Column(
                         verticalArrangement = Arrangement.spacedBy(12.dp),
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text(
-                            text = "Basic Detail",
-                            color = Color.Black,
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.fillMaxWidth()
-                        )
 
                         // Full Name
                         InputField(
@@ -174,13 +160,6 @@ fun MyProfile(
                             label = "Email",
                             value = email,
                             onValueChange = { email = it }
-                        )
-
-                        // Phone Number
-                        InputField(
-                            label = "Phone number",
-                            value = phoneNumber,
-                            onValueChange = { phoneNumber = it }
                         )
                     }
                 }

@@ -32,8 +32,8 @@ import com.example.testhydromate.ui.components.PrimaryBlue
 
 @Composable
 fun LoginScreen(
-    onLoginSuccess: () -> Unit,
-    onRegisterSuccess: () -> Unit,
+    onLoginSuccess: () -> Unit = {},
+    onRegisterSuccess: () -> Unit = {},
     viewModel: AuthViewModel = hiltViewModel()
 ) {
     var isLogin by remember { mutableStateOf(true) }
@@ -356,3 +356,4 @@ fun AuthPreview() {
         )
     }
 }
+
