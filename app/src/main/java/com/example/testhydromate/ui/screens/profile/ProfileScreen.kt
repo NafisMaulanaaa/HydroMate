@@ -43,7 +43,7 @@ fun ProfileScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // Spacer Atas
-            Spacer(modifier = Modifier.height(72.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
             // Title Settings
             Text(
@@ -165,14 +165,14 @@ fun ProfileScreen(
                 onDismissRequest = { showLogoutDialog = false },
                 title = {
                     Text(
-                        text = "Logout",
+                        text = "Logout From HydroMate",
                         fontWeight = FontWeight.Bold,
                         fontSize = 20.sp
                     )
                 },
                 text = {
                     Text(
-                        text = "Apakah Anda yakin ingin logout?",
+                        text = "Are you sure want to logout?",
                         fontSize = 16.sp
                     )
                 },
@@ -196,7 +196,7 @@ fun ProfileScreen(
                             contentColor = Color.Gray
                         )
                     ) {
-                        Text("Batal")
+                        Text("Cancel")
                     }
                 },
                 shape = RoundedCornerShape(16.dp),

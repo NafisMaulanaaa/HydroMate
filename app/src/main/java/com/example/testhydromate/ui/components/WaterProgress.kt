@@ -1,10 +1,14 @@
 package com.example.testhydromate.ui.components
 
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -23,7 +27,16 @@ fun WaterProgress(
     current: Int,
     target: Int
 ) {
-    val progress = (current.toFloat() / target).coerceIn(0f, 1f)
+
+    // 🔥 ANIMATED PROGRESS
+    val animatedProgress by animateFloatAsState(
+        targetValue = (current.toFloat() / target).coerceIn(0f, 1f),
+        animationSpec = tween(
+            durationMillis = 800,
+            easing = FastOutSlowInEasing
+        ),
+        label = "water_progress"
+    )
 
     Box(
         contentAlignment = Alignment.Center,
@@ -33,44 +46,39 @@ fun WaterProgress(
     ) {
 
         Canvas(
-            modifier = Modifier
-                .size(240.dp)
+            modifier = Modifier.size(240.dp)
         ) {
             val strokeWidth = 26.dp.toPx()
             val arcSize = Size(size.width, size.height)
 
-            // Kita ingin total lengkungan 245 derajat.
-            // Agar simetris (tengahnya di atas/jam 12), kita mulai dari 147.5 derajat.
-            // Rumus: 270 (atas) - (TotalSudut / 2) -> 270 - 122.5 = 147.5
             val startAngleVal = 147.5f
             val sweepAngleVal = 245f
 
-            // background arc (abu-abu)
+            // Background arc
             drawArc(
                 color = Color(0xFFE0E0E0),
                 startAngle = startAngleVal,
                 sweepAngle = sweepAngleVal,
                 useCenter = false,
-                topLeft = Offset(0f, 0f),
+                topLeft = Offset.Zero,
                 size = arcSize,
                 style = Stroke(strokeWidth, cap = StrokeCap.Round)
             )
 
-            // progress arc (biru)
+            // Progress arc (SMOOTH)
             drawArc(
                 color = PrimaryBlue,
                 startAngle = startAngleVal,
-                sweepAngle = sweepAngleVal * progress, // Progress dikalikan 245 derajat
+                sweepAngle = sweepAngleVal * animatedProgress,
                 useCenter = false,
-                topLeft = Offset(0f, 0f),
+                topLeft = Offset.Zero,
                 size = arcSize,
                 style = Stroke(strokeWidth, cap = StrokeCap.Round)
             )
         }
 
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
             Spacer(Modifier.height(64.dp))
@@ -79,7 +87,7 @@ fun WaterProgress(
                 painter = painterResource(id = R.drawable.water),
                 contentDescription = null,
                 modifier = Modifier.size(90.dp),
-                tint = Color.Unspecified // <--- Gunakan ini agar warna asli gambar muncul
+                tint = Color.Unspecified
             )
 
             Spacer(Modifier.height(32.dp))

@@ -12,12 +12,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.sp
-import com.example.testhydromate.data.model.DrinkHistory
+import com.example.testhydromate.data.model.WaterLog
 import com.example.testhydromate.ui.utils.formatTime
 
 @Composable
 fun TodayHistoryCard(
-    history: List<DrinkHistory>,
+    history: List<WaterLog>,
     modifier: Modifier = Modifier
 ) {
     if (history.isEmpty()) {
@@ -34,14 +34,11 @@ fun TodayHistoryCard(
             .fillMaxWidth()
             .padding(16.dp),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.White
-        ),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
         border = BorderStroke(2.dp, Color.LightGray.copy(alpha = 0.5f))
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
 
-            // --- HEADER (DIAM / TIDAK SCROLL) ---
             Text(
                 text = "Today History",
                 fontSize = 18.sp,
@@ -50,10 +47,7 @@ fun TodayHistoryCard(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Menggunakan LazyColumn di sini agar hanya list ini yang scroll
-            LazyColumn(
-                modifier = Modifier.fillMaxWidth()
-            ) {
+            LazyColumn {
                 itemsIndexed(history) { index, item ->
                     Row(
                         modifier = Modifier
@@ -80,7 +74,6 @@ fun TodayHistoryCard(
                         )
                     }
 
-                    // Divider (kecuali item terakhir)
                     if (index < history.size - 1) {
                         HorizontalDivider(
                             thickness = 0.5.dp,

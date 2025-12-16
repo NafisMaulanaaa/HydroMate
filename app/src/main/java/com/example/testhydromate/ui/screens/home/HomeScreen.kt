@@ -42,7 +42,7 @@ fun HomeScreen(
         ) {
 
             // --- 1. Spacer Atas ---
-            Spacer(modifier = Modifier.height(72.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
             // ===== TITLE =====
             Text(
