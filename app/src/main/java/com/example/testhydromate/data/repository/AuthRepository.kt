@@ -76,4 +76,14 @@ class AuthRepository @Inject constructor(
         }
     }
 
+    suspend fun getUserProfile(): User? {
+        val userId = auth.currentUser?.uid ?: return null
+        return try {
+            val snapshot = firestore.collection("users").document(userId).get().await()
+            snapshot.toObject(User::class.java)
+        } catch (e: Exception) {
+            null
+        }
+    }
+
 }

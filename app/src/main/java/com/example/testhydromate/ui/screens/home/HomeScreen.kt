@@ -20,6 +20,7 @@ fun HomeScreen(
 ) {
     val total by viewModel.totalDrink.collectAsState()
     val history by viewModel.history.collectAsState()
+    val target by viewModel.dailyTarget.collectAsState()
 
     // 1. Tambahkan state scroll
     val scrollState = rememberScrollState()
@@ -56,7 +57,7 @@ fun HomeScreen(
 
             WaterProgress(
                 current = total,
-                target = viewModel.dailyTarget
+                target = target
             )
 
             Spacer(modifier = Modifier.height(32.dp))
