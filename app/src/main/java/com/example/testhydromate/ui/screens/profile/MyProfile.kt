@@ -1,5 +1,7 @@
 package com.example.testhydromate.ui.screens.profile
 
+import android.widget.Toast
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -38,6 +40,7 @@ fun MyProfile(
     var selectedGender by remember { mutableStateOf("Male") }
     var email by remember { mutableStateOf("Cecepknalpot@gmail.com") }
     var phoneNumber by remember { mutableStateOf("") }
+    val context = LocalContext.current
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -179,7 +182,13 @@ fun MyProfile(
                             .clickable(
                                 interactionSource = remember { MutableInteractionSource() },
                                 indication = null
-                            ) { /* Save action */ }
+                            ) {
+                                Toast.makeText(
+                                    context,
+                                    "Your Information has been saved.",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
                             .padding(16.dp)
                     ) {
                         Text(

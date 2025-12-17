@@ -14,6 +14,9 @@ sealed class Screen(val route: String) {
     object HISTORY : Screen("history")
     object PROFILE : Screen("profile")
     object MY_PROFILE : Screen("my_profile")
+
+    object NOTIFICATIONS : Screen("notifications")
+
 }
 
 data class Route(val route: String)

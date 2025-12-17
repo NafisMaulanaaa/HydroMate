@@ -21,6 +21,7 @@ import com.example.testhydromate.ui.screens.home.HomeScreen
 import com.example.testhydromate.ui.screens.home.ResultScreen
 import com.example.testhydromate.ui.screens.onboarding.*
 import com.example.testhydromate.ui.screens.profile.MyProfile
+import com.example.testhydromate.ui.screens.profile.NotificationsScreen
 import com.example.testhydromate.ui.screens.profile.ProfileScreen
 import com.example.testhydromate.ui.screens.splash.SplashScreen
 import com.example.testhydromate.ui.screens.splash.SplashViewModel
@@ -175,12 +176,16 @@ fun RouteScreen() {
                     onNavigateToMyProfile = {
                         navController.navigate(Screen.MY_PROFILE.route)
                     },
+                    onNavigateToNotifications = {
+                        navController.navigate(Screen.NOTIFICATIONS.route)
+                    },
                     onLogoutSuccess = {
                         navController.navigate(Screen.LOGIN.route) {
                             popUpTo(0)
                         }
                     }
                 )
+
             }
 
             composable(Screen.MY_PROFILE.route) {
@@ -188,6 +193,12 @@ fun RouteScreen() {
                     onBackClick = { navController.popBackStack() }
                 )
             }
+            composable(Screen.NOTIFICATIONS.route) {
+                NotificationsScreen(
+                    onBackClick = { navController.popBackStack() }
+                )
+            }
+
         }
     }
 }

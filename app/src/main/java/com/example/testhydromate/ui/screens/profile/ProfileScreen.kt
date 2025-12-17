@@ -20,10 +20,12 @@ import com.example.testhydromate.ui.components.PrimaryBlue
 
 @Composable
 fun ProfileScreen(
-    onLogoutSuccess: () -> Unit = {},          // ✅ FIX
-    onNavigateToMyProfile: () -> Unit = {},    // ✅ FIX
+    onLogoutSuccess: () -> Unit = {},
+    onNavigateToMyProfile: () -> Unit = {},
+    onNavigateToNotifications: () -> Unit = {},
     viewModel: ProfileViewModel = hiltViewModel()
-) {
+)
+ {
     var showLogoutDialog by remember { mutableStateOf(false) }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -80,9 +82,17 @@ fun ProfileScreen(
                 // ===== NOTIFICATIONS =====
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null
+                        ) {
+                            onNavigateToNotifications()
+                        }
                 ) {
-                    Image(
+
+                Image(
                         painter = painterResource(R.drawable.icon_notif),
                         contentDescription = null,
                         modifier = Modifier.size(24.dp)
