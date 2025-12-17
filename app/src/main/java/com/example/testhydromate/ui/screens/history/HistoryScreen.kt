@@ -1,23 +1,29 @@
 package com.example.testhydromate.ui.screens.history
 
+import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.testhydromate.data.model.WaterLog
+import com.example.testhydromate.ui.components.EditWaterBottomSheet
 import com.example.testhydromate.ui.components.PrimaryBlue
 import java.text.SimpleDateFormat
 import java.util.*
@@ -27,93 +33,161 @@ fun HistoryScreen(
     viewModel: HistoryViewModel = hiltViewModel()
 ) {
     val logs by viewModel.waterLogs.collectAsState()
+    val context = LocalContext.current
+
+    var selectedLogToDelete by remember { mutableStateOf<WaterLog?>(null) }
+    var selectedLogToEdit by remember { mutableStateOf<WaterLog?>(null) }
 
     val groupedLogs = logs.groupBy {
         SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
             .format(Date(it.timestamp))
     }
 
+    // ===== DELETE DIALOG =====
+    selectedLogToDelete?.let { log ->
+        val time = SimpleDateFormat("HH:mm", Locale.getDefault())
+            .format(Date(log.timestamp))
+
+        AlertDialog(
+            onDismissRequest = { selectedLogToDelete = null },
+            title = { Text("Delete history?") },
+            text = { Text("Delete drink at $time ?") },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.deleteLog(log)
+                    Toast.makeText(
+                        context,
+                        "Deleted drink at $time",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    selectedLogToDelete = null
+                }) {
+                    Text("Delete", color = Color.Red)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { selectedLogToDelete = null }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
+    // ===== EDIT BOTTOM SHEET =====
+    selectedLogToEdit?.let { log ->
+        EditWaterBottomSheet(
+            log = log,
+            onDismiss = { selectedLogToEdit = null },
+            onSave = { updated ->
+                viewModel.updateLog(updated)
+                selectedLogToEdit = null
+            }
+        )
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(
-                top = 12.dp,
-                start = 16.dp,
-                end = 16.dp,
-                bottom = 100.dp // ruang aman navbar (dari route)
-            )
+            .background(Color.White)
     ) {
 
-        // --- 1. Spacer Atas ---
-        Spacer(modifier = Modifier.height(62.dp))
+        // HEADER
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 74.dp, bottom = 32.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                "History",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                color = PrimaryBlue
+            )
+        }
 
-        // ===== TITLE =====
-        Text(
-            text = "History",
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            color = PrimaryBlue,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        )
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        // ===== HISTORY LIST =====
         LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(bottom = 40.dp)
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp),
+            contentPadding = PaddingValues(bottom = 16.dp)
         ) {
 
             groupedLogs.forEach { (date, items) ->
-
                 item {
-                    Text(
-                        text = formatDateHeader(date),
-                        fontSize = 13.sp,
-                        color = Color.Gray,
-                        modifier = Modifier.padding(vertical = 8.dp)
+                    HistoryDateCard(
+                        date = date,
+                        logs = items,
+                        onDeleteClick = { selectedLogToDelete = it },
+                        onEditClick = { selectedLogToEdit = it }
                     )
                 }
-
-                item {
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(16.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = Color(0xFFF7F7F7)
-                        )
-                    ) {
-                        Column {
-                            items.forEachIndexed { index, log ->
-                                HistoryItem(log)
-                                if (index != items.lastIndex) {
-                                    Divider(
-                                        modifier = Modifier.padding(start = 72.dp),
-                                        color = Color(0xFFE0E0E0)
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-
-                item { Spacer(modifier = Modifier.height(16.dp)) }
+                item { Spacer(Modifier.height(20.dp)) }
             }
         }
     }
 }
 
 @Composable
-private fun HistoryItem(log: WaterLog) {
+fun HistoryDateCard(
+    date: String,
+    logs: List<WaterLog>,
+    onDeleteClick: (WaterLog) -> Unit,
+    onEditClick: (WaterLog) -> Unit
+) {
+    Column {
 
-    val timeFormat = remember {
-        SimpleDateFormat("HH:mm", Locale.getDefault())
+        Text(
+            formatDateHeader(date),
+            fontSize = 13.sp,
+            color = Color.Gray,
+            modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
+        )
+
+        Card(
+            shape = RoundedCornerShape(16.dp),
+            border = BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.4f)),
+            colors = CardDefaults.cardColors(
+                containerColor = Color.White
+            )
+        ) {
+            Column {
+                logs.forEachIndexed { index, log ->
+                    HistoryItem(
+                        log = log,
+                        onDeleteClick = onDeleteClick,
+                        onEditClick = onEditClick
+                    )
+
+                    if (index < logs.lastIndex) {
+                        Divider(
+                            modifier = Modifier.padding(start = 72.dp),
+                            color = Color.LightGray.copy(alpha = 0.5f)
+                        )
+                    }
+                }
+            }
+        }
     }
+}
+
+@Composable
+fun HistoryItem(
+    log: WaterLog,
+    onDeleteClick: (WaterLog) -> Unit,
+    onEditClick: (WaterLog) -> Unit
+) {
+    val time = remember {
+        SimpleDateFormat("HH:mm", Locale.getDefault())
+            .format(Date(log.timestamp))
+    }
+
+    var showMenu by remember { mutableStateOf(false) }
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(12.dp),
+            .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
 
@@ -123,50 +197,67 @@ private fun HistoryItem(log: WaterLog) {
                 .background(Color.LightGray, CircleShape)
         )
 
-        Spacer(modifier = Modifier.width(12.dp))
+        Spacer(Modifier.width(12.dp))
 
-        Column(
-            modifier = Modifier.weight(1f)
-        ) {
-            Text(
-                text = "Water",
-                fontWeight = FontWeight.Medium
-            )
-            Text(
-                text = timeFormat.format(Date(log.timestamp)),
-                fontSize = 12.sp,
-                color = Color.Gray
-            )
+        Column(Modifier.weight(1f)) {
+            Text("Water", fontWeight = FontWeight.Medium)
+            Text(time, fontSize = 12.sp, color = Color.Gray)
         }
 
-        Text(
-            text = "${log.amount} mL",
-            fontWeight = FontWeight.Medium
-        )
+        Text("${log.amount} mL", fontWeight = FontWeight.Medium)
 
-        Icon(
-            imageVector = Icons.Default.MoreVert,
-            contentDescription = null,
-            tint = Color.Gray,
-            modifier = Modifier.padding(start = 8.dp)
-        )
+        Box {
+            IconButton(onClick = { showMenu = true }) {
+                Icon(Icons.Default.MoreVert, null)
+            }
+
+            DropdownMenu(
+                expanded = showMenu,
+                onDismissRequest = { showMenu = false }
+            ) {
+
+                DropdownMenuItem(
+                    leadingIcon = {
+                        Icon(Icons.Outlined.Edit, null)
+                    },
+                    text = { Text("Edit") },
+                    onClick = {
+                        showMenu = false
+                        onEditClick(log)
+                    }
+                )
+
+                DropdownMenuItem(
+                    leadingIcon = {
+                        Icon(Icons.Outlined.Delete, null, tint = Color.Red)
+                    },
+                    text = { Text("Delete", color = Color.Red) },
+                    onClick = {
+                        showMenu = false
+                        onDeleteClick(log)
+                    }
+                )
+            }
+        }
     }
 }
 
-
-private fun formatDateHeader(date: String): String {
+fun formatDateHeader(date: String): String {
     val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
     val dateObj = sdf.parse(date) ?: return date
 
     val today = sdf.format(Date())
-    val cal = Calendar.getInstance().apply {
-        add(Calendar.DAY_OF_YEAR, -1)
-    }
-    val yesterday = sdf.format(cal.time)
+    val yesterday = sdf.format(
+        Calendar.getInstance().apply {
+            add(Calendar.DAY_OF_YEAR, -1)
+        }.time
+    )
 
     return when (date) {
         today -> "Today"
         yesterday -> "Yesterday"
-        else -> SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(dateObj)
+        else -> SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
+            .format(dateObj)
     }
 }
+

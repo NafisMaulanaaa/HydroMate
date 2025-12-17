@@ -34,16 +34,25 @@ private val ButtonCancelBg = Color(0xFFE3F2FD)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ResultScreen(
-    viewModel: OnboardingViewModel, // <-- TERIMA VIEWMODEL
+    viewModel: OnboardingViewModel,
     onContinueToHome: () -> Unit
 ) {
-
     var showBottomSheet by remember { mutableStateOf(false) }
 
-    var goalValue by remember(viewModel.dailyGoal) { mutableStateOf(viewModel.dailyGoal.toString()) }
-    var tempGoalValue by remember { mutableStateOf(goalValue) }
+    // 🔥 SOURCE OF TRUTH
+    val goalValue = viewModel.dailyGoal.toString()
 
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    // TEMP STATE BUAT EDIT
+    var tempGoalValue by remember { mutableStateOf("") }
+
+    // Sync temp state saat dailyGoal berubah
+    LaunchedEffect(viewModel.dailyGoal) {
+        tempGoalValue = viewModel.dailyGoal.toString()
+    }
+
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true
+    )
 
     Scaffold(
         containerColor = Color.White,
@@ -87,7 +96,8 @@ fun ResultScreen(
                 onValueChange = { tempGoalValue = it },
                 onCancel = { showBottomSheet = false },
                 onSave = {
-                    goalValue = tempGoalValue
+                    val newGoal = tempGoalValue.toIntOrNull() ?: return@EditGoalSheetContent
+                    viewModel.updateManualGoal(newGoal) // 🔥 UPDATE VIEWMODEL
                     showBottomSheet = false
                 }
             )
@@ -98,9 +108,7 @@ fun ResultScreen(
     }
 }
 
-// ==============================
 // MAIN SCREEN
-// ==============================
 @Composable
 fun DailyGoalMainScreen(
     modifier: Modifier = Modifier,
@@ -278,10 +286,10 @@ fun EditGoalSheetContent(
     }
 }
 
-@Preview(showBackground = true, widthDp = 390, heightDp = 844)
-@Composable
-fun MainDailyGoalPreview() {
+//@Preview(showBackground = true, widthDp = 390, heightDp = 844)
+//Composable
+//fun MainDailyGoalPreview() {
 //    ResultScreen(
 //        onContinueToHome = {}
 //    )
-}
+//}

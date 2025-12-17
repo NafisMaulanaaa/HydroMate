@@ -15,3 +15,5 @@ sealed class Screen(val route: String) {
     object PROFILE : Screen("profile")
     object MY_PROFILE : Screen("my_profile")
 }
+
+data class Route(val route: String)

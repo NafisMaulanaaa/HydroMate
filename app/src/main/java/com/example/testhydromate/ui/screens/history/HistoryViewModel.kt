@@ -28,4 +28,17 @@ class HistoryViewModel @Inject constructor(
             _waterLogs.value = repository.getAllHistory()
         }
     }
+
+    fun deleteLog(log: WaterLog) {
+        viewModelScope.launch {
+            repository.deleteLog(log.id)
+            _waterLogs.value = _waterLogs.value.filterNot { it.id == log.id }
+        }
+    }
+
+    fun updateLog(log: WaterLog) {
+        viewModelScope.launch {
+            repository.updateLog(log)
+        }
+    }
 }

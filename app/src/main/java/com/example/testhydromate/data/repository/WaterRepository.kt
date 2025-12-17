@@ -68,4 +68,32 @@ class WaterRepository @Inject constructor(
             )
         }
     }
+
+    class WaterRepository @Inject constructor(
+        private val firestore: FirebaseFirestore
+    ) {
+
+        suspend fun deleteLog(logId: String) {
+            firestore
+                .collection("water_logs")
+                .document(logId)
+                .delete()
+                .await()
+        }
+    }
+
+    suspend fun deleteLog(logId: String) {
+        firestore
+            .collection("water_logs")
+            .document(logId)
+            .delete()
+            .await()
+    }
+
+    suspend fun updateLog(log: WaterLog) {
+        firestore
+            .collection("water_logs")
+            .document(log.id)
+            .set(log)
+    }
 }

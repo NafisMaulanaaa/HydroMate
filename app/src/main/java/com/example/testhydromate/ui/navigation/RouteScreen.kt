@@ -1,3 +1,5 @@
+@file:Suppress("UnusedMaterial3ScaffoldPaddingParameter")
+
 package com.example.testhydromate.ui.navigation
 
 import androidx.compose.foundation.layout.Box
@@ -55,52 +57,44 @@ fun RouteScreen() {
                         onHome = {
                             navController.navigate(Screen.HOME.route) {
                                 launchSingleTop = true
-                                restoreState = true
                             }
                         },
                         onHistory = {
                             navController.navigate(Screen.HISTORY.route) {
                                 launchSingleTop = true
-                                restoreState = true
                             }
                         },
                         onProfile = {
                             navController.navigate(Screen.PROFILE.route) {
                                 launchSingleTop = true
-                                restoreState = true
                             }
                         }
                     )
                 }
             }
         }
-    ) {
+    ) { _ ->   // 🔥 SENGAJA DI-IGNORE → floating bottom bar, NO WARNING
 
         NavHost(
             navController = navController,
             startDestination = Screen.SPLASH.route
         ) {
 
-            // ================= SPLASH =================
+            // ===== SPLASH =====
             composable(Screen.SPLASH.route) {
                 val vm = hiltViewModel<SplashViewModel>()
-
                 SplashScreen(
                     onFinished = {
-                        val destination = if (vm.isUserLoggedIn()) {
-                            Screen.HOME.route
-                        } else {
-                            Screen.LOGIN.route
-                        }
-
-                        navController.navigate(destination) {
+                        navController.navigate(
+                            if (vm.isUserLoggedIn()) Screen.HOME.route else Screen.LOGIN.route
+                        ) {
                             popUpTo(Screen.SPLASH.route) { inclusive = true }
                         }
                     }
                 )
             }
 
-            // ================= AUTH =================
+            // ===== AUTH =====
             composable(Screen.LOGIN.route) {
                 LoginScreen(
                     onLoginSuccess = {
@@ -116,7 +110,7 @@ fun RouteScreen() {
                 )
             }
 
-            // ================= ONBOARDING =================
+            // ===== ONBOARDING =====
             composable(Screen.INPUT_PERSONAL.route) {
                 val vm = hiltViewModel<OnboardingViewModel>()
                 InputPersonalScreen(
@@ -134,9 +128,7 @@ fun RouteScreen() {
                     onContinueClicked = {
                         navController.navigate(Screen.INPUT_WEATHER.route)
                     },
-                    onBackClicked = {
-                        navController.popBackStack()
-                    }
+                    onBackClicked = { navController.popBackStack() }
                 )
             }
 
@@ -147,9 +139,7 @@ fun RouteScreen() {
                     onContinueClicked = {
                         navController.navigate(Screen.LOADING.route)
                     },
-                    onBackClicked = {
-                        navController.popBackStack()
-                    }
+                    onBackClicked = { navController.popBackStack() }
                 )
             }
 
@@ -158,9 +148,8 @@ fun RouteScreen() {
                 LoadingResultScreen(
                     viewModel = vm,
                     onFinished = {
-                        navController.navigate(Screen.RESULT.route) {
-                            popUpTo(Screen.INPUT_PERSONAL.route) { inclusive = true }
-                        }
+                        vm.submitOnboarding()
+                        navController.navigate(Screen.RESULT.route)
                     }
                 )
             }
@@ -177,14 +166,9 @@ fun RouteScreen() {
                 )
             }
 
-            // ================= MAIN =================
-            composable(Screen.HOME.route) {
-                HomeScreen()
-            }
-
-            composable(Screen.HISTORY.route) {
-                HistoryScreen()
-            }
+            // ===== MAIN =====
+            composable(Screen.HOME.route) { HomeScreen() }
+            composable(Screen.HISTORY.route) { HistoryScreen() }
 
             composable(Screen.PROFILE.route) {
                 ProfileScreen(
@@ -193,7 +177,7 @@ fun RouteScreen() {
                     },
                     onLogoutSuccess = {
                         navController.navigate(Screen.LOGIN.route) {
-                            popUpTo(0) { inclusive = true }
+                            popUpTo(0)
                         }
                     }
                 )
@@ -201,9 +185,7 @@ fun RouteScreen() {
 
             composable(Screen.MY_PROFILE.route) {
                 MyProfile(
-                    onBackClick = {
-                        navController.popBackStack()
-                    }
+                    onBackClick = { navController.popBackStack() }
                 )
             }
         }

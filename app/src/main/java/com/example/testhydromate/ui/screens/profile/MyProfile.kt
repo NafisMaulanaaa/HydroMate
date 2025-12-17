@@ -31,7 +31,7 @@ import com.example.testhydromate.ui.components.PrimaryBlue
 
 @Composable
 fun MyProfile(
-    onBackClick: () -> Unit = {},
+    onBackClick: () -> Unit,
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
     var fullName by remember { mutableStateOf("Cecep Knalpot") }

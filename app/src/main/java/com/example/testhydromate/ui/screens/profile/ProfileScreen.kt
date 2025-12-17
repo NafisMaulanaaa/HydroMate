@@ -143,6 +143,7 @@ fun ProfileScreen(
                     TextButton(
                         onClick = {
                             showLogoutDialog = false
+                            viewModel.logout()
                             onLogoutSuccess()
                         },
                         colors = ButtonDefaults.textButtonColors(
