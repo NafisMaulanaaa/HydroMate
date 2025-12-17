@@ -23,9 +23,9 @@ fun ProfileScreen(
     onLogoutSuccess: () -> Unit = {},
     onNavigateToMyProfile: () -> Unit = {},
     onNavigateToNotifications: () -> Unit = {},
+    onNavigateToAboutApp: () -> Unit = {},
     viewModel: ProfileViewModel = hiltViewModel()
-)
- {
+) {
     var showLogoutDialog by remember { mutableStateOf(false) }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -91,8 +91,7 @@ fun ProfileScreen(
                             onNavigateToNotifications()
                         }
                 ) {
-
-                Image(
+                    Image(
                         painter = painterResource(R.drawable.icon_notif),
                         contentDescription = null,
                         modifier = Modifier.size(24.dp)
@@ -101,10 +100,15 @@ fun ProfileScreen(
                     Text("Notifications", fontSize = 16.sp)
                 }
 
-                // ===== ABOUT =====
+                // ===== ABOUT APP =====
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null
+                        ) { onNavigateToAboutApp() }
                 ) {
                     Image(
                         painter = painterResource(R.drawable.icon_info),

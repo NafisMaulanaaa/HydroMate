@@ -1,3 +1,5 @@
+package com.example.testhydromate.ui.navigation
+
 sealed class Screen(val route: String) {
     object SPLASH : Screen("splash")
     object LOGIN : Screen("login")
@@ -14,9 +16,9 @@ sealed class Screen(val route: String) {
     object HISTORY : Screen("history")
     object PROFILE : Screen("profile")
     object MY_PROFILE : Screen("my_profile")
-
     object NOTIFICATIONS : Screen("notifications")
-
+    object ABOUT_APP : Screen("about_app")
+    object PRIVACY_POLICY : Screen("privacy_policy")
 }
 
 data class Route(val route: String)
