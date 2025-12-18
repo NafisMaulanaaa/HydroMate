@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -17,17 +18,22 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.testhydromate.R
-import com.example.testhydromate.data.model.WaterLog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditWaterBottomSheet(
-    log: WaterLog,
+fun AdjustDrinkAmountBottomSheet(
+    initialAmount: Int,
     onDismiss: () -> Unit,
-    onSave: (WaterLog) -> Unit
+    onSave: (Int) -> Unit
 ) {
-    var amountText by remember { mutableStateOf(log.amount.toString()) }
+    // 1. Inisialisasi state
+    var amountText by remember { mutableStateOf(initialAmount.toString()) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    // 2. PENTING: Jika initialAmount berubah dari server, update text field-nya
+    LaunchedEffect(initialAmount) {
+        amountText = initialAmount.toString()
+    }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -42,19 +48,16 @@ fun EditWaterBottomSheet(
                 .padding(bottom = 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            /* ===== TITLE ===== */
             Text(
-                text = "Edit Water Intake",
+                text = "Set Drink Amount",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(vertical = 16.dp)
             )
 
-            HorizontalDivider(color = Color(0xFFF0F0F0), thickness = 1.dp)
-
+            HorizontalDivider(color = Color(0xFFF0F0F0))
             Spacer(Modifier.height(32.dp))
 
-            /* ===== ICON ===== */
             Image(
                 painter = painterResource(id = R.drawable.water),
                 contentDescription = null,
@@ -63,53 +66,45 @@ fun EditWaterBottomSheet(
 
             Spacer(Modifier.height(32.dp))
 
-            /* ===== INPUT BOX (Presisi Tengah & Baseline) ===== */
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 24.dp)
-                    .height(90.dp) // Box tetap tinggi
-                    .background(color = Color(0xFFF8F9FA), shape = RoundedCornerShape(16.dp)),
-                contentAlignment = Alignment.Center // Memastikan Row tepat di tengah Box
+                    .height(90.dp)
+                    .background(Color(0xFFF8F9FA), RoundedCornerShape(16.dp)),
+                contentAlignment = Alignment.Center
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically, // Row-nya di tengah Box
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    androidx.compose.foundation.text.BasicTextField(
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    BasicTextField(
                         value = amountText,
-                        onValueChange = { if (it.length <= 4) amountText = it.filter { c -> c.isDigit() } },
+                        onValueChange = {
+                            // Hanya izinkan angka, max 4 digit, dan tidak boleh diawali 0 jika lebih dari 1 digit
+                            if (it.all { char -> char.isDigit() } && it.length <= 4) {
+                                amountText = it
+                            }
+                        },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         textStyle = androidx.compose.ui.text.TextStyle(
                             fontSize = 44.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF1976D2), // Ganti ke PrimaryBlue milikmu
+                            color = PrimaryBlue, // Pastikan warna ini terdefinisi
                             textAlign = TextAlign.Center
                         ),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        modifier = Modifier
-                            .width(IntrinsicSize.Min)
-                            .alignByBaseline() // Kunci pertama
+                        modifier = Modifier.width(IntrinsicSize.Min)
                     )
-
                     Spacer(Modifier.width(8.dp))
-
-                    Text(
-                        text = "mL",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color.Gray,
-                        modifier = Modifier.alignByBaseline() // Kunci kedua: Sejajar bawah dengan angka
-                    )
+                    Text(text = "mL", fontSize = 18.sp, color = Color.Gray)
                 }
             }
 
             Spacer(Modifier.height(40.dp))
-            HorizontalDivider(color = Color(0xFFF0F0F0), thickness = 1.dp, modifier = Modifier.padding(horizontal = 24.dp))
+            HorizontalDivider(color = Color(0xFFF0F0F0))
             Spacer(Modifier.height(24.dp))
 
-            /* ===== BUTTONS ===== */
             Row(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Button(
@@ -119,8 +114,7 @@ fun EditWaterBottomSheet(
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xFFE3F2FD),
                         contentColor = PrimaryBlue
-                    ),
-                    elevation = null
+                    )
                 ) {
                     Text("Cancel", fontWeight = FontWeight.Bold)
                 }
@@ -128,8 +122,13 @@ fun EditWaterBottomSheet(
                 Button(
                     modifier = Modifier.weight(1f).height(56.dp),
                     onClick = {
-                        val amount = amountText.toIntOrNull()
-                        if (amount != null) onSave(log.copy(amount = amount))
+                        // 3. Validasi angka sebelum dikirim
+                        val finalAmount = amountText.toIntOrNull() ?: 0
+                        if (finalAmount > 0) {
+                            onSave(finalAmount)
+                        } else {
+                            // Opsi: Berikan toast jika 0
+                        }
                     },
                     shape = RoundedCornerShape(28.dp),
                     colors = ButtonDefaults.buttonColors(

@@ -5,7 +5,6 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -21,6 +20,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.testhydromate.data.model.WaterLog
 import com.example.testhydromate.ui.components.EditWaterBottomSheet
@@ -35,52 +35,38 @@ fun HistoryScreen(
     val logs by viewModel.waterLogs.collectAsState()
     val context = LocalContext.current
 
-    var selectedLogToDelete by remember { mutableStateOf<WaterLog?>(null) }
-    var selectedLogToEdit by remember { mutableStateOf<WaterLog?>(null) }
+    var selectedDelete by remember { mutableStateOf<WaterLog?>(null) }
+    var selectedEdit by remember { mutableStateOf<WaterLog?>(null) }
 
     val groupedLogs = logs.groupBy {
         SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
             .format(Date(it.timestamp))
     }
 
-    // ===== DELETE DIALOG =====
-    selectedLogToDelete?.let { log ->
+    // ===== MATURE DELETE DIALOG =====
+    selectedDelete?.let { log ->
         val time = SimpleDateFormat("HH:mm", Locale.getDefault())
             .format(Date(log.timestamp))
 
-        AlertDialog(
-            onDismissRequest = { selectedLogToDelete = null },
-            title = { Text("Delete history?") },
-            text = { Text("Delete drink at $time ?") },
-            confirmButton = {
-                TextButton(onClick = {
-                    viewModel.deleteLog(log)
-                    Toast.makeText(
-                        context,
-                        "Deleted drink at $time",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    selectedLogToDelete = null
-                }) {
-                    Text("Delete", color = Color.Red)
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { selectedLogToDelete = null }) {
-                    Text("Cancel")
-                }
+        ConfirmDeleteDialog(
+            time = time,
+            onCancel = { selectedDelete = null },
+            onConfirm = {
+                viewModel.deleteLog(log)
+                showDeleteToast(context, time)
+                selectedDelete = null
             }
         )
     }
 
-    // ===== EDIT BOTTOM SHEET =====
-    selectedLogToEdit?.let { log ->
+    // ===== EDIT SHEET =====
+    selectedEdit?.let { log ->
         EditWaterBottomSheet(
             log = log,
-            onDismiss = { selectedLogToEdit = null },
-            onSave = { updated ->
-                viewModel.updateLog(updated)
-                selectedLogToEdit = null
+            onDismiss = { selectedEdit = null },
+            onSave = {
+                viewModel.updateLog(it)
+                selectedEdit = null
             }
         )
     }
@@ -99,7 +85,7 @@ fun HistoryScreen(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                "History",
+                text = "History",
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 color = PrimaryBlue
@@ -110,7 +96,7 @@ fun HistoryScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 16.dp),
-            contentPadding = PaddingValues(bottom = 16.dp)
+            contentPadding = PaddingValues(bottom = 24.dp)
         ) {
 
             groupedLogs.forEach { (date, items) ->
@@ -118,8 +104,8 @@ fun HistoryScreen(
                     HistoryDateCard(
                         date = date,
                         logs = items,
-                        onDeleteClick = { selectedLogToDelete = it },
-                        onEditClick = { selectedLogToEdit = it }
+                        onEdit = { selectedEdit = it },
+                        onDelete = { selectedDelete = it }
                     )
                 }
                 item { Spacer(Modifier.height(20.dp)) }
@@ -128,17 +114,19 @@ fun HistoryScreen(
     }
 }
 
+/* ================= DATE CARD ================= */
+
 @Composable
 fun HistoryDateCard(
     date: String,
     logs: List<WaterLog>,
-    onDeleteClick: (WaterLog) -> Unit,
-    onEditClick: (WaterLog) -> Unit
+    onEdit: (WaterLog) -> Unit,
+    onDelete: (WaterLog) -> Unit
 ) {
     Column {
 
         Text(
-            formatDateHeader(date),
+            text = formatDateHeader(date),
             fontSize = 13.sp,
             color = Color.Gray,
             modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
@@ -147,22 +135,20 @@ fun HistoryDateCard(
         Card(
             shape = RoundedCornerShape(16.dp),
             border = BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.4f)),
-            colors = CardDefaults.cardColors(
-                containerColor = Color.White
-            )
+            colors = CardDefaults.cardColors(containerColor = Color.White)
         ) {
             Column {
                 logs.forEachIndexed { index, log ->
                     HistoryItem(
                         log = log,
-                        onDeleteClick = onDeleteClick,
-                        onEditClick = onEditClick
+                        onEdit = onEdit,
+                        onDelete = onDelete
                     )
 
                     if (index < logs.lastIndex) {
                         Divider(
                             modifier = Modifier.padding(start = 72.dp),
-                            color = Color.LightGray.copy(alpha = 0.5f)
+                            color = Color.LightGray.copy(alpha = 0.4f)
                         )
                     }
                 }
@@ -171,18 +157,19 @@ fun HistoryDateCard(
     }
 }
 
+/* ================= ITEM ================= */
 @Composable
 fun HistoryItem(
     log: WaterLog,
-    onDeleteClick: (WaterLog) -> Unit,
-    onEditClick: (WaterLog) -> Unit
+    onEdit: (WaterLog) -> Unit,
+    onDelete: (WaterLog) -> Unit
 ) {
     val time = remember {
         SimpleDateFormat("HH:mm", Locale.getDefault())
             .format(Date(log.timestamp))
     }
 
-    var showMenu by remember { mutableStateOf(false) }
+    var menuOpen by remember { mutableStateOf(false) }
 
     Row(
         modifier = Modifier
@@ -191,10 +178,12 @@ fun HistoryItem(
         verticalAlignment = Alignment.CenterVertically
     ) {
 
-        Box(
+        androidx.compose.foundation.Image(
+            painter = androidx.compose.ui.res.painterResource(id = com.example.testhydromate.R.drawable.water),
+            contentDescription = null,
             modifier = Modifier
                 .size(40.dp)
-                .background(Color.LightGray, CircleShape)
+                .padding(4.dp)
         )
 
         Spacer(Modifier.width(12.dp))
@@ -207,34 +196,42 @@ fun HistoryItem(
         Text("${log.amount} mL", fontWeight = FontWeight.Medium)
 
         Box {
-            IconButton(onClick = { showMenu = true }) {
-                Icon(Icons.Default.MoreVert, null)
+            IconButton(onClick = { menuOpen = true }) {
+                Icon(Icons.Default.MoreVert, contentDescription = null)
             }
 
             DropdownMenu(
-                expanded = showMenu,
-                onDismissRequest = { showMenu = false }
+                expanded = menuOpen,
+                onDismissRequest = { menuOpen = false },
+                shape = RoundedCornerShape(12.dp),
+                containerColor = Color.White,
+                tonalElevation = 8.dp
             ) {
 
                 DropdownMenuItem(
                     leadingIcon = {
-                        Icon(Icons.Outlined.Edit, null)
+                        Icon(Icons.Outlined.Edit, null, tint = Color.Black)
                     },
                     text = { Text("Edit") },
                     onClick = {
-                        showMenu = false
-                        onEditClick(log)
+                        menuOpen = false
+                        onEdit(log)
                     }
                 )
 
                 DropdownMenuItem(
                     leadingIcon = {
-                        Icon(Icons.Outlined.Delete, null, tint = Color.Red)
+                        Icon(Icons.Outlined.Delete, null, tint = Color(0xFFD32F2F))
                     },
-                    text = { Text("Delete", color = Color.Red) },
+                    text = {
+                        Text(
+                            "Delete",
+                            color = Color(0xFFD32F2F)
+                        )
+                    },
                     onClick = {
-                        showMenu = false
-                        onDeleteClick(log)
+                        menuOpen = false
+                        onDelete(log)
                     }
                 )
             }
@@ -242,6 +239,77 @@ fun HistoryItem(
     }
 }
 
+/* ================= MATURE DELETE DIALOG ================= */
+@Composable
+fun ConfirmDeleteDialog(
+    time: String,
+    onCancel: () -> Unit,
+    onConfirm: () -> Unit
+) {
+    Dialog(onDismissRequest = onCancel) {
+        Surface(
+            shape = RoundedCornerShape(16.dp),
+            color = Color.White,
+            tonalElevation = 10.dp
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(24.dp)
+                    .widthIn(min = 280.dp, max = 340.dp)
+            ) {
+
+                Text(
+                    text = "Delete history",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+
+                Spacer(Modifier.height(8.dp))
+
+                Text(
+                    text = "This action will permanently remove the drink record at $time.",
+                    fontSize = 14.sp,
+                    color = Color(0xFF666666),
+                    lineHeight = 20.sp
+                )
+
+                Spacer(Modifier.height(24.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+
+                    TextButton(onClick = onCancel) {
+                        Text("Cancel", color = Color(0xFF555555))
+                    }
+
+                    Spacer(Modifier.width(8.dp))
+
+                    TextButton(onClick = onConfirm) {
+                        Text(
+                            "Delete",
+                            color = Color(0xFFD32F2F),
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+/* ================= TOAST ================= */
+
+fun showDeleteToast(context: android.content.Context, time: String) {
+    Toast.makeText(
+        context,
+        "Drink record at $time has been deleted",
+        Toast.LENGTH_SHORT
+    ).show()
+}
+
+/* ================= DATE FORMAT ================= */
 fun formatDateHeader(date: String): String {
     val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
     val dateObj = sdf.parse(date) ?: return date
@@ -260,4 +328,3 @@ fun formatDateHeader(date: String): String {
             .format(dateObj)
     }
 }
-

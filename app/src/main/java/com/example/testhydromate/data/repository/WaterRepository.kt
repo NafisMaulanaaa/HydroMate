@@ -1,10 +1,12 @@
 package com.example.testhydromate.data.repository
 
 import com.example.testhydromate.data.model.WaterLog
-import com.example.testhydromate.util.Resource
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 import java.util.Calendar
 import javax.inject.Inject
@@ -16,84 +18,54 @@ class WaterRepository @Inject constructor(
 
     private val userId get() = auth.currentUser?.uid
 
+    // Tetap suspend karena ini operasi satu kali (write)
     suspend fun addDrink(amount: Int) {
         val uid = userId ?: return
-
         val data = hashMapOf(
-            "amount" to amount,
+            "amount" to amount.toInt(), // Pastikan dia Int
             "timestamp" to System.currentTimeMillis(),
             "userId" to uid
         )
 
-        firestore.collection("water_logs")
-            .add(data)
-            .await()
+        // Tambahkan Logcat di sini buat ngintip di Android Studio
+        println("REPOS_CHECK: Menulis ke Firestore amount = $amount")
+
+        firestore.collection("water_logs").add(data).await()
     }
 
-    suspend fun getTodayTotal(): Int {
-        val uid = userId ?: return 0
-
-        val calendar = Calendar.getInstance().apply {
-            set(Calendar.HOUR_OF_DAY, 0)
-            set(Calendar.MINUTE, 0)
-            set(Calendar.SECOND, 0)
-            set(Calendar.MILLISECOND, 0)
+    // DIUBAH MENJADI FLOW: Untuk history real-time
+    fun getAllHistoryRealtime(): Flow<List<WaterLog>> = callbackFlow {
+        val uid = userId
+        if (uid == null) {
+            trySend(emptyList())
+            return@callbackFlow
         }
 
-        val snapshot = firestore.collection("water_logs")
-            .whereEqualTo("userId", uid)
-            .whereGreaterThanOrEqualTo("timestamp", calendar.timeInMillis)
-            .get()
-            .await()
-
-        return snapshot.documents.sumOf {
-            it.getLong("amount")?.toInt() ?: 0
-        }
-    }
-
-    suspend fun getAllHistory(): List<WaterLog> {
-        val uid = userId ?: return emptyList()
-
-        val snapshot = firestore.collection("water_logs")
+        val subscription = firestore.collection("water_logs")
             .whereEqualTo("userId", uid)
             .orderBy("timestamp", Query.Direction.DESCENDING)
-            .get()
-            .await()
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) return@addSnapshotListener
 
-        return snapshot.documents.map {
-            WaterLog(
-                id = it.id,
-                amount = it.getLong("amount")?.toInt() ?: 0,
-                timestamp = it.getLong("timestamp") ?: 0L
-            )
-        }
-    }
+                val logs = snapshot?.documents?.mapNotNull { doc ->
+                    val log = doc.toObject(WaterLog::class.java)
+                    log?.copy(id = doc.id) // Pastikan ID dokumen ikut terbawa
+                } ?: emptyList()
 
-    class WaterRepository @Inject constructor(
-        private val firestore: FirebaseFirestore
-    ) {
+                trySend(logs)
+            }
 
-        suspend fun deleteLog(logId: String) {
-            firestore
-                .collection("water_logs")
-                .document(logId)
-                .delete()
-                .await()
-        }
+        // Penting: menutup listener saat tidak digunakan agar hemat baterai
+        awaitClose { subscription.remove() }
     }
 
     suspend fun deleteLog(logId: String) {
-        firestore
-            .collection("water_logs")
-            .document(logId)
-            .delete()
-            .await()
+        firestore.collection("water_logs").document(logId).delete().await()
     }
 
     suspend fun updateLog(log: WaterLog) {
-        firestore
-            .collection("water_logs")
-            .document(log.id)
-            .set(log)
+        firestore.collection("water_logs").document(log.id)
+            .update(mapOf("amount" to log.amount))
+            .await()
     }
 }

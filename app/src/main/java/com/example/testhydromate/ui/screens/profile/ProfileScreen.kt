@@ -1,6 +1,7 @@
 package com.example.testhydromate.ui.screens.profile
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -28,7 +29,11 @@ fun ProfileScreen(
 ) {
     var showLogoutDialog by remember { mutableStateOf(false) }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White)
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()

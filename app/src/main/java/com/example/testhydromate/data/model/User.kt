@@ -17,5 +17,7 @@ data class User(
 //    val bedTime: String = "",
     val activityLevel: String = "",
     val weatherCondition: String = "",
-    val dailyGoal: Int = 0
+    val dailyGoal: Int = 0,
+
+    val preferredAmount: Int = 100
 )
