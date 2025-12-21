@@ -15,6 +15,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.testhydromate.ui.components.HydroBottomBar
+import com.example.testhydromate.ui.screens.achievement.AchievementScreen
 import com.example.testhydromate.ui.screens.auth.LoginScreen
 import com.example.testhydromate.ui.screens.history.HistoryScreen
 import com.example.testhydromate.ui.screens.home.HomeScreen
@@ -212,6 +213,17 @@ fun RouteScreen() {
             composable(Screen.PRIVACY_POLICY.route) {
                 PrivacyPolicy(
                     onBackClick = { navController.popBackStack() }
+                )
+            }
+
+            // ===== ACHIEVEMENT =====
+            composable(Screen.ACHIEVEMENT.route) {
+                AchievementScreen(
+                    onBackToHome = {
+                        navController.navigate(Screen.HOME.route) {
+                            popUpTo(Screen.HOME.route) { inclusive = true }
+                        }
+                    }
                 )
             }
         }

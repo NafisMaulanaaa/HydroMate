@@ -19,6 +19,9 @@ sealed class Screen(val route: String) {
     object NOTIFICATIONS : Screen("notifications")
     object ABOUT_APP : Screen("about_app")
     object PRIVACY_POLICY : Screen("privacy_policy")
+
+    //achievement
+    object ACHIEVEMENT : Screen("achievement")
 }
 
 data class Route(val route: String)
