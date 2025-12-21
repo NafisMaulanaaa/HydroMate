@@ -59,10 +59,10 @@ fun ProfileScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             Column(
-                verticalArrangement = Arrangement.spacedBy(48.dp),
+                verticalArrangement = Arrangement.spacedBy(40.dp),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 32.dp)
+                    .padding(horizontal = 18.dp)
             ) {
 
                 // ===== MY PROFILE =====
@@ -78,10 +78,10 @@ fun ProfileScreen(
                     Image(
                         painter = painterResource(R.drawable.icon_profile),
                         contentDescription = null,
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(21.dp)
                     )
                     Spacer(Modifier.width(24.dp))
-                    Text("My Profile", fontSize = 16.sp)
+                    Text("My Profile", fontSize = 17.sp)
                 }
 
                 // ===== NOTIFICATIONS =====
@@ -99,10 +99,10 @@ fun ProfileScreen(
                     Image(
                         painter = painterResource(R.drawable.icon_notif),
                         contentDescription = null,
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(21.dp)
                     )
-                    Spacer(Modifier.width(24.dp))
-                    Text("Notifications", fontSize = 16.sp)
+                    Spacer(Modifier.width(21.dp))
+                    Text("Notifications", fontSize = 17.sp)
                 }
 
                 // ===== ABOUT APP =====
@@ -118,10 +118,10 @@ fun ProfileScreen(
                     Image(
                         painter = painterResource(R.drawable.icon_info),
                         contentDescription = null,
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(21.dp)
                     )
                     Spacer(Modifier.width(24.dp))
-                    Text("About App", fontSize = 16.sp)
+                    Text("About App", fontSize = 17.sp)
                 }
 
                 // ===== LOGOUT =====
@@ -137,10 +137,10 @@ fun ProfileScreen(
                     Image(
                         painter = painterResource(R.drawable.icon_logout),
                         contentDescription = null,
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(21.dp)
                     )
                     Spacer(Modifier.width(24.dp))
-                    Text("Logout", fontSize = 16.sp)
+                    Text("Logout", fontSize = 17.sp)
                 }
             }
         }

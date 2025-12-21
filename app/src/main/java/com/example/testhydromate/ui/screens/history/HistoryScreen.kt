@@ -5,7 +5,6 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
@@ -38,16 +37,18 @@ fun HistoryScreen(
     var selectedDelete by remember { mutableStateOf<WaterLog?>(null) }
     var selectedEdit by remember { mutableStateOf<WaterLog?>(null) }
 
-    val groupedLogs = logs.groupBy {
-        SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-            .format(Date(it.timestamp))
+    // Memproses data: Urutkan dari yang terbaru, lalu grupkan berdasarkan tanggal
+    val groupedLogs = remember(logs) {
+        logs.sortedByDescending { it.timestamp }
+            .groupBy {
+                SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                    .format(Date(it.timestamp))
+            }
     }
 
-    // ===== MATURE DELETE DIALOG =====
+    // DIALOG KONFIRMASI HAPUS
     selectedDelete?.let { log ->
-        val time = SimpleDateFormat("HH:mm", Locale.getDefault())
-            .format(Date(log.timestamp))
-
+        val time = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(log.timestamp))
         ConfirmDeleteDialog(
             time = time,
             onCancel = { selectedDelete = null },
@@ -59,7 +60,7 @@ fun HistoryScreen(
         )
     }
 
-    // ===== EDIT SHEET =====
+    // BOTTOM SHEET EDIT
     selectedEdit?.let { log ->
         EditWaterBottomSheet(
             log = log,
@@ -76,8 +77,7 @@ fun HistoryScreen(
             .fillMaxSize()
             .background(Color.White)
     ) {
-
-        // HEADER
+        // HEADER (Statik)
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -92,29 +92,37 @@ fun HistoryScreen(
             )
         }
 
+        // DAFTAR RIWAYAT (Scrollable)
         LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp),
-            contentPadding = PaddingValues(bottom = 24.dp)
+            modifier = Modifier.fillMaxSize(),
+            // PENTING: bottom = 100.dp agar tidak tertutup BottomBar saat scroll mentok
+            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 100.dp)
         ) {
-
-            groupedLogs.forEach { (date, items) ->
+            if (groupedLogs.isEmpty()) {
                 item {
-                    HistoryDateCard(
-                        date = date,
-                        logs = items,
-                        onEdit = { selectedEdit = it },
-                        onDelete = { selectedDelete = it }
-                    )
+                    Box(
+                        modifier = Modifier.fillParentMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(text = "No drink history found", color = Color.Gray)
+                    }
                 }
-                item { Spacer(Modifier.height(20.dp)) }
+            } else {
+                groupedLogs.forEach { (date, items) ->
+                    item {
+                        HistoryDateCard(
+                            date = date,
+                            logs = items,
+                            onEdit = { selectedEdit = it },
+                            onDelete = { selectedDelete = it }
+                        )
+                        Spacer(Modifier.height(20.dp))
+                    }
+                }
             }
         }
     }
 }
-
-/* ================= DATE CARD ================= */
 
 @Composable
 fun HistoryDateCard(
@@ -124,7 +132,6 @@ fun HistoryDateCard(
     onDelete: (WaterLog) -> Unit
 ) {
     Column {
-
         Text(
             text = formatDateHeader(date),
             fontSize = 13.sp,
@@ -139,12 +146,7 @@ fun HistoryDateCard(
         ) {
             Column {
                 logs.forEachIndexed { index, log ->
-                    HistoryItem(
-                        log = log,
-                        onEdit = onEdit,
-                        onDelete = onDelete
-                    )
-
+                    HistoryItem(log = log, onEdit = onEdit, onDelete = onDelete)
                     if (index < logs.lastIndex) {
                         Divider(
                             modifier = Modifier.padding(start = 72.dp),
@@ -157,174 +159,91 @@ fun HistoryDateCard(
     }
 }
 
-/* ================= ITEM ================= */
 @Composable
 fun HistoryItem(
     log: WaterLog,
     onEdit: (WaterLog) -> Unit,
     onDelete: (WaterLog) -> Unit
 ) {
-    val time = remember {
-        SimpleDateFormat("HH:mm", Locale.getDefault())
-            .format(Date(log.timestamp))
-    }
-
+    val time = remember { SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(log.timestamp)) }
     var menuOpen by remember { mutableStateOf(false) }
 
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
+        modifier = Modifier.fillMaxWidth().padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-
         androidx.compose.foundation.Image(
             painter = androidx.compose.ui.res.painterResource(id = com.example.testhydromate.R.drawable.water),
             contentDescription = null,
-            modifier = Modifier
-                .size(40.dp)
-                .padding(4.dp)
+            modifier = Modifier.size(40.dp)
         )
 
         Spacer(Modifier.width(12.dp))
 
         Column(Modifier.weight(1f)) {
-            Text("Water", fontWeight = FontWeight.Medium)
+            Text("Water", fontWeight = FontWeight.Bold, fontSize = 16.sp)
             Text(time, fontSize = 12.sp, color = Color.Gray)
         }
 
-        Text("${log.amount} mL", fontWeight = FontWeight.Medium)
+        Text("${log.amount} mL", fontWeight = FontWeight.Bold, color = PrimaryBlue, fontSize = 16.sp)
 
         Box {
             IconButton(onClick = { menuOpen = true }) {
-                Icon(Icons.Default.MoreVert, contentDescription = null)
+                Icon(Icons.Default.MoreVert, contentDescription = null, tint = Color.Gray)
             }
-
             DropdownMenu(
                 expanded = menuOpen,
                 onDismissRequest = { menuOpen = false },
                 shape = RoundedCornerShape(12.dp),
-                containerColor = Color.White,
-                tonalElevation = 8.dp
+                containerColor = Color.White
             ) {
-
                 DropdownMenuItem(
-                    leadingIcon = {
-                        Icon(Icons.Outlined.Edit, null, tint = Color.Black)
-                    },
+                    leadingIcon = { Icon(Icons.Outlined.Edit, null) },
                     text = { Text("Edit") },
-                    onClick = {
-                        menuOpen = false
-                        onEdit(log)
-                    }
+                    onClick = { menuOpen = false; onEdit(log) }
                 )
-
                 DropdownMenuItem(
-                    leadingIcon = {
-                        Icon(Icons.Outlined.Delete, null, tint = Color(0xFFD32F2F))
-                    },
-                    text = {
-                        Text(
-                            "Delete",
-                            color = Color(0xFFD32F2F)
-                        )
-                    },
-                    onClick = {
-                        menuOpen = false
-                        onDelete(log)
-                    }
+                    leadingIcon = { Icon(Icons.Outlined.Delete, null, tint = Color.Red) },
+                    text = { Text("Delete", color = Color.Red) },
+                    onClick = { menuOpen = false; onDelete(log) }
                 )
             }
         }
     }
 }
 
-/* ================= MATURE DELETE DIALOG ================= */
 @Composable
-fun ConfirmDeleteDialog(
-    time: String,
-    onCancel: () -> Unit,
-    onConfirm: () -> Unit
-) {
+fun ConfirmDeleteDialog(time: String, onCancel: () -> Unit, onConfirm: () -> Unit) {
     Dialog(onDismissRequest = onCancel) {
-        Surface(
-            shape = RoundedCornerShape(16.dp),
-            color = Color.White,
-            tonalElevation = 10.dp
-        ) {
-            Column(
-                modifier = Modifier
-                    .padding(24.dp)
-                    .widthIn(min = 280.dp, max = 340.dp)
-            ) {
-
-                Text(
-                    text = "Delete history",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.SemiBold
-                )
-
+        Surface(shape = RoundedCornerShape(16.dp), color = Color.White) {
+            Column(modifier = Modifier.padding(24.dp).widthIn(min = 280.dp)) {
+                Text(text = "Delete history", fontSize = 18.sp, fontWeight = FontWeight.Bold)
                 Spacer(Modifier.height(8.dp))
-
-                Text(
-                    text = "This action will permanently remove the drink record at $time.",
-                    fontSize = 14.sp,
-                    color = Color(0xFF666666),
-                    lineHeight = 20.sp
-                )
-
+                Text(text = "Are you sure you want to delete the drink record at $time?", fontSize = 14.sp, color = Color.Gray)
                 Spacer(Modifier.height(24.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
-                ) {
-
-                    TextButton(onClick = onCancel) {
-                        Text("Cancel", color = Color(0xFF555555))
-                    }
-
-                    Spacer(Modifier.width(8.dp))
-
-                    TextButton(onClick = onConfirm) {
-                        Text(
-                            "Delete",
-                            color = Color(0xFFD32F2F),
-                            fontWeight = FontWeight.Medium
-                        )
-                    }
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                    TextButton(onClick = onCancel) { Text("Cancel", color = Color.Gray) }
+                    TextButton(onClick = onConfirm) { Text("Delete", color = Color.Red) }
                 }
             }
         }
     }
 }
 
-/* ================= TOAST ================= */
-
 fun showDeleteToast(context: android.content.Context, time: String) {
-    Toast.makeText(
-        context,
-        "Drink record at $time has been deleted",
-        Toast.LENGTH_SHORT
-    ).show()
+    Toast.makeText(context, "Drink record at $time deleted", Toast.LENGTH_SHORT).show()
 }
 
-/* ================= DATE FORMAT ================= */
 fun formatDateHeader(date: String): String {
     val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
     val dateObj = sdf.parse(date) ?: return date
-
     val today = sdf.format(Date())
-    val yesterday = sdf.format(
-        Calendar.getInstance().apply {
-            add(Calendar.DAY_OF_YEAR, -1)
-        }.time
-    )
+    val cal = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, -1) }
+    val yesterday = sdf.format(cal.time)
 
     return when (date) {
         today -> "Today"
         yesterday -> "Yesterday"
-        else -> SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
-            .format(dateObj)
+        else -> SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(dateObj)
     }
 }

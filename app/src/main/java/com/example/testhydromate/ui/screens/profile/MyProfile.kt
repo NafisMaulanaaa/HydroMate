@@ -101,8 +101,8 @@ fun MyProfile(
                             )
 
                             // Gender Selection
-                            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                                Text("Gender", color = Color(0xFF333333), fontSize = 16.sp)
+                            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                Text("Gender", color = Color.Gray, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                                     GenderButton(
                                         text = "Male",
@@ -125,7 +125,6 @@ fun MyProfile(
 
                     item {
                         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                            Text("Contact Detail", fontWeight = FontWeight.Bold, fontSize = 16.sp)
                             InputField(
                                 label = "Email",
                                 value = email,

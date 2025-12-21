@@ -47,7 +47,7 @@ fun HydroBottomBar(
         BoxWithConstraints(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 20.dp), // Padding dalam surface
+                .padding(horizontal = 10.dp), // Padding dalam surface
             contentAlignment = Alignment.CenterStart
         ) {
             val maxWidth = maxWidth

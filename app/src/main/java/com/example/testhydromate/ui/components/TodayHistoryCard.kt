@@ -1,11 +1,9 @@
 package com.example.testhydromate.ui.components
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
@@ -34,24 +32,18 @@ fun TodayHistoryCard(
     onDeleteConfirm: (WaterLog) -> Unit
 ) {
     val context = LocalContext.current
-
     var selectedEdit by remember { mutableStateOf<WaterLog?>(null) }
     var selectedDelete by remember { mutableStateOf<WaterLog?>(null) }
 
     val todayLogs = remember(history) {
         val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val today = sdf.format(Date())
-
-        history.filter {
-            sdf.format(Date(it.timestamp)) == today
-        }
+        history.filter { sdf.format(Date(it.timestamp)) == today }
+            .sortedByDescending { it.timestamp }
     }
 
-    /* ===== DELETE DIALOG ===== */
     selectedDelete?.let { log ->
-        val time = SimpleDateFormat("HH:mm", Locale.getDefault())
-            .format(Date(log.timestamp))
-
+        val time = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(log.timestamp))
         ConfirmDeleteDialog(
             time = time,
             onCancel = { selectedDelete = null },
@@ -63,26 +55,17 @@ fun TodayHistoryCard(
         )
     }
 
-    /* ===== EDIT SHEET ===== */
     selectedEdit?.let { log ->
-        EditWaterBottomSheet(
-            log = log,
-            onDismiss = { selectedEdit = null },
-            onSave = {
-                onUpdate(it)
-                selectedEdit = null
-            }
-        )
+        EditWaterBottomSheet(log = log, onDismiss = { selectedEdit = null }, onSave = { onUpdate(it); selectedEdit = null })
     }
 
     Card(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(16.dp), // Sama dengan History Date Card
         colors = CardDefaults.cardColors(containerColor = Color.White),
         border = BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.4f))
     ) {
-        Column {
-
+        Column(modifier = Modifier.fillMaxSize()) {
             Text(
                 text = "Today History",
                 fontSize = 18.sp,
@@ -91,31 +74,20 @@ fun TodayHistoryCard(
             )
 
             if (todayLogs.isEmpty()) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 32.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "No drink history today",
-                        color = Color.Gray,
-                        fontSize = 14.sp
-                    )
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text("No drink history today", color = Color.Gray, fontSize = 14.sp)
                 }
             } else {
                 LazyColumn(
                     modifier = Modifier.fillMaxWidth(),
-                    contentPadding = PaddingValues(bottom = 16.dp)
+                    contentPadding = PaddingValues(bottom = 100.dp) // Ruang untuk Navbar
                 ) {
-
                     itemsIndexed(todayLogs) { index, log ->
                         TodayHistoryItem(
                             log = log,
                             onEdit = { selectedEdit = it },
                             onDelete = { selectedDelete = it }
                         )
-
                         if (index < todayLogs.lastIndex) {
                             Divider(
                                 modifier = Modifier.padding(start = 72.dp),
@@ -129,90 +101,45 @@ fun TodayHistoryCard(
     }
 }
 
-
 @Composable
-fun TodayHistoryItem(
-    log: WaterLog,
-    onEdit: (WaterLog) -> Unit,
-    onDelete: (WaterLog) -> Unit
-) {
-    val time = remember {
-        SimpleDateFormat("HH:mm", Locale.getDefault())
-            .format(Date(log.timestamp))
-    }
-
+fun TodayHistoryItem(log: WaterLog, onEdit: (WaterLog) -> Unit, onDelete: (WaterLog) -> Unit) {
+    val time = remember { SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(log.timestamp)) }
     var menuOpen by remember { mutableStateOf(false) }
 
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
+        modifier = Modifier.fillMaxWidth().padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-
         androidx.compose.foundation.Image(
             painter = androidx.compose.ui.res.painterResource(id = com.example.testhydromate.R.drawable.water),
             contentDescription = null,
-            modifier = Modifier
-                .size(40.dp)
-                .padding(4.dp)
+            modifier = Modifier.size(40.dp)
         )
-
         Spacer(Modifier.width(12.dp))
-
         Column(Modifier.weight(1f)) {
-            Text("Water", fontWeight = FontWeight.Medium)
+            Text("Water", fontWeight = FontWeight.Bold, fontSize = 16.sp)
             Text(time, fontSize = 12.sp, color = Color.Gray)
         }
-
-        Text("${log.amount} mL", fontWeight = FontWeight.Medium)
-
+        Text("${log.amount} mL", fontWeight = FontWeight.Bold, color = PrimaryBlue, fontSize = 16.sp)
         Box {
             IconButton(onClick = { menuOpen = true }) {
-                Icon(
-                    imageVector = Icons.Default.MoreVert,
-                    contentDescription = "More options",
-                    tint = Color.Gray
-                )
+                Icon(Icons.Default.MoreVert, null, tint = Color.Gray)
             }
-
             DropdownMenu(
                 expanded = menuOpen,
                 onDismissRequest = { menuOpen = false },
                 shape = RoundedCornerShape(12.dp),
-                containerColor = Color.White,
-                tonalElevation = 8.dp
+                containerColor = Color.White
             ) {
-
                 DropdownMenuItem(
-                    leadingIcon = {
-                        Icon(Icons.Outlined.Edit, null)
-                    },
+                    leadingIcon = { Icon(Icons.Outlined.Edit, null) },
                     text = { Text("Edit") },
-                    onClick = {
-                        menuOpen = false
-                        onEdit(log)
-                    }
+                    onClick = { menuOpen = false; onEdit(log) }
                 )
-
                 DropdownMenuItem(
-                    leadingIcon = {
-                        Icon(
-                            Icons.Outlined.Delete,
-                            null,
-                            tint = Color(0xFFD32F2F)
-                        )
-                    },
-                    text = {
-                        Text(
-                            "Delete",
-                            color = Color(0xFFD32F2F)
-                        )
-                    },
-                    onClick = {
-                        menuOpen = false
-                        onDelete(log)
-                    }
+                    leadingIcon = { Icon(Icons.Outlined.Delete, null, tint = Color.Red) },
+                    text = { Text("Delete", color = Color.Red) },
+                    onClick = { menuOpen = false; onDelete(log) }
                 )
             }
         }

@@ -51,13 +51,11 @@ class HomeViewModel @Inject constructor(
     private val _dailyTarget = MutableStateFlow(2000)
     val dailyTarget = _dailyTarget.asStateFlow()
 
-    // 🎯 Achievement flag
     private val _shouldShowAchievement = MutableStateFlow(false)
     val shouldShowAchievement = _shouldShowAchievement.asStateFlow()
 
-    // Track apakah sudah pernah achieve hari ini
-    private var hasAchievedToday = false
-    private var lastCheckedDate = ""
+    // Flag lokal agar tidak hit Firebase terus-menerus dalam satu sesi
+    private var hasAchievedInThisSession = false
 
     var selectedAmount by mutableStateOf(100)
         private set
@@ -65,26 +63,47 @@ class HomeViewModel @Inject constructor(
     init {
         loadUserProfile()
         loadPreferredAmount()
-        checkAndResetDailyAchievement()
 
-        // Monitor perubahan total untuk detect achievement
         viewModelScope.launch {
             totalDrink.collect { currentTotal ->
-                val currentDate = getCurrentDateString()
+                val target = _dailyTarget.value
 
-                // Reset achievement jika hari berganti
-                if (lastCheckedDate != currentDate) {
-                    hasAchievedToday = false
-                    lastCheckedDate = currentDate
-                }
-
-                // Cek apakah baru saja mencapai target dan belum pernah achieve hari ini
-                if (!hasAchievedToday && currentTotal >= _dailyTarget.value && _dailyTarget.value > 0) {
-                    _shouldShowAchievement.value = true
-                    hasAchievedToday = true
+                // Syarat: Total tercapai, target valid, dan belum pernah muncul di sesi ini
+                if (!hasAchievedInThisSession && currentTotal >= target && target > 0 && currentTotal > 0) {
+                    checkAndTriggerAchievement()
                 }
             }
         }
+    }
+
+    private fun checkAndTriggerAchievement() {
+        val uid = auth.currentUser?.uid ?: return
+        val dateKey = getCurrentDateString()
+
+        // Cek ke Firestore apakah tanggal hari ini sudah pernah klaim achievement
+        db.collection("users").document(uid)
+            .collection("daily_achievements").document(dateKey)
+            .get()
+            .addOnSuccessListener { doc ->
+                if (!doc.exists()) {
+                    // Jika belum ada dokumen untuk hari ini, tampilkan!
+                    _shouldShowAchievement.value = true
+                    hasAchievedInThisSession = true
+                    saveAchievementToFirebase(dateKey)
+                } else {
+                    // Jika sudah ada, kunci agar tidak muncul lagi
+                    hasAchievedInThisSession = true
+                }
+            }
+    }
+
+    private fun saveAchievementToFirebase(dateKey: String) {
+        val uid = auth.currentUser?.uid ?: return
+        val data = mapOf("achieved" to true, "timestamp" to System.currentTimeMillis())
+
+        db.collection("users").document(uid)
+            .collection("daily_achievements").document(dateKey)
+            .set(data)
     }
 
     private fun getCurrentDateString(): String {
@@ -92,43 +111,38 @@ class HomeViewModel @Inject constructor(
         return "${calendar.get(Calendar.YEAR)}-${calendar.get(Calendar.MONTH)}-${calendar.get(Calendar.DAY_OF_MONTH)}"
     }
 
-    private fun checkAndResetDailyAchievement() {
-        lastCheckedDate = getCurrentDateString()
+    fun resetAchievementFlag() {
+        _shouldShowAchievement.value = false
     }
 
-    fun drink(amount: Int) {
-        viewModelScope.launch {
-            waterRepository.addDrink(amount)
-        }
+    // --- Sisanya tetap sama ---
+    fun drinkUsingSelectedAmount() {
+        viewModelScope.launch { waterRepository.addDrink(selectedAmount) }
     }
 
     fun deleteLog(log: WaterLog) {
-        viewModelScope.launch {
-            waterRepository.deleteLog(log.id)
-        }
+        viewModelScope.launch { waterRepository.deleteLog(log.id) }
     }
 
     fun updateLog(log: WaterLog) {
-        viewModelScope.launch {
-            waterRepository.updateLog(log)
-        }
+        viewModelScope.launch { waterRepository.updateLog(log) }
+    }
+
+    fun updateSelectedAmount(amount: Int) {
+        selectedAmount = amount
+        savePreferredAmount(amount)
     }
 
     private fun savePreferredAmount(amount: Int) {
         val uid = auth.currentUser?.uid ?: return
-        db.collection("users").document(uid)
-            .set(mapOf("preferredAmount" to amount), SetOptions.merge())
+        db.collection("users").document(uid).set(mapOf("preferredAmount" to amount), SetOptions.merge())
     }
 
     private fun loadPreferredAmount() {
         val uid = auth.currentUser?.uid ?: return
-        db.collection("users").document(uid).get()
-            .addOnSuccessListener { doc ->
-                val saved = doc.getLong("preferredAmount")?.toInt()
-                if (saved != null) {
-                    selectedAmount = saved
-                }
-            }
+        db.collection("users").document(uid).get().addOnSuccessListener { doc ->
+            doc.getLong("preferredAmount")?.toInt()?.let { selectedAmount = it }
+        }
     }
 
     private fun loadUserProfile() {
@@ -137,23 +151,5 @@ class HomeViewModel @Inject constructor(
                 if (it.dailyGoal > 0) _dailyTarget.value = it.dailyGoal
             }
         }
-    }
-
-    fun drinkUsingSelectedAmount() {
-        val amountToSave = selectedAmount
-        viewModelScope.launch {
-            waterRepository.addDrink(amountToSave)
-        }
-    }
-
-    fun updateSelectedAmount(amount: Int) {
-        println("INFO: Menghapus keraguan, angka baru adalah: $amount")
-        selectedAmount = amount
-        savePreferredAmount(amount)
-    }
-
-    // Reset achievement flag setelah ditampilkan
-    fun resetAchievementFlag() {
-        _shouldShowAchievement.value = false
     }
 }
