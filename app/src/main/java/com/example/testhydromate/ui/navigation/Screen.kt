@@ -24,4 +24,4 @@ sealed class Screen(val route: String) {
     object ACHIEVEMENT : Screen("achievement")
 }
 
-data class Route(val route: String)
+//data class Route(val route: String)
