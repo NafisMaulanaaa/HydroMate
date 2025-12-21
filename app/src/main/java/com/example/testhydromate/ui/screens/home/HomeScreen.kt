@@ -24,15 +24,25 @@ import java.util.Locale
 @Composable
 fun HomeScreen(
     onLogout: () -> Unit = {},
+    onNavigateToAchievement: () -> Unit = {},
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val total by viewModel.totalDrink.collectAsState()
     val history by viewModel.history.collectAsState()
     val target by viewModel.dailyTarget.collectAsState()
+    val shouldShowAchievement by viewModel.shouldShowAchievement.collectAsState()
     val context = LocalContext.current
 
     var selectedDelete by remember { mutableStateOf<WaterLog?>(null) }
     var showAdjustSheet by remember { mutableStateOf(false) }
+
+    // 🎯 Detect ketika achievement flag di-trigger
+    LaunchedEffect(shouldShowAchievement) {
+        if (shouldShowAchievement) {
+            viewModel.resetAchievementFlag() // Reset DULU sebelum navigate
+            onNavigateToAchievement()
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -55,7 +65,6 @@ fun HomeScreen(
                 java.text.SimpleDateFormat("HH:mm", Locale.getDefault())
                     .format(Date(log.timestamp))
             }
-
             ConfirmDeleteDialog(
                 time = time,
                 onCancel = { selectedDelete = null },
@@ -122,7 +131,7 @@ fun HomeScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f) // Gunakan weight agar responsif di berbagai layar
+                    .weight(1f)
             ) {
                 TodayHistoryCard(
                     history = history,

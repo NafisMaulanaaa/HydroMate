@@ -1,27 +1,13 @@
 package com.example.testhydromate.ui.screens.home
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.testhydromate.data.model.WaterLog
 import com.example.testhydromate.data.repository.AuthRepository
 import com.example.testhydromate.data.repository.WaterRepository
-import com.example.testhydromate.ui.components.*
-import com.example.testhydromate.ui.screens.history.ConfirmDeleteDialog
-import com.example.testhydromate.ui.screens.history.showDeleteToast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
@@ -34,8 +20,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.util.Calendar
-import java.util.Date
-import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
@@ -67,20 +51,54 @@ class HomeViewModel @Inject constructor(
     private val _dailyTarget = MutableStateFlow(2000)
     val dailyTarget = _dailyTarget.asStateFlow()
 
+    // 🎯 Achievement flag
+    private val _shouldShowAchievement = MutableStateFlow(false)
+    val shouldShowAchievement = _shouldShowAchievement.asStateFlow()
+
+    // Track apakah sudah pernah achieve hari ini
+    private var hasAchievedToday = false
+    private var lastCheckedDate = ""
+
     var selectedAmount by mutableStateOf(100)
         private set
 
     init {
         loadUserProfile()
         loadPreferredAmount()
+        checkAndResetDailyAchievement()
+
+        // Monitor perubahan total untuk detect achievement
+        viewModelScope.launch {
+            totalDrink.collect { currentTotal ->
+                val currentDate = getCurrentDateString()
+
+                // Reset achievement jika hari berganti
+                if (lastCheckedDate != currentDate) {
+                    hasAchievedToday = false
+                    lastCheckedDate = currentDate
+                }
+
+                // Cek apakah baru saja mencapai target dan belum pernah achieve hari ini
+                if (!hasAchievedToday && currentTotal >= _dailyTarget.value && _dailyTarget.value > 0) {
+                    _shouldShowAchievement.value = true
+                    hasAchievedToday = true
+                }
+            }
+        }
+    }
+
+    private fun getCurrentDateString(): String {
+        val calendar = Calendar.getInstance()
+        return "${calendar.get(Calendar.YEAR)}-${calendar.get(Calendar.MONTH)}-${calendar.get(Calendar.DAY_OF_MONTH)}"
+    }
+
+    private fun checkAndResetDailyAchievement() {
+        lastCheckedDate = getCurrentDateString()
     }
 
     fun drink(amount: Int) {
-        // Kita paksa kirim 50 (angka yang kamu mau) buat ngetes doang
-        // Kalau di Firebase muncul 50, berarti masalahnya ada di UI/BottomSheet
-        // Kalau di Firebase TETAP muncul 100, berarti ada masalah di Repository atau Firebase Cache
         viewModelScope.launch {
-            waterRepository.addDrink(50)
+            waterRepository.addDrink(amount)
         }
     }
 
@@ -95,12 +113,6 @@ class HomeViewModel @Inject constructor(
             waterRepository.updateLog(log)
         }
     }
-
-    /*fun updateSelectedAmount(amount: Int) {
-        println("INFO: Menghapus keraguan, angka baru adalah: $amount")
-        selectedAmount = amount
-        savePreferredAmount(amount)
-    }*/
 
     private fun savePreferredAmount(amount: Int) {
         val uid = auth.currentUser?.uid ?: return
@@ -138,5 +150,10 @@ class HomeViewModel @Inject constructor(
         println("INFO: Menghapus keraguan, angka baru adalah: $amount")
         selectedAmount = amount
         savePreferredAmount(amount)
+    }
+
+    // Reset achievement flag setelah ditampilkan
+    fun resetAchievementFlag() {
+        _shouldShowAchievement.value = false
     }
 }

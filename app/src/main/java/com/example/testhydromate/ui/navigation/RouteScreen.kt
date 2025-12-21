@@ -167,7 +167,16 @@ fun RouteScreen() {
             }
 
             // ===== MAIN =====
-            composable(Screen.HOME.route) { HomeScreen() }
+            composable(Screen.HOME.route) {
+                HomeScreen(
+                    onNavigateToAchievement = {
+                        navController.navigate(Screen.ACHIEVEMENT.route) {
+                            // Tidak menghapus HOME dari backstack
+                            // Supaya bisa back ke home dengan data yang sama
+                        }
+                    }
+                )
+            }
             composable(Screen.HISTORY.route) { HistoryScreen() }
 
             composable(Screen.PROFILE.route) {
@@ -221,7 +230,10 @@ fun RouteScreen() {
                 AchievementScreen(
                     onBackToHome = {
                         navController.navigate(Screen.HOME.route) {
-                            popUpTo(Screen.HOME.route) { inclusive = true }
+                            popUpTo(Screen.ACHIEVEMENT.route) {
+                                inclusive = true  // Hapus achievement dari backstack
+                            }
+                            launchSingleTop = true
                         }
                     }
                 )
