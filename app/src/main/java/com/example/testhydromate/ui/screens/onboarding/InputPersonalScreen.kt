@@ -28,13 +28,15 @@ import com.example.testhydromate.ui.components.HydroPrimaryButton
 import com.example.testhydromate.ui.components.PrimaryBlue
 import com.example.testhydromate.ui.components.FemalePink
 import com.example.testhydromate.ui.components.LightGrayBg
+import com.example.testhydromate.ui.components.OnboardingTopBar
 import com.example.testhydromate.ui.components.TextGray
 
 
 @Composable
 fun InputPersonalScreen(
     viewModel: OnboardingViewModel,
-    onContinueClicked: () -> Unit
+    onContinueClicked: () -> Unit,
+    onBackClicked: (() -> Unit)? = null
 ) {
     var selectedGender by remember { mutableStateOf("") }
 //    var height by remember { mutableStateOf("") }
@@ -58,7 +60,10 @@ fun InputPersonalScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             // Top Bar
-            TopBarOnBoardingPage(progress = 0.33f, progressTxt = "1/3", showBackButton = false)
+            OnboardingTopBar(
+                currentStep = 1,
+                onBackClick = null
+            )
 
             Spacer(modifier = Modifier.height(32.dp))
 

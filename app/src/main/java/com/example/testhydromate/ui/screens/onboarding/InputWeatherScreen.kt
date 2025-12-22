@@ -13,6 +13,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.testhydromate.ui.components.HydroPrimaryButton
+import com.example.testhydromate.ui.components.OnboardingTopBar
 import com.example.testhydromate.ui.components.OptionButton
 import com.example.testhydromate.ui.components.TopBarOnBoardingPage
 import com.example.testhydromate.ui.components.PrimaryBlue
@@ -48,8 +49,11 @@ fun InputWeatherScreen(
         ) {
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Top Bar (Page 3/3)
-            TopBarOnBoardingPage(progress = 1f, progressTxt = "3/3", showBackButton = true, onBackClick = onBackClicked )
+            // Top Bar
+            OnboardingTopBar(
+                currentStep = 3,
+                onBackClick = onBackClicked
+            )
 
             Spacer(modifier = Modifier.height(32.dp))
 

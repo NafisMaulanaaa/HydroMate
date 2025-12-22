@@ -13,6 +13,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.testhydromate.ui.components.HydroPrimaryButton
+import com.example.testhydromate.ui.components.OnboardingTopBar
 import com.example.testhydromate.ui.components.TopBarOnBoardingPage
 import com.example.testhydromate.ui.components.OptionButton
 import com.example.testhydromate.ui.components.PrimaryBlue
@@ -51,7 +52,10 @@ fun InputHabitScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             // Top Bar
-            TopBarOnBoardingPage(progress = 0.66f, progressTxt =  "2/3", showBackButton = true, onBackClick = onBackClicked)
+            OnboardingTopBar(
+                currentStep = 2,
+                onBackClick = onBackClicked
+            )
 
             Spacer(modifier = Modifier.height(32.dp))
 

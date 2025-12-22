@@ -39,11 +39,10 @@ fun ResultScreen(
 ) {
     var showBottomSheet by remember { mutableStateOf(false) }
 
-    // 🔥 SOURCE OF TRUTH
     val goalValue = viewModel.dailyGoal.toString()
 
     // TEMP STATE BUAT EDIT
-    var tempGoalValue by remember { mutableStateOf("") }
+    var tempGoalValue by remember { mutableStateOf(goalValue) }
 
     // Sync temp state saat dailyGoal berubah
     LaunchedEffect(viewModel.dailyGoal) {
@@ -193,92 +192,104 @@ fun EditGoalSheetContent(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 24.dp),
+            .padding(bottom = 32.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
         Text(
             text = "Edit Your Daily Goal",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(vertical = 16.dp)
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        HorizontalDivider(color = Color(0xFFF0F0F0))
+        Spacer(modifier = Modifier.height(32.dp))
 
-        Icon(
-            imageVector = Icons.Default.WaterDrop,
+        Image(
+            painter = painterResource(id = R.drawable.water),
             contentDescription = null,
-            modifier = Modifier.size(60.dp),
-            tint = PrimaryBlue
+            modifier = Modifier.size(80.dp)
         )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(80.dp)
-                .background(InputBgGray, RoundedCornerShape(16.dp)),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
-        ) {
-
-            BasicTextField(
-                value = tempValue,
-                onValueChange = {
-                    if (it.length <= 5 && it.all { c -> c.isDigit() }) {
-                        onValueChange(it)
-                    }
-                },
-                textStyle = TextStyle(
-                    fontSize = 40.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = PrimaryBlue,
-                    textAlign = TextAlign.End
-                ),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                singleLine = true,
-                modifier = Modifier.width(IntrinsicSize.Min)
-            )
-
-            Spacer(modifier = Modifier.width(8.dp))
-
-            Text(
-                text = "mL",
-                fontSize = 18.sp,
-                color = TextGray,
-                modifier = Modifier.padding(top = 12.dp)
-            )
-        }
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        Row(modifier = Modifier.fillMaxWidth()) {
+        // INPUT BOX
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp)
+                .height(90.dp)
+                .background(color = Color(0xFFF8F9FA), shape = RoundedCornerShape(16.dp)),
+            contentAlignment = Alignment.Center
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                BasicTextField(
+                    value = tempValue,
+                    onValueChange = {
+                        if (it.length <= 5 && it.all { c -> c.isDigit() }) {
+                            onValueChange(it)
+                        }
+                    },
+                    textStyle = TextStyle(
+                        fontSize = 44.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = PrimaryBlue,
+                        textAlign = TextAlign.Center
+                    ),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    singleLine = true,
+                    modifier = Modifier
+                        .widthIn(min = 80.dp)
+                        .width(IntrinsicSize.Min)
+                        .alignByBaseline()
+                )
 
+                Spacer(modifier = Modifier.width(8.dp))
+
+                Text(
+                    text = "mL",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Color.Gray,
+                    modifier = Modifier.alignByBaseline()
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(40.dp))
+        HorizontalDivider(color = Color(0xFFF0F0F0))
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // BUTTONS
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
             Button(
+                modifier = Modifier.weight(1f).height(56.dp),
                 onClick = onCancel,
-                modifier = Modifier
-                    .weight(1f)
-                    .height(56.dp),
+                shape = RoundedCornerShape(28.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = ButtonCancelBg,
+                    containerColor = Color(0xFFE3F2FD),
                     contentColor = PrimaryBlue
-                ),
-                shape = RoundedCornerShape(30.dp),
-                elevation = null
+                )
             ) {
                 Text("Cancel", fontWeight = FontWeight.Bold)
             }
 
-            Spacer(modifier = Modifier.width(16.dp))
-
             Button(
+                modifier = Modifier.weight(1f).height(56.dp),
                 onClick = onSave,
-                modifier = Modifier
-                    .weight(1f)
-                    .height(56.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlue),
-                shape = RoundedCornerShape(30.dp)
+                shape = RoundedCornerShape(28.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = PrimaryBlue,
+                    contentColor = Color.White
+                )
             ) {
                 Text("Save", fontWeight = FontWeight.Bold)
             }

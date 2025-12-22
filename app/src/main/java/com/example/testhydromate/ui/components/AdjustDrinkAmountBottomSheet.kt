@@ -70,30 +70,38 @@ fun AdjustDrinkAmountBottomSheet(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 24.dp)
-                    .height(90.dp)
-                    .background(Color(0xFFF8F9FA), RoundedCornerShape(16.dp)),
-                contentAlignment = Alignment.Center
+                    .height(90.dp) // Box tetap tinggi
+                    .background(color = Color(0xFFF8F9FA), shape = RoundedCornerShape(16.dp)),
+                contentAlignment = Alignment.Center // Memastikan Row tepat di tengah Box
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    BasicTextField(
+                Row(
+                    verticalAlignment = Alignment.CenterVertically, // Row-nya di tengah Box
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    androidx.compose.foundation.text.BasicTextField(
                         value = amountText,
-                        onValueChange = {
-                            // Hanya izinkan angka, max 4 digit, dan tidak boleh diawali 0 jika lebih dari 1 digit
-                            if (it.all { char -> char.isDigit() } && it.length <= 4) {
-                                amountText = it
-                            }
-                        },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        onValueChange = { if (it.length <= 4) amountText = it.filter { c -> c.isDigit() } },
                         textStyle = androidx.compose.ui.text.TextStyle(
                             fontSize = 44.sp,
                             fontWeight = FontWeight.Bold,
-                            color = PrimaryBlue, // Pastikan warna ini terdefinisi
+                            color = Color(0xFF1976D2), // Ganti ke PrimaryBlue milikmu
                             textAlign = TextAlign.Center
                         ),
-                        modifier = Modifier.width(IntrinsicSize.Min)
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        modifier = Modifier
+                            .width(IntrinsicSize.Min)
+                            .alignByBaseline() // Kunci pertama
                     )
+
                     Spacer(Modifier.width(8.dp))
-                    Text(text = "mL", fontSize = 18.sp, color = Color.Gray)
+
+                    Text(
+                        text = "mL",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = Color.Gray,
+                        modifier = Modifier.alignByBaseline() // Kunci kedua: Sejajar bawah dengan angka
+                    )
                 }
             }
 
