@@ -145,40 +145,59 @@ fun ProfileScreen(
             }
         }
 
-        // ===== LOGOUT DIALOG =====
+        // ===== LOGOUT DIALOG (Mature Style) =====
         if (showLogoutDialog) {
             AlertDialog(
                 onDismissRequest = { showLogoutDialog = false },
+                containerColor = Color.White, // Background Putih Bersih
+                tonalElevation = 0.dp, // Menghilangkan bayangan kebiruan default M3
                 title = {
                     Text(
-                        "Logout From HydroMate",
-                        fontWeight = FontWeight.Bold
+                        text = "Logout",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF1A1C1E) // Warna teks hampir hitam agar elegan
                     )
                 },
                 text = {
-                    Text("Are you sure want to logout?")
+                    Text(
+                        text = "Are you sure you want to log out of HydroMate? You'll need to sign in again to access your data.",
+                        fontSize = 15.sp,
+                        color = Color.Gray,
+                        lineHeight = 22.sp
+                    )
                 },
                 confirmButton = {
-                    TextButton(
+                    Button(
                         onClick = {
                             showLogoutDialog = false
                             viewModel.logout()
                             onLogoutSuccess()
                         },
-                        colors = ButtonDefaults.textButtonColors(
-                            contentColor = Color.Red
-                        )
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFFBA1A1A), // Merah gelap (Danger) yang lebih mature
+                            contentColor = Color.White
+                        ),
+                        shape = RoundedCornerShape(12.dp),
+                        contentPadding = PaddingValues(horizontal = 20.dp)
                     ) {
-                        Text("Logout", fontWeight = FontWeight.Bold)
+                        Text("Logout", fontWeight = FontWeight.SemiBold)
                     }
                 },
                 dismissButton = {
-                    TextButton(onClick = { showLogoutDialog = false }) {
-                        Text("Cancel")
+                    TextButton(
+                        onClick = { showLogoutDialog = false }
+                    ) {
+                        Text(
+                            "Cancel",
+                            color = Color.Gray,
+                            fontWeight = FontWeight.Medium
+                        )
                     }
                 },
-                shape = RoundedCornerShape(16.dp)
+                shape = RoundedCornerShape(24.dp) // Sudut lebih melengkung agar modern
             )
         }
+
     }
 }

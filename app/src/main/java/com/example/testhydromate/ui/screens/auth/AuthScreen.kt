@@ -61,13 +61,17 @@ fun LoginScreen(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()){
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .background(Color.White)
+    ){
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 24.dp)
                 .verticalScroll(rememberScrollState())
-                .padding(top = 80.dp, bottom = 24.dp),
+                .padding(top = 80.dp, bottom = 24.dp)
+                .background(Color.White),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             AuthHeader()

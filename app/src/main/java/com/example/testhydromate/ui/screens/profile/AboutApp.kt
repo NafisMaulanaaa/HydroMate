@@ -36,46 +36,56 @@ fun AboutApp(
     modifier: Modifier = Modifier
 ) {
     Scaffold(
+        // 1. Pastikan Scaffold berwarna Putih
+        containerColor = Color.White,
         topBar = {
-            CenterAlignedTopAppBar(
-                title = { },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
-                            tint = PrimaryBlue
-                        )
-                    }
+            // 2. Custom Top Bar agar gaya konsisten (Back button di atas, Judul di bawah)
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.White)
+                    .statusBarsPadding() // Mencegah mepet ke atas status bar
+            ) {
+                IconButton(
+                    onClick = onBackClick,
+                    modifier = Modifier.padding(start = 8.dp, top = 8.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Back",
+                        tint = PrimaryBlue
+                    )
                 }
-            )
+
+                Text(
+                    text = "About App",
+                    color = PrimaryBlue,
+                    textAlign = TextAlign.Center,
+                    style = TextStyle(
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 24.dp)
+                )
+            }
         },
         modifier = modifier
     ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .background(Color.White) // 3. Tambahkan background putih di sini juga
                 .padding(innerPadding)
                 .padding(horizontal = 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            Text(
-                text = "About App",
-                color = PrimaryBlue,
-                textAlign = TextAlign.Center,
-                style = TextStyle(
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 24.dp)
-            )
+            Spacer(modifier = Modifier.height(16.dp))
 
-            Spacer(modifier = Modifier.height(40.dp))
-
-            // Logo
+            // Logo (Jika ingin diaktifkan nanti)
+            /*
             Image(
                 painter = painterResource(id = R.drawable.hydromate_logo_2),
                 contentDescription = "HydroMate Logo",
@@ -83,86 +93,73 @@ fun AboutApp(
                     .width(174.dp)
                     .height(98.dp)
             )
-
             Spacer(modifier = Modifier.height(40.dp))
+            */
 
-            // Privacy Policy Row
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
+            // Privacy Policy Row (Gaya Mature)
+            Surface(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(shape = RoundedCornerShape(10.dp))
-                    .background(color = Color.White)
-                    .border(
-                        border = BorderStroke(1.dp, Color(0xFFE0E0E0)),
-                        shape = RoundedCornerShape(10.dp)
-                    )
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = null
-                    ) { onPrivacyPolicyClick() }
-                    .padding(horizontal = 14.dp, vertical = 16.dp)
+                    ) { onPrivacyPolicyClick() },
+                shape = RoundedCornerShape(12.dp),
+                color = Color.White,
+                border = BorderStroke(1.dp, Color(0xFFF0F0F0)) // Border lebih halus
             ) {
-                Text(
-                    text = "Privacy Policy",
-                    color = Color(0xff1a1c1e),
-                    style = TextStyle(
-                        fontSize = 14.sp,
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 18.dp)
+                ) {
+                    Text(
+                        text = "Privacy Policy",
+                        color = Color(0xFF1A1C1E),
+                        fontSize = 15.sp,
                         fontWeight = FontWeight.Medium
-                    ),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Icon(
-                    painter = painterResource(id = R.drawable.caretright_1),
-                    contentDescription = "Navigate",
-                    tint = Color(0xff7b7b7d),
-                    modifier = Modifier.size(18.dp)
-                )
+                    )
+                    Icon(
+                        painter = painterResource(id = R.drawable.caretright_1),
+                        contentDescription = "Navigate",
+                        tint = Color(0xFF7B7B7D),
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Version Row
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(shape = RoundedCornerShape(10.dp))
-                    .background(color = Color.White)
-                    .border(
-                        border = BorderStroke(1.dp, Color(0xFFE0E0E0)),
-                        shape = RoundedCornerShape(10.dp)
-                    )
-                    .padding(horizontal = 14.dp, vertical = 16.dp)
+            // Version Row (Gaya Mature)
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                color = Color.White,
+                border = BorderStroke(1.dp, Color(0xFFF0F0F0))
             ) {
-                Text(
-                    text = "Version",
-                    color = Color(0xff1a1c1e),
-                    style = TextStyle(
-                        fontSize = 14.sp,
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 18.dp)
+                ) {
+                    Text(
+                        text = "Version",
+                        color = Color(0xFF1A1C1E),
+                        fontSize = 15.sp,
                         fontWeight = FontWeight.Medium
-                    ),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Text(
-                    text = "6.1.26",
-                    color = Color(0xff6c7278),
-                    textAlign = TextAlign.End,
-                    style = TextStyle(
-                        fontSize = 14.sp,
+                    )
+                    Text(
+                        text = "1.1.1",
+                        color = Color(0xFF6C7278),
+                        fontSize = 15.sp,
                         fontWeight = FontWeight.Medium
-                    ),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
+                    )
+                }
             }
         }
     }
 }
+
 
 @Preview(widthDp = 390, heightDp = 844)
 @Composable

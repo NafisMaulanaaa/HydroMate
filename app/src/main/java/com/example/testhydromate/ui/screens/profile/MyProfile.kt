@@ -11,6 +11,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Female
+import androidx.compose.material.icons.filled.Male
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -49,7 +51,10 @@ fun MyProfile(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .background(Color.White)
+    ) {
         if (isLoading) {
             // Loading Indicator
             CircularProgressIndicator(
@@ -106,6 +111,7 @@ fun MyProfile(
                                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                                     GenderButton(
                                         text = "Male",
+                                        icon = Icons.Default.Male,
                                         isSelected = selectedGender.equals("Male", true),
                                         color = Color(0xFF0E61D1),
                                         onClick = { selectedGender = "Male" },
@@ -113,6 +119,7 @@ fun MyProfile(
                                     )
                                     GenderButton(
                                         text = "Female",
+                                        icon = Icons.Default.Female,
                                         isSelected = selectedGender.equals("Female", true),
                                         color = Color(0xFFD10E79),
                                         onClick = { selectedGender = "Female" },
@@ -175,16 +182,46 @@ fun InputField(label: String, value: String, onValueChange: (String) -> Unit) {
 }
 
 @Composable
-fun GenderButton(text: String, isSelected: Boolean, color: Color, onClick: () -> Unit, modifier: Modifier = Modifier) {
+fun GenderButton(
+    text: String,
+    icon: androidx.compose.ui.graphics.vector.ImageVector, // Tambahkan ini
+    isSelected: Boolean,
+    color: Color,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
             .height(50.dp)
             .clip(RoundedCornerShape(10.dp))
             .background(if (isSelected) color.copy(alpha = 0.1f) else Color.White)
-            .border(BorderStroke(2.dp, if (isSelected) color else Color(0xFFE0E0E0)), RoundedCornerShape(10.dp))
-            .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) { onClick() }
+            .border(
+                BorderStroke(2.dp, if (isSelected) color else Color(0xFFE0E0E0)),
+                RoundedCornerShape(10.dp)
+            )
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null
+            ) { onClick() }
     ) {
-        Text(text = text, color = if (isSelected) color else Color(0xFF999999), fontWeight = FontWeight.Medium)
+        // Tambahkan Row agar Icon dan Text berdampingan
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = if (isSelected) color else Color(0xFF999999),
+                modifier = Modifier.size(20.dp)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = text,
+                color = if (isSelected) color else Color(0xFF999999),
+                fontWeight = FontWeight.Medium
+            )
+        }
     }
 }

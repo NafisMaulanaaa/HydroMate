@@ -3,6 +3,7 @@ package com.example.testhydromate.ui.screens.home
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -14,6 +15,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -27,6 +30,7 @@ import com.example.testhydromate.R
 import com.example.testhydromate.ui.components.PrimaryBlue
 import com.example.testhydromate.ui.components.TextGray
 import com.example.testhydromate.ui.screens.onboarding.OnboardingViewModel
+
 
 private val InputBgGray = Color(0xFFF5F5F5)
 private val ButtonCancelBg = Color(0xFFE3F2FD)
@@ -189,12 +193,21 @@ fun EditGoalSheetContent(
     onCancel: () -> Unit,
     onSave: () -> Unit
 ) {
+    val focusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(Unit) {
+        kotlinx.coroutines.delay(150)
+        focusRequester.requestFocus()
+    }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(bottom = 32.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+
+        /* ===== TITLE ===== */
         Text(
             text = "Edit Your Daily Goal",
             fontSize = 20.sp,
@@ -205,6 +218,7 @@ fun EditGoalSheetContent(
         HorizontalDivider(color = Color(0xFFF0F0F0))
         Spacer(modifier = Modifier.height(32.dp))
 
+        /* ===== ICON ===== */
         Image(
             painter = painterResource(id = R.drawable.water),
             contentDescription = null,
@@ -213,18 +227,22 @@ fun EditGoalSheetContent(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // INPUT BOX
+        /* ===== INPUT BOX (Presisi Tengah & Baseline) ===== */
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 24.dp)
                 .height(90.dp)
-                .background(color = Color(0xFFF8F9FA), shape = RoundedCornerShape(16.dp)),
-            contentAlignment = Alignment.Center
+                .background(
+                    color = Color(0xFFF8F9FA),
+                    shape = RoundedCornerShape(16.dp)
+                ),
+            contentAlignment = Alignment.Center // INI yang membuat Row (Angka+mL) berada di tengah
         ) {
             Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
+                // wrapContentWidth memastikan lebar Row hanya pas seukuran teks
+                modifier = Modifier.wrapContentWidth(),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 BasicTextField(
                     value = tempValue,
@@ -237,17 +255,21 @@ fun EditGoalSheetContent(
                         fontSize = 44.sp,
                         fontWeight = FontWeight.Bold,
                         color = PrimaryBlue,
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center // Tetap Center agar angka tumbuh seimbang
                     ),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number
+                    ),
                     singleLine = true,
                     modifier = Modifier
-                        .widthIn(min = 80.dp)
-                        .width(IntrinsicSize.Min)
+                        // wrapContentWidth() pada TextField sangat krusial agar tidak ada ruang kosong
+                        .wrapContentWidth()
                         .alignByBaseline()
+                        .focusRequester(focusRequester)
+                        .focusable()
                 )
 
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(4.dp)) // Jarak nempel 4dp
 
                 Text(
                     text = "mL",
@@ -260,10 +282,10 @@ fun EditGoalSheetContent(
         }
 
         Spacer(modifier = Modifier.height(40.dp))
-        HorizontalDivider(color = Color(0xFFF0F0F0))
+        HorizontalDivider(color = Color(0xFFF0F0F0), modifier = Modifier.padding(horizontal = 24.dp))
         Spacer(modifier = Modifier.height(24.dp))
 
-        // BUTTONS
+        /* ===== BUTTONS ===== */
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -297,10 +319,12 @@ fun EditGoalSheetContent(
     }
 }
 
-//@Preview(showBackground = true, widthDp = 390, heightDp = 844)
-//Composable
-//fun MainDailyGoalPreview() {
-//    ResultScreen(
-//        onContinueToHome = {}
-//    )
-//}
+
+
+/*@Preview(showBackground = true, widthDp = 390, heightDp = 844)
+Composable
+fun MainDailyGoalPreview() {
+    ResultScreen(
+        onContinueToHome = {}
+    )
+}*/

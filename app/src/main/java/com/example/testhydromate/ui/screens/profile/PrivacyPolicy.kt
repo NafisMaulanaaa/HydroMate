@@ -1,5 +1,6 @@
 package com.example.testhydromate.ui.screens.profile
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -26,44 +27,54 @@ fun PrivacyPolicy(
     modifier: Modifier = Modifier
 ) {
     Scaffold(
+        // 1. Pastikan seluruh background Scaffold berwarna putih
+        containerColor = Color.White,
         topBar = {
-            CenterAlignedTopAppBar(
-                title = { },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
-                            tint = PrimaryBlue
-                        )
-                    }
+            // 2. Custom Top Bar agar konsisten dengan My Profile & About App
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.White)
+                    .statusBarsPadding() // Mencegah mepet ke atas
+            ) {
+                IconButton(
+                    onClick = onBackClick,
+                    modifier = Modifier.padding(start = 8.dp, top = 8.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Back",
+                        tint = PrimaryBlue
+                    )
                 }
-            )
+
+                Text(
+                    text = "Privacy Policy",
+                    color = PrimaryBlue,
+                    textAlign = TextAlign.Center,
+                    style = TextStyle(
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 24.dp)
+                )
+            }
         },
         modifier = modifier
     ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .background(Color.White) // 3. Pastikan konten juga berlatar putih
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 32.dp, vertical = 16.dp)
         ) {
-            // Title
-            Text(
-                text = "Privacy Policy",
-                color = PrimaryBlue,
-                textAlign = TextAlign.Center,
-                style = TextStyle(
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 24.dp)
-            )
+            // Spacer(modifier = Modifier.height(16.dp)) // Bisa dihapus karena sudah ada padding di judul
 
-            // Information we collect
+            // --- Information we collect ---
             Text(
                 text = "Information we collect",
                 color = PrimaryBlue,
@@ -95,7 +106,7 @@ fun PrivacyPolicy(
                 modifier = Modifier.padding(bottom = 24.dp)
             )
 
-            // How we use the information
+            // --- How we use the information ---
             Text(
                 text = "How we use the information we collect, and legal bases for use",
                 color = PrimaryBlue,
@@ -137,60 +148,7 @@ fun PrivacyPolicy(
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
-            Text(
-                text = "As needed to operate and improve HydroMate, including:",
-                color = Color(0xff5c6268),
-                style = TextStyle(
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold
-                ),
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-
-            Text(
-                text = "• Enhancing your experience by personalizing hydration insights.\n• Improving the accuracy of water-intake recommendations.\n• Diagnosing technical issues, fixing bugs, and optimizing performance.\n• Protecting the security of your account and preventing unauthorized access.",
-                color = Color.Black,
-                style = TextStyle(
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Normal,
-                    lineHeight = 18.sp
-                ),
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
-
-            Text(
-                text = "As required for legal compliance",
-                color = Color(0xff5c6268),
-                style = TextStyle(
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold
-                ),
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-
-            Text(
-                text = "We may use or retain certain information if necessary to comply with applicable laws or regulations.",
-                color = Color.Black,
-                style = TextStyle(
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Normal,
-                    lineHeight = 18.sp
-                ),
-                modifier = Modifier.padding(bottom = 12.dp)
-            )
-
-            Text(
-                text = "HydroMate does not sell, rent, or share your personal information with third parties for advertising or marketing.",
-                color = Color.Black,
-                style = TextStyle(
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Normal,
-                    lineHeight = 18.sp
-                ),
-                modifier = Modifier.padding(bottom = 24.dp)
-            )
-
-            // Contact Us
+            // --- Contact Us ---
             Text(
                 text = "Contact Us",
                 color = PrimaryBlue,
@@ -220,11 +178,12 @@ fun PrivacyPolicy(
                     fontWeight = FontWeight.Normal,
                     lineHeight = 18.sp
                 ),
-                modifier = Modifier.padding(bottom = 24.dp)
+                modifier = Modifier.padding(bottom = 32.dp) // Jarak ekstra di akhir scroll
             )
         }
     }
 }
+
 
 @Preview(widthDp = 390, heightDp = 958)
 @Composable
