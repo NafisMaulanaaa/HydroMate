@@ -2,13 +2,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Izin untuk menampilkan notifikasi (Android 13+) -->
+    <!-- Izin Dasar Notifikasi -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
-    <!-- Izin agar notifikasi tetap jalan setelah HP restart -->
+    <!-- Izin agar bisa tetap jalan/bangun di background (PENTING) -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
-    <!-- Izin opsional: Agar notifikasi lebih tepat waktu (lebih mature) -->
+    <!-- Izin untuk alarm presisi (opsional tapi bagus untuk pengingat) -->
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"
         android:maxSdkVersion="32" />
 
@@ -34,7 +35,7 @@
             </intent-filter>
         </activity>
 
-        <!-- Tambahkan Provider untuk WorkManager agar stabil setelah Reboot -->
+        <!-- Konfigurasi WorkManager yang Lebih Stabil -->
         <provider
             android:name="androidx.startup.InitializationProvider"
             android:authorities="${applicationId}.androidx-startup"

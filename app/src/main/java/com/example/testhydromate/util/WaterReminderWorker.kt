@@ -77,16 +77,26 @@ class WaterReminderWorker(
     companion object {
         fun schedule(context: Context, isEnabled: Boolean) {
             val workManager = WorkManager.getInstance(context)
+
             if (isEnabled) {
+                // Tambahkan Constraints agar sistem menganggap ini tugas penting
+                val constraints = Constraints.Builder()
+                    .setRequiredNetworkType(NetworkType.NOT_REQUIRED) // Tidak butuh internet
+                    .setRequiresBatteryNotLow(false) // Tetap jalan meskipun baterai tidak penuh
+                    .build()
+
+                // Gunakan interval minimum (15 menit - 1 jam) agar lebih sering muncul
                 val request = PeriodicWorkRequestBuilder<WaterReminderWorker>(
-                    2, TimeUnit.HOURS
+                    1, TimeUnit.HOURS // Android minimal 15 menit, 1 jam sudah cukup bagus
                 )
+                    .setConstraints(constraints)
                     .addTag("water_reminder")
                     .build()
 
+                // Gunakan KEEP agar jadwal tidak reset setiap kali aplikasi dibuka
                 workManager.enqueueUniquePeriodicWork(
                     "WaterReminderWork",
-                    ExistingPeriodicWorkPolicy.UPDATE,
+                    ExistingPeriodicWorkPolicy.KEEP,
                     request
                 )
             } else {
