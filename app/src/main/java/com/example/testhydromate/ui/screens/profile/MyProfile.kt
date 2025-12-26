@@ -15,6 +15,8 @@ import androidx.compose.material.icons.filled.Female
 import androidx.compose.material.icons.filled.Male
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,21 +35,27 @@ fun MyProfile(
     onBackClick: () -> Unit,
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
-    // State lokal untuk input field
+    // 1. Tambahkan State lokal baru
     var fullName by remember { mutableStateOf("") }
     var selectedGender by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
+    var age by remember { mutableStateOf("") }     // Tambah Age
+    var weight by remember { mutableStateOf("") }  // Tambah Weight
+    var height by remember { mutableStateOf("") }  // Tambah Height
 
     val context = LocalContext.current
     val user = viewModel.userData
     val isLoading = viewModel.isLoading
 
-    // Sync data dari Firebase ke State Lokal saat data berhasil dimuat
+    // 2. Sinkronisasi data dari Firebase (Pastikan field ini ada di data class User-mu)
     LaunchedEffect(user) {
         user?.let {
             fullName = "${it.firstName} ${it.lastName}".trim()
             selectedGender = it.gender
             email = it.email
+            age = it.age.toString()       // Ambil Age
+            weight = it.weight.toString() // Ambil Weight
+            height = it.height.toString() // Ambil Height
         }
     }
 
@@ -56,7 +64,6 @@ fun MyProfile(
         .background(Color.White)
     ) {
         if (isLoading) {
-            // Loading Indicator
             CircularProgressIndicator(
                 modifier = Modifier.align(Alignment.Center),
                 color = PrimaryBlue
@@ -65,64 +72,57 @@ fun MyProfile(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(top = 12.dp, start = 16.dp, end = 16.dp, bottom = 85.dp),
+                    .statusBarsPadding() // Tambahkan ini agar tidak mepet status bar
+                    .padding(horizontal = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Spacer(modifier = Modifier.height(32.dp))
-
-                // Top Bar
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(onClick = onBackClick) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
-                            tint = PrimaryBlue
-                        )
+                // Top Bar & Title
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        IconButton(onClick = onBackClick) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "Back",
+                                tint = PrimaryBlue
+                            )
+                        }
                     }
+                    Text(
+                        text = "My Profile",
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = PrimaryBlue,
+                        modifier = Modifier.padding(bottom = 24.dp)
+                    )
                 }
-
-                Text(
-                    text = "My Profile",
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = PrimaryBlue,
-                    modifier = Modifier.padding(bottom = 24.dp)
-                )
 
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(20.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                    contentPadding = PaddingValues(bottom = 100.dp) // Beri ruang agar tidak tertutup tombol save
                 ) {
+                    // Item 1: Nama & Gender
                     item {
                         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                            InputField(
-                                label = "Full name",
-                                value = fullName,
-                                onValueChange = { fullName = it }
-                            )
+                            InputField(label = "Full name", value = fullName, onValueChange = { fullName = it })
 
-                            // Gender Selection
                             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                                Text("Gender", color = Color.Gray, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                Text("Gender", color = Color.Gray, fontSize = 12.sp, fontWeight = FontWeight.Medium)
                                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                                     GenderButton(
-                                        text = "Male",
-                                        icon = Icons.Default.Male,
+                                        text = "Male", icon = Icons.Default.Male,
                                         isSelected = selectedGender.equals("Male", true),
-                                        color = Color(0xFF0E61D1),
-                                        onClick = { selectedGender = "Male" },
+                                        color = Color(0xFF0E61D1), onClick = { selectedGender = "Male" },
                                         modifier = Modifier.weight(1f)
                                     )
                                     GenderButton(
-                                        text = "Female",
-                                        icon = Icons.Default.Female,
+                                        text = "Female", icon = Icons.Default.Female,
                                         isSelected = selectedGender.equals("Female", true),
-                                        color = Color(0xFFD10E79),
-                                        onClick = { selectedGender = "Female" },
+                                        color = Color(0xFFD10E79), onClick = { selectedGender = "Female" },
                                         modifier = Modifier.weight(1f)
                                     )
                                 }
@@ -130,25 +130,38 @@ fun MyProfile(
                         }
                     }
 
+                    // Item 2: Age, Weight, Height (Dibuat berdampingan agar rapi)
                     item {
-                        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                            InputField(
-                                label = "Email",
-                                value = email,
-                                onValueChange = { email = it }
-                            )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Box(modifier = Modifier.weight(1f)) {
+                                InputField(label = "Age", value = age, onValueChange = { age = it })
+                            }
+                            Box(modifier = Modifier.weight(1f)) {
+                                InputField(label = "Weight (kg)", value = weight, onValueChange = { weight = it })
+                            }
+                            Box(modifier = Modifier.weight(1f)) {
+                                InputField(label = "Height (cm)", value = height, onValueChange = { height = it })
+                            }
                         }
                     }
 
+                    // Item 3: Email
+                    item {
+                        InputField(label = "Email", value = email, onValueChange = { email = it })
+                    }
+
+                    // Item 4: Save Button
                     item {
                         Spacer(modifier = Modifier.height(8.dp))
                         Button(
                             onClick = {
                                 Toast.makeText(context, "Information saved locally", Toast.LENGTH_SHORT).show()
+                                // Di sini nantinya kamu panggil viewModel.updateUser(...)
                             },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(50.dp),
+                            modifier = Modifier.fillMaxWidth().height(50.dp),
                             shape = RoundedCornerShape(50.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlue)
                         ) {

@@ -1,26 +1,32 @@
 package com.example.testhydromate.ui.screens.profile
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.testhydromate.ui.components.PrimaryBlue
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.text.style.TextAlign
+import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.testhydromate.ui.components.PrimaryBlue
+import com.example.testhydromate.util.WaterReminderWorker
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -28,7 +34,18 @@ fun NotificationsScreen(
     onBackClick: () -> Unit,
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
+
+    // State untuk Switch
     var notificationsEnabled by remember { mutableStateOf(true) }
+
+    // Launcher untuk request permission (Android 13+)
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        notificationsEnabled = isGranted
+        WaterReminderWorker.schedule(context, isGranted)
+    }
 
     Scaffold(
         topBar = {
@@ -36,23 +53,16 @@ fun NotificationsScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(Color.White)
-                    // Menggunakan statusBarsPadding() agar otomatis memberi jarak seukuran Status Bar
                     .statusBarsPadding()
-                    .padding(top = 11.dp) // Tambahan sedikit napas agar tidak terlalu rapat ke status bar
+                    .padding(top = 11.dp)
             ) {
-                // 1. Baris untuk Tombol Back
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Di dalam Row tombol Back
                     IconButton(
                         onClick = onBackClick,
-                        modifier = Modifier.padding(
-                            start = 8.dp,// Tambah nilai ini agar tombol lebih ke KANAN
-                            top = 4.dp,     // Tambah nilai ini agar tombol lebih TURUN
-                            bottom = 0.dp   // (Opsional) Sesuaikan jika ingin lebih NAIK
-                        )
+                        modifier = Modifier.padding(start = 8.dp, top = 4.dp)
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -60,10 +70,8 @@ fun NotificationsScreen(
                             tint = PrimaryBlue
                         )
                     }
-
                 }
 
-                // 2. Baris untuk Judul (Di bawah tombol back dan Center)
                 Text(
                     text = "Notifications",
                     fontSize = 24.sp,
@@ -71,7 +79,7 @@ fun NotificationsScreen(
                     color = PrimaryBlue,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 32.dp), // Jarak ke bawah dikurangi sedikit agar seimbang
+                        .padding(bottom = 32.dp),
                     textAlign = TextAlign.Center
                 )
             }
@@ -81,11 +89,10 @@ fun NotificationsScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .background(Color.White)
                 .padding(paddingValues)
                 .padding(horizontal = 24.dp)
         ) {
-            // Spacer dihapus karena sudah ada padding di judul
-
             Surface(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
@@ -105,11 +112,38 @@ fun NotificationsScreen(
                             fontWeight = FontWeight.SemiBold,
                             color = Color(0xFF1A1C1E)
                         )
+                        Text(
+                            text = "Get reminders between 05:00 - 22:00",
+                            fontSize = 12.sp,
+                            color = Color.Gray
+                        )
                     }
 
                     Switch(
                         checked = notificationsEnabled,
-                        onCheckedChange = { notificationsEnabled = it },
+                        onCheckedChange = { checked ->
+                            if (checked) {
+                                // Cek Permission untuk Android 13+
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                    val isPermissionGranted = ContextCompat.checkSelfPermission(
+                                        context, Manifest.permission.POST_NOTIFICATIONS
+                                    ) == PackageManager.PERMISSION_GRANTED
+
+                                    if (isPermissionGranted) {
+                                        notificationsEnabled = true
+                                        WaterReminderWorker.schedule(context, true)
+                                    } else {
+                                        permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                                    }
+                                } else {
+                                    notificationsEnabled = true
+                                    WaterReminderWorker.schedule(context, true)
+                                }
+                            } else {
+                                notificationsEnabled = false
+                                WaterReminderWorker.schedule(context, false)
+                            }
+                        },
                         colors = SwitchDefaults.colors(
                             checkedThumbColor = Color.White,
                             checkedTrackColor = PrimaryBlue,

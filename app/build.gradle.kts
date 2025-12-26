@@ -86,4 +86,7 @@ dependencies {
 
     //Screen Animation Transition
     implementation("com.google.accompanist:accompanist-navigation-animation:0.34.0")
+
+    //Notification
+    implementation("androidx.work:work-runtime-ktx:2.9.1")
 }
