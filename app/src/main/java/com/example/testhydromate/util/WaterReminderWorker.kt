@@ -61,8 +61,8 @@ class WaterReminderWorker(
         }
 
         val notification = NotificationCompat.Builder(applicationContext, channelId)
-            .setContentTitle("Lets Hydrate Your Body!")
-            .setContentText("Don't let your streak end.")
+            .setContentTitle("Lets Hydrate!")
+            .setContentText("Keep your body hydrated everytime.")
             .setSmallIcon(com.example.testhydromate.R.drawable.hydromate_blue_logo)
             .setColor(android.graphics.Color.parseColor("#0061FF"))
             .setPriority(NotificationCompat.PRIORITY_HIGH)
