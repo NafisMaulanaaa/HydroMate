@@ -13,11 +13,16 @@ data class User(
     val weight: Int = 0,
     val height: Int = 0,
     val age: Int = 0,
+
 //    val wakeTime: String = "",
 //    val bedTime: String = "",
     val activityLevel: String = "",
     val weatherCondition: String = "",
     val dailyGoal: Int = 0,
 
-    val preferredAmount: Int = 100
+    val preferredAmount: Int = 100,
+
+    // Streak
+    val currentStreak: Int = 0,
+    val lastStreakDate: String = ""
 )

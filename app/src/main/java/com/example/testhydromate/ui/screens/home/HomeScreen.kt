@@ -25,6 +25,7 @@ import java.util.Locale
 fun HomeScreen(
     onLogout: () -> Unit = {},
     onNavigateToAchievement: () -> Unit = {},
+    onNavigateToStreak: () -> Unit = {},
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val total by viewModel.totalDrink.collectAsState()
@@ -33,6 +34,10 @@ fun HomeScreen(
     val shouldShowAchievement by viewModel.shouldShowAchievement.collectAsState()
 
     var showAdjustSheet by remember { mutableStateOf(false) }
+
+    // State untuk streak
+    val streakCount by viewModel.streakCount.collectAsState()
+    val isStreakActive by viewModel.isStreakActiveToday.collectAsState()
 
     LaunchedEffect(shouldShowAchievement) {
         if (shouldShowAchievement) {
@@ -107,6 +112,25 @@ fun HomeScreen(
                     onDeleteConfirm = { viewModel.deleteLog(it) }
                 )
             }
+        }
+
+        //STREAK
+        FloatingStreakTrophy(
+            streakCount = streakCount, // Perbaikan: samakan dengan nama variabel di atas
+            isActive = isStreakActive,
+            onClick = onNavigateToStreak
+        )
+
+        // Bottom Sheet
+        if (showAdjustSheet) {
+            AdjustDrinkAmountBottomSheet(
+                initialAmount = viewModel.selectedAmount,
+                onDismiss = { showAdjustSheet = false },
+                onSave = { newAmount ->
+                    viewModel.updateSelectedAmount(newAmount)
+                    showAdjustSheet = false
+                }
+            )
         }
     }
 }

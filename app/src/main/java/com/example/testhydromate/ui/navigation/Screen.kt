@@ -22,6 +22,9 @@ sealed class Screen(val route: String) {
 
     //achievement
     object ACHIEVEMENT : Screen("achievement")
+
+    // streak
+    object STREAK : Screen("streak")
 }
 
 //data class Route(val route: String)

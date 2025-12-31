@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember // Tambahan penting
 import androidx.compose.ui.Alignment
@@ -21,11 +22,13 @@ import com.example.testhydromate.ui.screens.achievement.AchievementScreen
 import com.example.testhydromate.ui.screens.auth.LoginScreen
 import com.example.testhydromate.ui.screens.history.HistoryScreen
 import com.example.testhydromate.ui.screens.home.HomeScreen
+import com.example.testhydromate.ui.screens.home.HomeViewModel
 import com.example.testhydromate.ui.screens.home.ResultScreen
 import com.example.testhydromate.ui.screens.onboarding.*
 import com.example.testhydromate.ui.screens.profile.*
 import com.example.testhydromate.ui.screens.splash.SplashScreen
 import com.example.testhydromate.ui.screens.splash.SplashViewModel
+import com.example.testhydromate.ui.screens.streak.StreakScreen
 
 // Definisikan nama route untuk Graph Onboarding agar konsisten
 const val ONBOARDING_GRAPH_ROUTE = "onboarding_graph"
@@ -216,10 +219,28 @@ fun RouteScreen() {
 
             // ===== MAIN =====
             composable(Screen.HOME.route) {
+                val homeViewModel: HomeViewModel = hiltViewModel() // Ambil VM agar data streak sinkron
+
                 HomeScreen(
                     onNavigateToAchievement = {
                         navController.navigate(Screen.ACHIEVEMENT.route)
-                    }
+                    },
+                    // TAMBAHKAN INI agar tombol piala di Home bisa pindah halaman
+                    onNavigateToStreak = {
+                        navController.navigate(Screen.STREAK.route)
+                    },
+                    viewModel = homeViewModel
+                )
+            }
+
+            // composable baru untuk StreakScreen
+            composable(Screen.STREAK.route) {
+                val homeViewModel: HomeViewModel = hiltViewModel()
+                val streakCount by homeViewModel.streakCount.collectAsState()
+
+                StreakScreen(
+                    onBack = { navController.popBackStack() },
+                    streakCount = streakCount
                 )
             }
 
