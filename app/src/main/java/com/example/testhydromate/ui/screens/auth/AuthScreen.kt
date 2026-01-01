@@ -27,7 +27,7 @@ import android.graphics.RenderEffect
 import android.graphics.Shader
 import androidx.compose.ui.graphics.asComposeRenderEffect
 import androidx.compose.ui.graphics.graphicsLayer
-import com.example.testhydromate.data.model.southeastAsiaCountryList
+//import com.example.testhydromate.data.model.southeastAsiaCountryList
 import com.example.testhydromate.ui.components.PrimaryBlue
 
 @Composable
@@ -200,8 +200,8 @@ fun SignUpForm(viewModel: AuthViewModel) {
     var showDatePicker by remember { mutableStateOf(false) }
     val datePickerState = rememberDatePickerState()
 
-    val countryList = remember { southeastAsiaCountryList } // Pastikan variable ini ada
-    var selectedCountry by remember { mutableStateOf(countryList.first()) }
+//    val countryList = remember { southeastAsiaCountryList } // Pastikan variable ini ada
+//    var selectedCountry by remember { mutableStateOf(countryList.first()) }
     var showCountryDialog by remember { mutableStateOf(false) }
     var phoneNumber by remember { mutableStateOf("") }
 

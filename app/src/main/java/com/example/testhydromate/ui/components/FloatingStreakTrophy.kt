@@ -138,7 +138,7 @@ fun FloatingStreakTrophy(
                     }
                 }
             }
-            .size(80.dp),
+            .size(50.dp),
         contentAlignment = Alignment.Center
     ) {
         // Efek Sinar (Hanya muncul jika isActive true)
@@ -163,7 +163,7 @@ fun FloatingStreakTrophy(
             painter = painterResource(id = R.drawable.trophy_1),
             contentDescription = "Streak Trophy",
             modifier = Modifier
-                .size(50.dp)
+                .size(30.dp)
                 .clickable(
                     indication = null, // Hilangkan ripple effect abu-abu
                     interactionSource = remember { MutableInteractionSource() }
@@ -173,11 +173,11 @@ fun FloatingStreakTrophy(
         )
 
         // Angka Streak kecil di pojok piala
-        Badge(
-            modifier = Modifier.align(Alignment.BottomEnd),
-            containerColor = Color(0xFF2196F3) // Ganti dengan PrimaryBlue Anda
-        ) {
-            Text("$streakCount", color = Color.White, fontSize = 10.sp)
-        }
+//        Badge(
+//            modifier = Modifier.align(Alignment.BottomEnd),
+//            containerColor = Color(0xFF2196F3) // Ganti dengan PrimaryBlue Anda
+//        ) {
+//            Text("$streakCount", color = Color.White, fontSize = 10.sp)
+//        }
     }
 }

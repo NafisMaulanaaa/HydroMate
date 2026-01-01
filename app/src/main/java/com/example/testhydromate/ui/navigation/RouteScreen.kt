@@ -26,6 +26,7 @@ import com.example.testhydromate.ui.screens.home.HomeViewModel
 import com.example.testhydromate.ui.screens.home.ResultScreen
 import com.example.testhydromate.ui.screens.onboarding.*
 import com.example.testhydromate.ui.screens.profile.*
+import com.example.testhydromate.ui.screens.report.ReportScreen
 import com.example.testhydromate.ui.screens.splash.SplashScreen
 import com.example.testhydromate.ui.screens.splash.SplashViewModel
 import com.example.testhydromate.ui.screens.streak.StreakScreen
@@ -43,6 +44,7 @@ fun RouteScreen() {
     val showBottomBar = currentRoute in listOf(
         Screen.HOME.route,
         Screen.HISTORY.route,
+        Screen.REPORT.route,
         Screen.PROFILE.route
     )
 
@@ -52,7 +54,8 @@ fun RouteScreen() {
                 val selectedIndex = when (currentRoute) {
                     Screen.HOME.route -> 0
                     Screen.HISTORY.route -> 1
-                    Screen.PROFILE.route -> 2
+                    Screen.REPORT.route -> 2
+                    Screen.PROFILE.route -> 3
                     else -> 0
                 }
 
@@ -71,6 +74,13 @@ fun RouteScreen() {
                         },
                         onHistory = {
                             navController.navigate(Screen.HISTORY.route) {
+                                launchSingleTop = true
+                                popUpTo(Screen.HOME.route) { saveState = true }
+                                restoreState = true
+                            }
+                        },
+                        onReport = {
+                            navController.navigate(Screen.REPORT.route) {
                                 launchSingleTop = true
                                 popUpTo(Screen.HOME.route) { saveState = true }
                                 restoreState = true
@@ -245,6 +255,18 @@ fun RouteScreen() {
             }
 
             composable(Screen.HISTORY.route) { HistoryScreen() }
+
+            composable(Screen.REPORT.route) {
+                // Gunakan ReportScreen yang sudah kita buat tadi
+                ReportScreen(
+                    onBackClick = {
+                        // Jika user klik back di header report, kembalikan ke Home
+                        navController.navigate(Screen.HOME.route) {
+                            popUpTo(Screen.HOME.route) { inclusive = true }
+                        }
+                    }
+                )
+            }
 
             composable(Screen.PROFILE.route) {
                 ProfileScreen(

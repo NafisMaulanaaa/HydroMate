@@ -14,11 +14,13 @@ sealed class Screen(val route: String) {
     // main
     object HOME : Screen("home")
     object HISTORY : Screen("history")
+    object REPORT : Screen("report")
     object PROFILE : Screen("profile")
     object MY_PROFILE : Screen("my_profile")
     object NOTIFICATIONS : Screen("notifications")
     object ABOUT_APP : Screen("about_app")
     object PRIVACY_POLICY : Screen("privacy_policy")
+
 
     //achievement
     object ACHIEVEMENT : Screen("achievement")

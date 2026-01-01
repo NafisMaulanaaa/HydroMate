@@ -30,12 +30,13 @@ fun HydroBottomBar(
     selectedIndex: Int,
     onHome: () -> Unit,
     onHistory: () -> Unit,
+    onReport: () -> Unit,
     onProfile: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Surface(
         modifier = modifier
-            .width(320.dp)
+            .width(400.dp)
             .padding(horizontal = 16.dp)
             .padding(bottom = 25.dp)
             .height(64.dp),
@@ -47,11 +48,11 @@ fun HydroBottomBar(
         BoxWithConstraints(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 10.dp), // Padding dalam surface
+                .padding(horizontal = 10.dp),
             contentAlignment = Alignment.CenterStart
         ) {
             val maxWidth = maxWidth
-            val itemCount = 3
+            val itemCount = 4 // DIUBAH JADI 4
             // Lebar satu segmen/item
             val itemWidth = maxWidth / itemCount
 
@@ -66,18 +67,17 @@ fun HydroBottomBar(
             )
 
             // 2. BACKGROUND BIRU (SLIDING INDICATOR)
-            // Ini dirender DULUAN agar berada di BELAKANG icon
             Box(
                 modifier = Modifier
-                    .offset(x = indicatorOffset) // Geser posisi X
-                    .width(itemWidth) // Lebar area indikator sama dengan lebar 1 item
+                    .offset(x = indicatorOffset)
+                    .width(itemWidth)
                     .fillMaxHeight(),
-                contentAlignment = Alignment.Center // Pastikan pill biru di tengah area
+                contentAlignment = Alignment.Center
             ) {
                 Box(
                     modifier = Modifier
                         .height(40.dp)
-                        .width(72.dp) // Ukuran fix pill biru
+                        .width(60.dp) // Ukuran pill sedikit dikecilkan agar muat 4 item
                         .background(
                             color = PrimaryBlue,
                             shape = RoundedCornerShape(24.dp)
@@ -85,7 +85,7 @@ fun HydroBottomBar(
                 )
             }
 
-            // 3. ROW ICON (DI ATAS BACKGROUND)
+            // 3. ROW ICON
             Row(
                 modifier = Modifier.fillMaxSize(),
                 verticalAlignment = Alignment.CenterVertically
@@ -98,15 +98,23 @@ fun HydroBottomBar(
                 )
 
                 BottomItem(
-                    icon = Icons.Default.Description,
+                    icon = Icons.Default.Description, // History
                     selected = selectedIndex == 1,
                     onClick = onHistory,
                     modifier = Modifier.weight(1f)
                 )
 
+                // ITEM BARU: REPORT
                 BottomItem(
-                    icon = Icons.Default.Person,
+                    icon = Icons.Default.BarChart, // Icon Chart
                     selected = selectedIndex == 2,
+                    onClick = onReport,
+                    modifier = Modifier.weight(1f)
+                )
+
+                BottomItem(
+                    icon = Icons.Default.Settings,
+                    selected = selectedIndex == 3,
                     onClick = onProfile,
                     modifier = Modifier.weight(1f)
                 )
@@ -122,17 +130,14 @@ private fun BottomItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    // Interaction Source & State Tekan (untuk efek scale)
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
 
-    // Animasi Scale (Mengecil saat ditekan)
     val scale by animateFloatAsState(
         targetValue = if (isPressed) 0.90f else 1f,
         label = "scale_anim"
     )
 
-    // Animasi Warna Icon (Biar transisinya smooth ngikutin background)
     val iconColor by animateColorAsState(
         targetValue = if (selected) Color.White else Color(0xff9E9E9E),
         animationSpec = spring(stiffness = Spring.StiffnessLow),
@@ -145,17 +150,15 @@ private fun BottomItem(
             .scale(scale)
             .clickable(
                 interactionSource = interactionSource,
-                indication = null, // Hapus ripple
+                indication = null,
                 onClick = onClick
             ),
         contentAlignment = Alignment.Center
     ) {
-
-        // Icon
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = iconColor, // Gunakan animasi warna
+            tint = iconColor,
             modifier = Modifier.size(22.dp)
         )
     }
