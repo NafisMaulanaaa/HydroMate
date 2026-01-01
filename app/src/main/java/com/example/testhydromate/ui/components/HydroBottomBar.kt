@@ -36,10 +36,10 @@ fun HydroBottomBar(
 ) {
     Surface(
         modifier = modifier
-            .width(400.dp)
-            .padding(horizontal = 16.dp)
+            .width(340.dp)
+            .padding(horizontal = 24.dp)
             .padding(bottom = 25.dp)
-            .height(64.dp),
+            .height(56.dp),
         shape = RoundedCornerShape(120.dp),
         color = Color(0xffFBFBFB),
         shadowElevation = 12.dp

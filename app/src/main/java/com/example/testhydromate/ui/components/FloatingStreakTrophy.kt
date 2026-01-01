@@ -42,9 +42,9 @@ fun FloatingStreakTrophy(
     val screenHeightPx = with(density) { configuration.screenHeightDp.dp.toPx() }
 
     // Ukuran trophy
-    val trophySize = with(density) { 80.dp.toPx() }
+    val trophySize = with(density) { 60.dp.toPx() }
     val margin = with(density) { 16.dp.toPx() }
-    val topMargin = with(density) {60.dp.toPx() } // Jarak dari atas biar ga nabrak header
+    val topMargin = with(density) {75.dp.toPx() } // Jarak dari atas biar ga nabrak header
 
     // ✅ DEFAULT POSISI: KANAN ATAS
     var offsetX by remember { mutableStateOf(screenWidthPx - trophySize - margin) }
@@ -163,9 +163,9 @@ fun FloatingStreakTrophy(
             painter = painterResource(id = R.drawable.trophy_1),
             contentDescription = "Streak Trophy",
             modifier = Modifier
-                .size(30.dp)
+                .size(50.dp)
                 .clickable(
-                    indication = null, // Hilangkan ripple effect abu-abu
+                    indication = null,
                     interactionSource = remember { MutableInteractionSource() }
                 ) {
                     onClick()

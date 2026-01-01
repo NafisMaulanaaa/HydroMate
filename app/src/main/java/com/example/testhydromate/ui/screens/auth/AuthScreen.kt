@@ -150,9 +150,9 @@ fun LoginForm(viewModel: AuthViewModel) {
             onValueChange = { password = it }
         )
 
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(24.dp))
 
-        Row(
+        /*Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
@@ -172,7 +172,7 @@ fun LoginForm(viewModel: AuthViewModel) {
             Text("Forgot Password?", color = Color(0xff1d61e7), fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
         }
 
-        Spacer(Modifier.height(24.dp))
+        Spacer(Modifier.height(24.dp))*/
 
         HydroPrimaryButton(
             text = "Log In",
