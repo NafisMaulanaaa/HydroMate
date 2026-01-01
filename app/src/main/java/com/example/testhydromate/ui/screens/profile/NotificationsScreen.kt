@@ -112,11 +112,6 @@ fun NotificationsScreen(
                             fontWeight = FontWeight.SemiBold,
                             color = Color(0xFF1A1C1E)
                         )
-                        Text(
-                            text = "Get reminders between 05:00 - 22:00",
-                            fontSize = 12.sp,
-                            color = Color.Gray
-                        )
                     }
 
                     Switch(
