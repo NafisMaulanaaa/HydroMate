@@ -23,11 +23,13 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.testhydromate.ui.components.TopBarOnBoardingPage
+//import com.example.testhydromate.ui.components.TopBarOnBoardingPage
 import com.example.testhydromate.ui.components.HydroPrimaryButton
 import com.example.testhydromate.ui.components.PrimaryBlue
 import com.example.testhydromate.ui.components.FemalePink
+import com.example.testhydromate.ui.components.GenderButton
 import com.example.testhydromate.ui.components.LightGrayBg
+import com.example.testhydromate.ui.components.MeasurementInput
 import com.example.testhydromate.ui.components.OnboardingTopBar
 import com.example.testhydromate.ui.components.TextGray
 
@@ -156,92 +158,9 @@ fun InputPersonalScreen(
     }
 }
 
-@Composable
-fun GenderButton(
-    text: String,
-    icon: ImageVector,
-    isSelected: Boolean,
-    color: Color,
-    scndColor: Color,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit
-) {
-    OutlinedButton(
-        onClick = onClick,
-        modifier = modifier.height(56.dp),
-        shape = RoundedCornerShape(12.dp),
-        border = BorderStroke(1.dp, color),
-        colors =
-            ButtonDefaults.outlinedButtonColors(
-                containerColor = if (isSelected) scndColor else Color.Transparent)
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = text,
-            tint = if (isSelected) color else Color.Gray,
-            modifier = Modifier.size(20.dp)
-        )
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(
-            text = text,
-            color = if (isSelected) color else Color.Gray,
-            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
-        )
-    }
-}
 
-@Composable
-fun MeasurementInput(
-    label: String,
-    value: String,
-    unit: String,
-    onValueChange: (String) -> Unit
-) {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Text(
-            text = label,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.SemiBold,
-            color = Color.Black
-        )
-        Spacer(modifier = Modifier.height(10.dp))
 
-        // Custom Styled Input Box
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp)
-                .background(LightGrayBg, RoundedCornerShape(12.dp))
-                .padding(horizontal = 16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
-        ) {
-            // Kita pakai Box untuk menengahkan Text Field secara presisi
-            Box(
-                modifier = Modifier.weight(1f),
-                contentAlignment = Alignment.Center
-            ) {
-                BasicTextField(
-                    value = value,
-                    onValueChange = onValueChange,
-                    textStyle = TextStyle(
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = PrimaryBlue,
-                        textAlign = TextAlign.Center
-                    ),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    singleLine = true
-                )
-            }
-            Text(
-                text = unit,
-                fontSize = 16.sp,
-                color = Color.Black
-            )
-        }
-    }
-}
+
 
 // --- Preview ---
 //@Preview(showBackground = true, widthDp = 390, heightDp = 844)

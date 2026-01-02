@@ -28,10 +28,8 @@ fun HydrationChart(
     isPercentage: Boolean, // True jika chart %, False jika chart Volume (mL)
     modifier: Modifier = Modifier
 ) {
-    // State untuk tooltip interaktif (default pilih hari terakhir)
     var selectedIndex by remember { mutableStateOf(data.lastIndex) }
 
-    // Warna
     val activeColor = PrimaryBlue
     val inactiveColor = Color(0xFFE3F2FD) // Light Blue
     val pathColor = PrimaryBlue
@@ -41,7 +39,6 @@ fun HydrationChart(
             .fillMaxSize()
             .pointerInput(Unit) {
                 detectTapGestures { offset ->
-                    // Logic sederhana mendeteksi tap area X
                     val barWidth = size.width / (data.size * 2f)
                     val stepX = size.width / data.size
                     val index = (offset.x / stepX).toInt().coerceIn(0, data.lastIndex)
@@ -54,14 +51,12 @@ fun HydrationChart(
         val barWidth = (w / data.size) * 0.4f
         val stepX = w / data.size
 
-        // Mencari nilai Max untuk scaling Y
         val maxValue = if (isPercentage) 100f else data.maxOfOrNull { it.totalAmount.toFloat() }?.coerceAtLeast(1000f) ?: 2000f
 
         // --- DRAW CHART ---
         if (type == ChartType.BAR) {
             data.forEachIndexed { index, item ->
                 val value = if (isPercentage) item.completionPercent else item.totalAmount.toFloat()
-                // Clamp value agar tidak melebihi grafik jika > 100%
                 val drawValue = value.coerceAtMost(maxValue)
 
                 val barHeight = (drawValue / maxValue) * (h * 0.7f) // Pakai 70% tinggi canvas

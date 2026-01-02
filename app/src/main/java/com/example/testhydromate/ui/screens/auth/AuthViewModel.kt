@@ -62,4 +62,18 @@ class AuthViewModel @Inject constructor(
     fun resetState() {
         authState = null
     }
+
+    // UTILS (Validation)
+    fun isValidEmail(email: String): Boolean {
+        val emailRegex = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$")
+        return emailRegex.matches(email)
+    }
+
+    fun isStrongPassword(password: String): Boolean {
+        val hasUpper = password.any { it.isUpperCase() }
+        val hasLower = password.any { it.isLowerCase() }
+        val hasDigit = password.any { it.isDigit() }
+        val hasSymbol = password.any { !it.isLetterOrDigit() }
+        return password.length >= 8 && hasUpper && hasLower && hasDigit && hasSymbol
+    }
 }

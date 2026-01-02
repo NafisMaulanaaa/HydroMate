@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.testhydromate.ui.components.HydroPrimaryButton
 import com.example.testhydromate.ui.components.OnboardingTopBar
-import com.example.testhydromate.ui.components.TopBarOnBoardingPage
+//import com.example.testhydromate.ui.components.TopBarOnBoardingPage
 import com.example.testhydromate.ui.components.OptionButton
 import com.example.testhydromate.ui.components.PrimaryBlue
 import com.example.testhydromate.ui.components.TextGray
@@ -74,30 +74,6 @@ fun InputHabitScreen(
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
-//
-//            Spacer(modifier = Modifier.height(32.dp))
-//
-//            // 3. Waktu Bangun (Wake Up)
-//            TimeInputSection(
-//                label = "What time you usually wake up?",
-//                hourValue = viewModel.wakeHour,
-//                minuteValue = viewModel.wakeMinute,
-//                amPmLabel = "AM", // Logika AM/PM bisa dibuat dinamis jika perlu
-//                onHourChange = { viewModel.wakeHour = it },
-//                onMinuteChange = { viewModel.wakeMinute = it }
-//            )
-//
-//            Spacer(modifier = Modifier.height(24.dp))
-//
-//            // 4. Waktu Tidur (Bed Time)
-//            TimeInputSection(
-//                label = "What time you usually go to bed?",
-//                hourValue = viewModel.bedHour,
-//                minuteValue = viewModel.bedMinute,
-//                amPmLabel = "PM",
-//                onHourChange = { viewModel.bedHour = it },
-//                onMinuteChange = { viewModel.bedMinute = it }
-//            )
 
             Spacer(modifier = Modifier.height(32.dp))
 

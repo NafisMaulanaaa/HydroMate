@@ -149,14 +149,14 @@ fun ProfileScreen(
         if (showLogoutDialog) {
             AlertDialog(
                 onDismissRequest = { showLogoutDialog = false },
-                containerColor = Color.White, // Background Putih Bersih
-                tonalElevation = 0.dp, // Menghilangkan bayangan kebiruan default M3
+                containerColor = Color.White,
+                tonalElevation = 0.dp,
                 title = {
                     Text(
                         text = "Logout",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF1A1C1E) // Warna teks hampir hitam agar elegan
+                        color = Color(0xFF1A1C1E)
                     )
                 },
                 text = {
@@ -175,7 +175,7 @@ fun ProfileScreen(
                             onLogoutSuccess()
                         },
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFFBA1A1A), // Merah gelap (Danger) yang lebih mature
+                            containerColor = Color(0xFFBA1A1A),
                             contentColor = Color.White
                         ),
                         shape = RoundedCornerShape(12.dp),
@@ -195,7 +195,7 @@ fun ProfileScreen(
                         )
                     }
                 },
-                shape = RoundedCornerShape(24.dp) // Sudut lebih melengkung agar modern
+                shape = RoundedCornerShape(24.dp)
             )
         }
 

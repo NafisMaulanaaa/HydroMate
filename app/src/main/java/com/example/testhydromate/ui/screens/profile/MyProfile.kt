@@ -28,34 +28,35 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.testhydromate.ui.components.GenderButton
+import com.example.testhydromate.ui.components.InputField
 import com.example.testhydromate.ui.components.PrimaryBlue
+import com.example.testhydromate.ui.components.ProfileGenderButton
 
 @Composable
 fun MyProfile(
     onBackClick: () -> Unit,
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
-    // 1. Tambahkan State lokal baru
     var fullName by remember { mutableStateOf("") }
     var selectedGender by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
-    var age by remember { mutableStateOf("") }     // Tambah Age
-    var weight by remember { mutableStateOf("") }  // Tambah Weight
-    var height by remember { mutableStateOf("") }  // Tambah Height
+    var age by remember { mutableStateOf("") }
+    var weight by remember { mutableStateOf("") }
+    var height by remember { mutableStateOf("") }
 
     val context = LocalContext.current
     val user = viewModel.userData
     val isLoading = viewModel.isLoading
 
-    // 2. Sinkronisasi data dari Firebase (Pastikan field ini ada di data class User-mu)
     LaunchedEffect(user) {
         user?.let {
             fullName = "${it.firstName} ${it.lastName}".trim()
             selectedGender = it.gender
             email = it.email
-            age = it.age.toString()       // Ambil Age
-            weight = it.weight.toString() // Ambil Weight
-            height = it.height.toString() // Ambil Height
+            age = it.age.toString()
+            weight = it.weight.toString()
+            height = it.height.toString()
         }
     }
 
@@ -72,7 +73,7 @@ fun MyProfile(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .statusBarsPadding() // Tambahkan ini agar tidak mepet status bar
+                    .statusBarsPadding()
                     .padding(horizontal = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -103,9 +104,9 @@ fun MyProfile(
                     verticalArrangement = Arrangement.spacedBy(20.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                    contentPadding = PaddingValues(bottom = 100.dp) // Beri ruang agar tidak tertutup tombol save
+                    contentPadding = PaddingValues(bottom = 100.dp)
                 ) {
-                    // Item 1: Nama & Gender
+                    // Nama & Gender
                     item {
                         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                             InputField(label = "Full name", value = fullName, onValueChange = { fullName = it })
@@ -113,13 +114,13 @@ fun MyProfile(
                             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                                 Text("Gender", color = Color.Gray, fontSize = 12.sp, fontWeight = FontWeight.Medium)
                                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                                    GenderButton(
+                                    ProfileGenderButton(
                                         text = "Male", icon = Icons.Default.Male,
                                         isSelected = selectedGender.equals("Male", true),
                                         color = Color(0xFF0E61D1), onClick = { selectedGender = "Male" },
                                         modifier = Modifier.weight(1f)
                                     )
-                                    GenderButton(
+                                    ProfileGenderButton(
                                         text = "Female", icon = Icons.Default.Female,
                                         isSelected = selectedGender.equals("Female", true),
                                         color = Color(0xFFD10E79), onClick = { selectedGender = "Female" },
@@ -130,7 +131,7 @@ fun MyProfile(
                         }
                     }
 
-                    // Item 2: Age, Weight, Height (Dibuat berdampingan agar rapi)
+                    // Age, Weight, Height (Dibuat berdampingan agar rapi)
                     item {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -148,12 +149,12 @@ fun MyProfile(
                         }
                     }
 
-                    // Item 3: Email
+                    //  Email
                     item {
                         InputField(label = "Email", value = email, onValueChange = { email = it })
                     }
 
-                    // Item 4: Save Button
+                    // Save Button
                     item {
                         Spacer(modifier = Modifier.height(8.dp))
                         Button(
@@ -170,71 +171,6 @@ fun MyProfile(
                     }
                 }
             }
-        }
-    }
-}
-
-// Komponen InputField dan GenderButton tetap sama seperti kode awal Anda
-@Composable
-fun InputField(label: String, value: String, onValueChange: (String) -> Unit) {
-    Column(verticalArrangement = Arrangement.spacedBy(2.dp), modifier = Modifier.fillMaxWidth()) {
-        Text(text = label, color = Color(0xFF999999), fontSize = 12.sp, fontWeight = FontWeight.Medium)
-        OutlinedTextField(
-            value = value,
-            onValueChange = onValueChange,
-            modifier = Modifier.fillMaxWidth().height(56.dp),
-            textStyle = TextStyle(fontSize = 14.sp, color = Color(0xFF1A1C1E)),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color(0xFFE0E0E0),
-                unfocusedBorderColor = Color(0xFFE0E0E0)
-            ),
-            shape = RoundedCornerShape(10.dp),
-            singleLine = true
-        )
-    }
-}
-
-@Composable
-fun GenderButton(
-    text: String,
-    icon: androidx.compose.ui.graphics.vector.ImageVector, // Tambahkan ini
-    isSelected: Boolean,
-    color: Color,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = modifier
-            .height(50.dp)
-            .clip(RoundedCornerShape(10.dp))
-            .background(if (isSelected) color.copy(alpha = 0.1f) else Color.White)
-            .border(
-                BorderStroke(2.dp, if (isSelected) color else Color(0xFFE0E0E0)),
-                RoundedCornerShape(10.dp)
-            )
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null
-            ) { onClick() }
-    ) {
-        // Tambahkan Row agar Icon dan Text berdampingan
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = if (isSelected) color else Color(0xFF999999),
-                modifier = Modifier.size(20.dp)
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = text,
-                color = if (isSelected) color else Color(0xFF999999),
-                fontWeight = FontWeight.Medium
-            )
         }
     }
 }

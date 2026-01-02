@@ -36,7 +36,7 @@ fun HydroBottomBar(
 ) {
     Surface(
         modifier = modifier
-            .width(340.dp)
+            .width(370.dp)
             .padding(horizontal = 24.dp)
             .padding(bottom = 25.dp)
             .height(56.dp),
@@ -52,11 +52,10 @@ fun HydroBottomBar(
             contentAlignment = Alignment.CenterStart
         ) {
             val maxWidth = maxWidth
-            val itemCount = 4 // DIUBAH JADI 4
-            // Lebar satu segmen/item
+            val itemCount = 4
             val itemWidth = maxWidth / itemCount
 
-            // 1. ANIMASI GESER (OFFSET)
+            // 1. ANIMASI GESER
             val indicatorOffset by animateDpAsState(
                 targetValue = itemWidth * selectedIndex,
                 animationSpec = spring(
@@ -77,7 +76,7 @@ fun HydroBottomBar(
                 Box(
                     modifier = Modifier
                         .height(40.dp)
-                        .width(60.dp) // Ukuran pill sedikit dikecilkan agar muat 4 item
+                        .width(60.dp)
                         .background(
                             color = PrimaryBlue,
                             shape = RoundedCornerShape(24.dp)
@@ -98,15 +97,14 @@ fun HydroBottomBar(
                 )
 
                 BottomItem(
-                    icon = Icons.Default.Description, // History
+                    icon = Icons.Default.Description,
                     selected = selectedIndex == 1,
                     onClick = onHistory,
                     modifier = Modifier.weight(1f)
                 )
 
-                // ITEM BARU: REPORT
                 BottomItem(
-                    icon = Icons.Default.BarChart, // Icon Chart
+                    icon = Icons.Default.BarChart,
                     selected = selectedIndex == 2,
                     onClick = onReport,
                     modifier = Modifier.weight(1f)

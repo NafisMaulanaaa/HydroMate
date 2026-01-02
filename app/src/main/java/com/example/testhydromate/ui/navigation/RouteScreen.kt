@@ -229,13 +229,12 @@ fun RouteScreen() {
 
             // ===== MAIN =====
             composable(Screen.HOME.route) {
-                val homeViewModel: HomeViewModel = hiltViewModel() // Ambil VM agar data streak sinkron
+                val homeViewModel: HomeViewModel = hiltViewModel()
 
                 HomeScreen(
                     onNavigateToAchievement = {
                         navController.navigate(Screen.ACHIEVEMENT.route)
                     },
-                    // TAMBAHKAN INI agar tombol piala di Home bisa pindah halaman
                     onNavigateToStreak = {
                         navController.navigate(Screen.STREAK.route)
                     },

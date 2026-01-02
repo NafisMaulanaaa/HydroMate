@@ -47,10 +47,8 @@ fun LoginScreen(
                 viewModel.resetState()
             }
             is Resource.Error -> {
-                // FILTER ERRORNYA
                 val msg = state.message ?: "Unknown Error"
 
-                // Kalau errornya soal config, CUEKIN AJA (Siapa tau loginnya tetep berhasil)
                 if (!msg.contains("CONFIGURATION_NOT_FOUND")) {
                     Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
                 }
@@ -80,7 +78,6 @@ fun LoginScreen(
             Spacer(Modifier.height(24.dp))
 
             if (isLogin) {
-                // 4. Oper ViewModel ke Form
                 LoginForm(viewModel)
             } else {
                 SignUpForm(viewModel)
@@ -89,7 +86,6 @@ fun LoginScreen(
 
         if (state is Resource.Loading) {
             Box(modifier = Modifier.fillMaxSize()) {
-
                 // BLUR BACKGROUND
                 Box(
                     modifier = Modifier
@@ -137,7 +133,7 @@ fun LoginForm(viewModel: AuthViewModel) {
             value = email,
             onValueChange = {
                 email = it
-                emailError = if (!isValidEmail(it)) "Invalid email format" else null
+                emailError = if (!viewModel.isValidEmail(it)) "Invalid email format" else null
             },
             placeholder = "Email",
             errorMessage = emailError
@@ -151,28 +147,6 @@ fun LoginForm(viewModel: AuthViewModel) {
         )
 
         Spacer(Modifier.height(24.dp))
-
-        /*Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Checkbox(
-                    checked = rememberMe,
-                    onCheckedChange = { rememberMe = it },
-                    colors = CheckboxDefaults.colors(
-                        checkedColor = PrimaryBlue,
-                        checkmarkColor = Color.White,
-                        uncheckedColor = Color.Gray
-                    )
-                )
-                Text("Remember me", fontSize = 12.sp)
-            }
-            Text("Forgot Password?", color = Color(0xff1d61e7), fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
-        }
-
-        Spacer(Modifier.height(24.dp))*/
 
         HydroPrimaryButton(
             text = "Log In",
@@ -194,16 +168,6 @@ fun SignUpForm(viewModel: AuthViewModel) {
     // Validasi state
     var emailError by remember { mutableStateOf<String?>(null) }
     var passwordError by remember { mutableStateOf<String?>(null) }
-
-    // Date & Country
-    var birthDate by remember { mutableStateOf("") }
-    var showDatePicker by remember { mutableStateOf(false) }
-    val datePickerState = rememberDatePickerState()
-
-//    val countryList = remember { southeastAsiaCountryList } // Pastikan variable ini ada
-//    var selectedCountry by remember { mutableStateOf(countryList.first()) }
-    var showCountryDialog by remember { mutableStateOf(false) }
-    var phoneNumber by remember { mutableStateOf("") }
 
     Column(Modifier.fillMaxWidth()) {
         // Baris Nama Depan & Belakang
@@ -231,74 +195,13 @@ fun SignUpForm(viewModel: AuthViewModel) {
             value = email,
             onValueChange = {
                 email = it
-                emailError = if (!isValidEmail(it)) "Invalid email format" else null
+                emailError = if (!viewModel.isValidEmail(it)) "Invalid email format" else null
             },
             placeholder = "Email",
             errorMessage = emailError
         )
 
         Spacer(Modifier.height(16.dp))
-
-//        // Date Picker
-//        HydroClickableTextField(
-//            label = "Birth of date",
-//            value = birthDate,
-//            placeholder = "12/12/2000",
-//            onClick = { showDatePicker = true }
-//        )
-
-//        if (showDatePicker) {
-//            DatePickerDialog(
-//                onDismissRequest = { showDatePicker = false },
-//                confirmButton = {
-//                    TextButton(onClick = {
-//                        datePickerState.selectedDateMillis?.let { millis ->
-//                            val format = java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault())
-//                            birthDate = format.format(java.util.Date(millis))
-//                        }
-//                        showDatePicker = false
-//                    }) { Text("OK") }
-//                },
-//                dismissButton = { TextButton(onClick = { showDatePicker = false }) { Text("Cancel") } }
-//            ) { DatePicker(state = datePickerState) }
-//        }
-//
-//        Spacer(Modifier.height(16.dp))
-
-//        HydroTextField(
-//            label = "Phone Number",
-//            value = phoneNumber,
-//            onValueChange = { phoneNumber = it },
-//            placeholder = "",
-//            leadingIcon = {
-//                Row(
-//                    modifier = Modifier
-//                        .fillMaxHeight()
-//                        .clickable { showCountryDialog = true }
-//                        .padding(start = 16.dp, end = 6.dp),
-//                    verticalAlignment = Alignment.CenterVertically
-//                ) {
-//                    Text(selectedCountry.flag, fontSize = 18.sp)
-//                    Spacer(Modifier.width(6.dp))
-//                    Text(selectedCountry.code, fontSize = 14.sp)
-//                    Spacer(Modifier.width(4.dp))
-//                    Icon(Icons.Default.ArrowDropDown, null, tint = Color.Gray)
-//                }
-//            }
-//        )
-
-//        // Country Picker Dialog (Diasumsikan sudah ada komponen ini)
-//        if (showCountryDialog) {
-//            CountryPickerDialog(
-//                isOpen = showCountryDialog,
-//                countryList = countryList,
-//                onDismiss = { showCountryDialog = false },
-//                onCountrySelected = {
-//                    selectedCountry = it
-//                    showCountryDialog = false
-//                }
-//            )
-//        }
 
         Spacer(Modifier.height(16.dp))
 
@@ -307,7 +210,7 @@ fun SignUpForm(viewModel: AuthViewModel) {
             value = password,
             onValueChange = {
                 password = it
-                passwordError = if (!isStrongPassword(it)) "Min 8 chars, Upper, Lower, Number, Symbol" else null
+                passwordError = if (!viewModel.isStrongPassword(it)) "Min 8 chars, Upper, Lower, Number, Symbol" else null
             },
             errorMessage = passwordError
         )
@@ -322,27 +225,10 @@ fun SignUpForm(viewModel: AuthViewModel) {
                     lastName = lastName,
                     email = email,
                     pass = password
-//                    birthDate = birthDate,
-//                    phoneNumber = phoneNumber,
-//                    countryCode = selectedCountry.code
                 )
             }
         )
     }
-}
-
-// UTILS (Validation)
-fun isValidEmail(email: String): Boolean {
-    val emailRegex = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$")
-    return emailRegex.matches(email)
-}
-
-fun isStrongPassword(password: String): Boolean {
-    val hasUpper = password.any { it.isUpperCase() }
-    val hasLower = password.any { it.isLowerCase() }
-    val hasDigit = password.any { it.isDigit() }
-    val hasSymbol = password.any { !it.isLetterOrDigit() }
-    return password.length >= 8 && hasUpper && hasLower && hasDigit && hasSymbol
 }
 
 @Preview(

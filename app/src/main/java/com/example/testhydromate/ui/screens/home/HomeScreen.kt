@@ -16,8 +16,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.testhydromate.data.model.WaterLog
 import com.example.testhydromate.ui.components.*
-import com.example.testhydromate.ui.screens.history.ConfirmDeleteDialog
-import com.example.testhydromate.ui.screens.history.showDeleteToast
+//import com.example.testhydromate.ui.screens.history.ConfirmDeleteDialog
+//import com.example.testhydromate.ui.screens.history.showDeleteToast
 import java.util.Date
 import java.util.Locale
 

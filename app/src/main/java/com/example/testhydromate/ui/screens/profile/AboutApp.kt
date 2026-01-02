@@ -36,15 +36,13 @@ fun AboutApp(
     modifier: Modifier = Modifier
 ) {
     Scaffold(
-        // 1. Pastikan Scaffold berwarna Putih
         containerColor = Color.White,
         topBar = {
-            // 2. Custom Top Bar agar gaya konsisten (Back button di atas, Judul di bawah)
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(Color.White)
-                    .statusBarsPadding() // Mencegah mepet ke atas status bar
+                    .statusBarsPadding()
             ) {
                 IconButton(
                     onClick = onBackClick,
@@ -76,25 +74,13 @@ fun AboutApp(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White) // 3. Tambahkan background putih di sini juga
+                .background(Color.White)
                 .padding(innerPadding)
                 .padding(horizontal = 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
             Spacer(modifier = Modifier.height(16.dp))
-
-            // Logo (Jika ingin diaktifkan nanti)
-            /*
-            Image(
-                painter = painterResource(id = R.drawable.hydromate_logo_2),
-                contentDescription = "HydroMate Logo",
-                modifier = Modifier
-                    .width(174.dp)
-                    .height(98.dp)
-            )
-            Spacer(modifier = Modifier.height(40.dp))
-            */
 
             // Privacy Policy Row (Gaya Mature)
             Surface(
@@ -106,7 +92,7 @@ fun AboutApp(
                     ) { onPrivacyPolicyClick() },
                 shape = RoundedCornerShape(12.dp),
                 color = Color.White,
-                border = BorderStroke(1.dp, Color(0xFFF0F0F0)) // Border lebih halus
+                border = BorderStroke(1.dp, Color(0xFFF0F0F0))
             ) {
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
