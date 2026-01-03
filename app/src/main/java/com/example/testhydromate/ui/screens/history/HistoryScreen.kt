@@ -1,21 +1,23 @@
 package com.example.testhydromate.ui.screens.history
 
-import android.widget.Toast
+import androidx.compose.animation.*
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -24,6 +26,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.testhydromate.data.model.WaterLog
 import com.example.testhydromate.ui.components.EditWaterBottomSheet
 import com.example.testhydromate.ui.components.PrimaryBlue
+import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -32,10 +35,13 @@ fun HistoryScreen(
     viewModel: HistoryViewModel = hiltViewModel()
 ) {
     val logs by viewModel.waterLogs.collectAsState()
-    val context = LocalContext.current
 
     var selectedDelete by remember { mutableStateOf<WaterLog?>(null) }
     var selectedEdit by remember { mutableStateOf<WaterLog?>(null) }
+
+    // State untuk Custom Notification (Mature Green Notification)
+    var showNotification by remember { mutableStateOf(false) }
+    var notificationMessage by remember { mutableStateOf("") }
 
     // Memproses data: Urutkan dari yang terbaru, lalu grupkan berdasarkan tanggal
     val groupedLogs = remember(logs) {
@@ -54,7 +60,11 @@ fun HistoryScreen(
             onCancel = { selectedDelete = null },
             onConfirm = {
                 viewModel.deleteLog(log)
-                showDeleteToast(context, time)
+
+                // Trigger Notifikasi Custom
+                notificationMessage = "Drink record at $time has been deleted"
+                showNotification = true
+
                 selectedDelete = null
             }
         )
@@ -62,62 +72,115 @@ fun HistoryScreen(
 
     // BOTTOM SHEET EDIT
     selectedEdit?.let { log ->
+        val time = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(log.timestamp))
         EditWaterBottomSheet(
             log = log,
             onDismiss = { selectedEdit = null },
-            onSave = {
-                viewModel.updateLog(it)
+            onSave = { updatedLog ->
+                viewModel.updateLog(updatedLog)
+
+                // Trigger Notifikasi Custom saat Edit (Mature & Specific Message)
+                notificationMessage = "Drink record at $time updated to ${updatedLog.amount} mL"
+                showNotification = true
+
                 selectedEdit = null
             }
         )
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)
-    ) {
-        // HEADER (Statik)
-        Box(
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 74.dp, bottom = 32.dp),
-            contentAlignment = Alignment.Center
+                .fillMaxSize()
+                .background(Color.White)
         ) {
-            Text(
-                text = "History",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = PrimaryBlue
-            )
-        }
+            // HEADER (Statik)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 74.dp, bottom = 32.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "History",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = PrimaryBlue
+                )
+            }
 
-        // DAFTAR RIWAYAT (Scrollable)
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            // PENTING: bottom = 100.dp agar tidak tertutup BottomBar saat scroll mentok
-            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 100.dp)
-        ) {
-            if (groupedLogs.isEmpty()) {
-                item {
-                    Box(
-                        modifier = Modifier.fillParentMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(text = "No drink history found", color = Color.Gray)
+            // DAFTAR RIWAYAT (Scrollable)
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 100.dp)
+            ) {
+                if (groupedLogs.isEmpty()) {
+                    item {
+                        Box(
+                            modifier = Modifier.fillParentMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(text = "No drink history found", color = Color.Gray)
+                        }
+                    }
+                } else {
+                    groupedLogs.forEach { (date, items) ->
+                        item {
+                            HistoryDateCard(
+                                date = date,
+                                logs = items,
+                                onEdit = { selectedEdit = it },
+                                onDelete = { selectedDelete = it }
+                            )
+                            Spacer(Modifier.height(20.dp))
+                        }
                     }
                 }
-            } else {
-                groupedLogs.forEach { (date, items) ->
-                    item {
-                        HistoryDateCard(
-                            date = date,
-                            logs = items,
-                            onEdit = { selectedEdit = it },
-                            onDelete = { selectedDelete = it }
-                        )
-                        Spacer(Modifier.height(20.dp))
-                    }
+            }
+        }
+
+        // --- CUSTOM NOTIFICATION (HIJAU DI ATAS) ---
+        AnimatedVisibility(
+            visible = showNotification,
+            enter = fadeIn() + slideInVertically(initialOffsetY = { -it }),
+            exit = fadeOut() + slideOutVertically(targetOffsetY = { -it }),
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(top = 50.dp) // Jarak dari atas layar agar tidak tertutup notch
+        ) {
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                color = Color(0xFF4CAF50), // Warna Hijau Mature
+                shape = RoundedCornerShape(12.dp),
+                shadowElevation = 8.dp
+            ) {
+                Row(
+                    modifier = Modifier.padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.CheckCircle,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(Modifier.width(12.dp))
+                    Text(
+                        text = notificationMessage,
+                        color = Color.White,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+            }
+
+            // Auto-hide notifikasi setelah 3 detik
+            LaunchedEffect(showNotification) {
+                if (showNotification) {
+                    delay(3000)
+                    showNotification = false
                 }
             }
         }
@@ -148,7 +211,7 @@ fun HistoryDateCard(
                 logs.forEachIndexed { index, log ->
                     HistoryItem(log = log, onEdit = onEdit, onDelete = onDelete)
                     if (index < logs.lastIndex) {
-                        Divider(
+                        HorizontalDivider(
                             modifier = Modifier.padding(start = 72.dp),
                             color = Color.LightGray.copy(alpha = 0.4f)
                         )
@@ -169,7 +232,9 @@ fun HistoryItem(
     var menuOpen by remember { mutableStateOf(false) }
 
     Row(
-        modifier = Modifier.fillMaxWidth().padding(16.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         androidx.compose.foundation.Image(
@@ -228,10 +293,6 @@ fun ConfirmDeleteDialog(time: String, onCancel: () -> Unit, onConfirm: () -> Uni
             }
         }
     }
-}
-
-fun showDeleteToast(context: android.content.Context, time: String) {
-    Toast.makeText(context, "Drink record at $time deleted", Toast.LENGTH_SHORT).show()
 }
 
 fun formatDateHeader(date: String): String {

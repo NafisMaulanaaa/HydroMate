@@ -11,16 +11,17 @@ import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.testhydromate.data.model.WaterLog
 import com.example.testhydromate.ui.screens.history.ConfirmDeleteDialog
-import com.example.testhydromate.ui.screens.history.showDeleteToast
+// HAPUS import showDeleteToast karena fungsinya sudah tidak ada
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -31,7 +32,7 @@ fun TodayHistoryCard(
     onUpdate: (WaterLog) -> Unit,
     onDeleteConfirm: (WaterLog) -> Unit
 ) {
-    val context = LocalContext.current
+    // Context tidak diperlukan lagi karena Toast dihapus
     var selectedEdit by remember { mutableStateOf<WaterLog?>(null) }
     var selectedDelete by remember { mutableStateOf<WaterLog?>(null) }
 
@@ -42,26 +43,32 @@ fun TodayHistoryCard(
             .sortedByDescending { it.timestamp }
     }
 
+    // DIALOG KONFIRMASI HAPUS
     selectedDelete?.let { log ->
         val time = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(log.timestamp))
         ConfirmDeleteDialog(
             time = time,
             onCancel = { selectedDelete = null },
             onConfirm = {
+                // Panggil callback ke HomeScreen.
+                // Di HomeScreen nanti yang akan memunculkan Notifikasi Hijau.
                 onDeleteConfirm(log)
-                showDeleteToast(context, time)
                 selectedDelete = null
             }
         )
     }
 
     selectedEdit?.let { log ->
-        EditWaterBottomSheet(log = log, onDismiss = { selectedEdit = null }, onSave = { onUpdate(it); selectedEdit = null })
+        EditWaterBottomSheet(
+            log = log,
+            onDismiss = { selectedEdit = null },
+            onSave = { onUpdate(it); selectedEdit = null }
+        )
     }
 
     Card(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp), // Sama dengan History Date Card
+        shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         border = BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.4f))
     ) {
@@ -80,7 +87,8 @@ fun TodayHistoryCard(
             } else {
                 LazyColumn(
                     modifier = Modifier.fillMaxWidth(),
-                    contentPadding = PaddingValues(bottom = 100.dp) // Ruang untuk Navbar
+                    // Memberikan padding bawah agar tidak tertutup Navbar
+                    contentPadding = PaddingValues(bottom = 80.dp)
                 ) {
                     itemsIndexed(todayLogs) { index, log ->
                         TodayHistoryItem(
@@ -89,7 +97,8 @@ fun TodayHistoryCard(
                             onDelete = { selectedDelete = it }
                         )
                         if (index < todayLogs.lastIndex) {
-                            Divider(
+                            // Gunakan HorizontalDivider untuk Material3
+                            HorizontalDivider(
                                 modifier = Modifier.padding(start = 72.dp),
                                 color = Color.LightGray.copy(alpha = 0.4f)
                             )

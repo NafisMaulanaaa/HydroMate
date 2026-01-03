@@ -1,23 +1,26 @@
 package com.example.testhydromate.ui.screens.home
 
+import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.testhydromate.data.model.WaterLog
 import com.example.testhydromate.ui.components.*
-//import com.example.testhydromate.ui.screens.history.ConfirmDeleteDialog
-//import com.example.testhydromate.ui.screens.history.showDeleteToast
+import kotlinx.coroutines.delay
+import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
@@ -39,6 +42,10 @@ fun HomeScreen(
     val streakCount by viewModel.streakCount.collectAsState()
     val isStreakActive by viewModel.isStreakActiveToday.collectAsState()
 
+    // --- STATE UNTUK NOTIFIKASI DEWASA (MATURE NOTIFICATION) ---
+    var showNotification by remember { mutableStateOf(false) }
+    var notificationMessage by remember { mutableStateOf("") }
+
     LaunchedEffect(shouldShowAchievement) {
         if (shouldShowAchievement) {
             viewModel.resetAchievementFlag()
@@ -51,17 +58,6 @@ fun HomeScreen(
             .fillMaxSize()
             .background(Color.White)
     ) {
-        if (showAdjustSheet) {
-            AdjustDrinkAmountBottomSheet(
-                initialAmount = viewModel.selectedAmount,
-                onDismiss = { showAdjustSheet = false },
-                onSave = { newAmount ->
-                    viewModel.updateSelectedAmount(newAmount)
-                    showAdjustSheet = false
-                }
-            )
-        }
-
         Column(modifier = Modifier.fillMaxSize()) {
             // Header & Progress Area
             Column(
@@ -99,29 +95,91 @@ fun HomeScreen(
                 Spacer(modifier = Modifier.height(20.dp))
             }
 
-            // AREA HISTORY BOX (Outline tidak mepet)
+            // AREA HISTORY BOX
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
-                    .padding(horizontal = 16.dp) // PENTING: Supaya outline box ngga mepet layar
+                    .padding(horizontal = 16.dp)
             ) {
                 TodayHistoryCard(
                     history = history,
-                    onUpdate = { viewModel.updateLog(it) },
-                    onDeleteConfirm = { viewModel.deleteLog(it) }
+                    onUpdate = { log ->
+                        // 1. Update data via ViewModel
+                        viewModel.updateLog(log)
+
+                        // 2. Tampilkan Notifikasi Custom untuk EDIT
+                        val time = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(log.timestamp))
+                        notificationMessage = "Drink record at $time updated to ${log.amount} mL"
+                        showNotification = true
+                    },
+                    onDeleteConfirm = { log ->
+                        // 1. Hapus data via ViewModel
+                        viewModel.deleteLog(log)
+
+                        // 2. Tampilkan Notifikasi Custom untuk DELETE
+                        val time = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(log.timestamp))
+                        notificationMessage = "Drink record at $time has been deleted"
+                        showNotification = true
+                    }
                 )
             }
         }
 
-        //STREAK
+        // STREAK (Floating Trophy)
         FloatingStreakTrophy(
-            streakCount = streakCount, // Perbaikan: samakan dengan nama variabel di atas
+            streakCount = streakCount,
             isActive = isStreakActive,
             onClick = onNavigateToStreak
         )
 
-        // Bottom Sheet
+        // --- CUSTOM NOTIFICATION (HIJAU DI ATAS) ---
+        AnimatedVisibility(
+            visible = showNotification,
+            enter = fadeIn() + slideInVertically(initialOffsetY = { -it }),
+            exit = fadeOut() + slideOutVertically(targetOffsetY = { -it }),
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(top = 50.dp) // Jarak dari atas layar agar tidak tertutup notch
+        ) {
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                color = Color(0xFF4CAF50), // Warna Hijau Mature
+                shape = RoundedCornerShape(12.dp),
+                shadowElevation = 8.dp
+            ) {
+                Row(
+                    modifier = Modifier.padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.CheckCircle,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(Modifier.width(12.dp))
+                    Text(
+                        text = notificationMessage,
+                        color = Color.White,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+            }
+
+            // Auto-hide notifikasi setelah 3 detik
+            LaunchedEffect(showNotification) {
+                if (showNotification) {
+                    delay(3000)
+                    showNotification = false
+                }
+            }
+        }
+
+        // Bottom Sheet Adjust Amount
         if (showAdjustSheet) {
             AdjustDrinkAmountBottomSheet(
                 initialAmount = viewModel.selectedAmount,
