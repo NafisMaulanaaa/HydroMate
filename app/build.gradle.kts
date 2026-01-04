@@ -89,4 +89,7 @@ dependencies {
 
     //Notification
     implementation("androidx.work:work-runtime-ktx:2.9.1")
+
+    // DataStore
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
 }

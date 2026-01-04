@@ -18,6 +18,7 @@ sealed class Screen(val route: String) {
     object PROFILE : Screen("profile")
     object MY_PROFILE : Screen("my_profile")
     object NOTIFICATIONS : Screen("notifications")
+    object REMINDER_SETTING : Screen("reminder_setting")
     object ABOUT_APP : Screen("about_app")
     object PRIVACY_POLICY : Screen("privacy_policy")
 

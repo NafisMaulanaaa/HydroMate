@@ -1,22 +1,26 @@
 package com.example.testhydromate.ui.screens.profile
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Logout
+import androidx.compose.material.icons.outlined.AccountCircle
+import androidx.compose.material.icons.outlined.Alarm
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.testhydromate.R
 import com.example.testhydromate.ui.components.PrimaryBlue
 
 @Composable
@@ -24,6 +28,7 @@ fun ProfileScreen(
     onLogoutSuccess: () -> Unit = {},
     onNavigateToMyProfile: () -> Unit = {},
     onNavigateToNotifications: () -> Unit = {},
+    onNavigateToReminderSetting: () -> Unit = {},
     onNavigateToAboutApp: () -> Unit = {},
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
@@ -65,7 +70,7 @@ fun ProfileScreen(
                     .padding(horizontal = 18.dp)
             ) {
 
-                // ===== MY PROFILE =====
+                // ===== MY PROFILE (Icon: Person) =====
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
@@ -75,16 +80,17 @@ fun ProfileScreen(
                             indication = null
                         ) { onNavigateToMyProfile() }
                 ) {
-                    Image(
-                        painter = painterResource(R.drawable.icon_profile),
+                    Icon(
+                        imageVector = Icons.Outlined.AccountCircle,
                         contentDescription = null,
-                        modifier = Modifier.size(21.dp)
+                        tint = PrimaryBlue, // Bisa diganti Color.Gray atau Color.Black
+                        modifier = Modifier.size(24.dp)
                     )
                     Spacer(Modifier.width(24.dp))
                     Text("My Profile", fontSize = 17.sp)
                 }
 
-                // ===== NOTIFICATIONS =====
+                // ===== NOTIFICATIONS (Icon: Notifications) =====
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
@@ -96,16 +102,39 @@ fun ProfileScreen(
                             onNavigateToNotifications()
                         }
                 ) {
-                    Image(
-                        painter = painterResource(R.drawable.icon_notif),
+                    Icon(
+                        imageVector = Icons.Outlined.Notifications,
                         contentDescription = null,
-                        modifier = Modifier.size(21.dp)
+                        tint = PrimaryBlue,
+                        modifier = Modifier.size(24.dp)
                     )
-                    Spacer(Modifier.width(21.dp))
+                    Spacer(Modifier.width(24.dp))
                     Text("Notifications", fontSize = 17.sp)
                 }
 
-                // ===== ABOUT APP =====
+                // ===== REMINDER SETTINGS (Icon: Alarm) =====
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null
+                        ) {
+                            onNavigateToReminderSetting()
+                        }
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Alarm, // Menggunakan icon Alarm/Jam
+                        contentDescription = null,
+                        tint = PrimaryBlue,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(Modifier.width(24.dp))
+                    Text("Reminder", fontSize = 17.sp)
+                }
+
+                // ===== ABOUT APP (Icon: Info) =====
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
@@ -115,16 +144,17 @@ fun ProfileScreen(
                             indication = null
                         ) { onNavigateToAboutApp() }
                 ) {
-                    Image(
-                        painter = painterResource(R.drawable.icon_info),
+                    Icon(
+                        imageVector = Icons.Outlined.Info,
                         contentDescription = null,
-                        modifier = Modifier.size(21.dp)
+                        tint = PrimaryBlue,
+                        modifier = Modifier.size(24.dp)
                     )
                     Spacer(Modifier.width(24.dp))
                     Text("About App", fontSize = 17.sp)
                 }
 
-                // ===== LOGOUT =====
+                // ===== LOGOUT (Icon: Logout) =====
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
@@ -134,18 +164,20 @@ fun ProfileScreen(
                             indication = null
                         ) { showLogoutDialog = true }
                 ) {
-                    Image(
-                        painter = painterResource(R.drawable.icon_logout),
+                    Icon(
+                        // AutoMirrored: Icon otomatis membalik arah jika HP user pakai bahasa Arab/RTL
+                        imageVector = Icons.AutoMirrored.Outlined.Logout,
                         contentDescription = null,
-                        modifier = Modifier.size(21.dp)
+                        tint = Color.Red, // Logout biasanya merah, atau ganti PrimaryBlue
+                        modifier = Modifier.size(24.dp)
                     )
                     Spacer(Modifier.width(24.dp))
-                    Text("Logout", fontSize = 17.sp)
+                    Text("Logout", fontSize = 17.sp, color = Color.Red) // Teks juga merah biar serasi
                 }
             }
         }
 
-        // ===== LOGOUT DIALOG (Mature Style) =====
+        // ===== LOGOUT DIALOG =====
         if (showLogoutDialog) {
             AlertDialog(
                 onDismissRequest = { showLogoutDialog = false },
@@ -198,6 +230,5 @@ fun ProfileScreen(
                 shape = RoundedCornerShape(24.dp)
             )
         }
-
     }
 }

@@ -26,6 +26,7 @@ import com.example.testhydromate.ui.screens.home.HomeViewModel
 import com.example.testhydromate.ui.screens.home.ResultScreen
 import com.example.testhydromate.ui.screens.onboarding.*
 import com.example.testhydromate.ui.screens.profile.*
+import com.example.testhydromate.ui.screens.reminder.ReminderSettingScreen
 import com.example.testhydromate.ui.screens.report.ReportScreen
 import com.example.testhydromate.ui.screens.splash.SplashScreen
 import com.example.testhydromate.ui.screens.splash.SplashViewModel
@@ -275,6 +276,9 @@ fun RouteScreen() {
                     onNavigateToNotifications = {
                         navController.navigate(Screen.NOTIFICATIONS.route)
                     },
+                    onNavigateToReminderSetting = {
+                        navController.navigate(Screen.REMINDER_SETTING.route)
+                    },
                     onNavigateToAboutApp = {
                         navController.navigate(Screen.ABOUT_APP.route)
                     },
@@ -292,6 +296,13 @@ fun RouteScreen() {
 
             composable(Screen.NOTIFICATIONS.route) {
                 NotificationsScreen(onBackClick = { navController.popBackStack() })
+            }
+
+            // Import ReminderSettingScreen
+            composable(Screen.REMINDER_SETTING.route) {
+                ReminderSettingScreen(
+                    onBackClick = { navController.popBackStack() }
+                )
             }
 
             composable(Screen.ABOUT_APP.route) {

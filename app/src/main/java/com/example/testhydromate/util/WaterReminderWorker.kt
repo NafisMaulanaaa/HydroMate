@@ -5,10 +5,20 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.media.AudioAttributes
 import android.os.Build
+import android.provider.Settings
 import androidx.core.app.NotificationCompat
 import androidx.work.*
-import com.example.testhydromate.MainActivity // Pastikan import MainActivity-mu benar
+import com.example.testhydromate.MainActivity
+import com.example.testhydromate.R
+import com.example.testhydromate.di.dataStore
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.stringSetPreferencesKey
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.runBlocking
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -17,90 +27,122 @@ class WaterReminderWorker(
     workerParams: WorkerParameters
 ) : Worker(context, workerParams) {
 
-    override fun doWork(): Result {
-        val calendar = Calendar.getInstance()
-        val currentHour = calendar.get(Calendar.HOUR_OF_DAY)
+    // Helper untuk membaca DataStore secara Synchronous di Worker
+    private fun getSettings() = runBlocking {
+        applicationContext.dataStore.data.map { prefs ->
+            mapOf(
+                "enabled" to (prefs[booleanPreferencesKey("is_enabled")] ?: true),
+                "startTime" to (prefs[stringPreferencesKey("start_time")] ?: "08:00"),
+                "endTime" to (prefs[stringPreferencesKey("end_time")] ?: "22:00"),
+                "days" to (prefs[stringSetPreferencesKey("repeat_days")] ?: setOf("1","2","3","4","5","6","7")),
+                "sound" to (prefs[booleanPreferencesKey("is_sound")] ?: true),
+                "vibration" to (prefs[booleanPreferencesKey("is_vibration")] ?: true)
+            )
+        }.first()
+    }
 
-        // Hanya munculkan notifikasi antara jam 05:00 sampai 22:00
-        if (currentHour in 5..21) {
-            showNotification()
+    override fun doWork(): Result {
+        val settings = getSettings()
+
+        // 1. Cek Master Switch
+        if (settings["enabled"] as Boolean == false) return Result.success()
+
+        val calendar = Calendar.getInstance()
+        val currentDay = calendar.get(Calendar.DAY_OF_WEEK).toString() // 1=Sun, 2=Mon...
+
+        // 2. Cek Hari
+        val selectedDays = settings["days"] as Set<String>
+        if (!selectedDays.contains(currentDay)) return Result.success()
+
+        // 3. Cek Jam (Start - End)
+        val startTime = (settings["startTime"] as String).split(":")
+        val endTime = (settings["endTime"] as String).split(":")
+
+        val nowMinutes = calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE)
+        val startMinutes = startTime[0].toInt() * 60 + startTime[1].toInt()
+        val endMinutes = endTime[0].toInt() * 60 + endTime[1].toInt()
+
+        if (nowMinutes in startMinutes..endMinutes) {
+            val withSound = settings["sound"] as Boolean
+            val withVibration = settings["vibration"] as Boolean
+            showNotification(withSound, withVibration)
         }
 
         return Result.success()
     }
 
-    private fun showNotification() {
-        val channelId = "water_reminder_channel"
+    private fun showNotification(withSound: Boolean, withVibration: Boolean) {
+        val channelId = "water_channel_${withSound}_${withVibration}" // ID unik berdasarkan setting
         val notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        // 1. Buat Intent untuk membuka MainActivity
         val intent = Intent(applicationContext, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
 
-        // 2. Buat PendingIntent (Flag IMMUTABLE wajib untuk Android 12+)
         val pendingIntent = PendingIntent.getActivity(
-            applicationContext,
-            0,
-            intent,
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-                PendingIntent.FLAG_IMMUTABLE
-            else
-                PendingIntent.FLAG_UPDATE_CURRENT
+            applicationContext, 0, intent,
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else PendingIntent.FLAG_UPDATE_CURRENT
         )
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                channelId,
-                "Water Reminders",
-                NotificationManager.IMPORTANCE_HIGH
-            ).apply {
-                description = "Reminders to stay hydrated"
+            // Cek apakah channel sudah ada, jika setting berubah kita buat channel baru
+            if (notificationManager.getNotificationChannel(channelId) == null) {
+                val channel = NotificationChannel(
+                    channelId,
+                    "Hydration Reminder",
+                    NotificationManager.IMPORTANCE_HIGH
+                ).apply {
+                    description = "Custom reminders"
+                    enableVibration(withVibration)
+                    if (!withSound) setSound(null, null)
+                    else setSound(Settings.System.DEFAULT_NOTIFICATION_URI, AudioAttributes.Builder()
+                        .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                        .build())
+                }
+                notificationManager.createNotificationChannel(channel)
             }
-            notificationManager.createNotificationChannel(channel)
         }
 
         val notification = NotificationCompat.Builder(applicationContext, channelId)
-            .setContentTitle("Don't Let Your Streak End, Lets Hydrate!")
-            .setContentText("Keep your body hydrated everytime.")
-            .setSmallIcon(com.example.testhydromate.R.drawable.hydromate_blue_logo)
+            .setContentTitle("It's time to drink water!")
+            .setContentText("Keep up your streak and stay hydrated.")
+            .setSmallIcon(R.drawable.hydromate_logo) // Ganti icon sesuai resource kamu
             .setColor(android.graphics.Color.parseColor("#0061FF"))
             .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setCategory(NotificationCompat.CATEGORY_REMINDER)
-            .setContentIntent(pendingIntent) // 3. Set PendingIntent ke notifikasi
-            .setAutoCancel(true) // Notifikasi hilang setelah diklik
+            .setContentIntent(pendingIntent)
+            .setAutoCancel(true)
             .build()
 
-        notificationManager.notify(System.currentTimeMillis().toInt(), notification)
+        notificationManager.notify(1001, notification)
     }
 
     companion object {
-        fun schedule(context: Context, isEnabled: Boolean) {
+        fun schedule(context: Context, isEnabled: Boolean, intervalMinutes: Long = 60) {
             val workManager = WorkManager.getInstance(context)
+            val workName = "WaterReminderWork"
 
             if (isEnabled) {
-                // Tambahkan Constraints agar sistem menganggap ini tugas penting
+                // Minimum interval WorkManager adalah 15 menit
+                val safeInterval = if (intervalMinutes < 15) 15 else intervalMinutes
+
                 val constraints = Constraints.Builder()
-                    .setRequiredNetworkType(NetworkType.NOT_REQUIRED) // Tidak butuh internet
-                    .setRequiresBatteryNotLow(false) // Tetap jalan meskipun baterai tidak penuh
+                    .setRequiresBatteryNotLow(false)
                     .build()
 
-                // Gunakan interval minimum (15 menit - 1 jam) agar lebih sering muncul
                 val request = PeriodicWorkRequestBuilder<WaterReminderWorker>(
-                    1, TimeUnit.HOURS // Android minimal 15 menit, 1 jam sudah cukup bagus
+                    safeInterval, TimeUnit.MINUTES
                 )
                     .setConstraints(constraints)
-                    .addTag("water_reminder")
                     .build()
 
-                // Gunakan KEEP agar jadwal tidak reset setiap kali aplikasi dibuka
+                // REPLACE policy agar jika user ganti interval, worker lama dibuang ganti baru
                 workManager.enqueueUniquePeriodicWork(
-                    "WaterReminderWork",
-                    ExistingPeriodicWorkPolicy.KEEP,
+                    workName,
+                    ExistingPeriodicWorkPolicy.UPDATE,
                     request
                 )
             } else {
-                workManager.cancelUniqueWork("WaterReminderWork")
+                workManager.cancelUniqueWork(workName)
             }
         }
     }
