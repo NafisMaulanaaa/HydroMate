@@ -1,5 +1,6 @@
 package com.example.testhydromate.ui.screens.onboarding
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -8,6 +9,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext // Tambahkan ini
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -15,7 +17,6 @@ import androidx.compose.ui.unit.sp
 import com.example.testhydromate.ui.components.HydroPrimaryButton
 import com.example.testhydromate.ui.components.OnboardingTopBar
 import com.example.testhydromate.ui.components.OptionButton
-//import com.example.testhydromate.ui.components.TopBarOnBoardingPage
 import com.example.testhydromate.ui.components.PrimaryBlue
 import com.example.testhydromate.ui.components.TextGray
 
@@ -25,6 +26,7 @@ fun InputWeatherScreen(
     onContinueClicked: () -> Unit,
     onBackClicked:() -> Unit
 ) {
+    val context = LocalContext.current // 1. Ambil Context
 
     Scaffold(
         containerColor = Color.White,
@@ -32,8 +34,12 @@ fun InputWeatherScreen(
             HydroPrimaryButton(
                 text = "Generate plan!",
                 onClick = {
-//                    viewModel.saveOnboardingData()
-                    onContinueClicked()
+                    // 2. VALIDASI CUACA
+                    if (viewModel.weather.isNotBlank()) {
+                        onContinueClicked()
+                    } else {
+                        Toast.makeText(context, "Please select the weather condition", Toast.LENGTH_SHORT).show()
+                    }
                 }
             )
 
@@ -104,9 +110,3 @@ fun InputWeatherScreen(
         }
     }
 }
-
-//@Preview(showBackground = true, widthDp = 390, heightDp = 844)
-//@Composable
-//fun WeatherInputPreview() {
-//    InputWeatherScreen(onContinueClicked = {}, onBackClicked = {})
-//}

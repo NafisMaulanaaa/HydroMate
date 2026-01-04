@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.sp
 fun AuthHeader() {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
-            text = "Get Started now",
+            text = "Get Started Now",
             fontWeight = FontWeight.Bold,
             fontSize = 32.sp,
             color = Color(0xff0e61d1),

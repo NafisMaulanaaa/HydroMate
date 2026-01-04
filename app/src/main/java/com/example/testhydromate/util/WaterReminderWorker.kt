@@ -14,11 +14,13 @@ import com.example.testhydromate.MainActivity
 import com.example.testhydromate.R
 import com.example.testhydromate.di.dataStore
 import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.intPreferencesKey // Tambahan Import
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
+import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -27,13 +29,14 @@ class WaterReminderWorker(
     workerParams: WorkerParameters
 ) : Worker(context, workerParams) {
 
-    // Helper untuk membaca DataStore secara Synchronous di Worker
+    // Helper untuk membaca DataStore
     private fun getSettings() = runBlocking {
         applicationContext.dataStore.data.map { prefs ->
             mapOf(
                 "enabled" to (prefs[booleanPreferencesKey("is_enabled")] ?: true),
                 "startTime" to (prefs[stringPreferencesKey("start_time")] ?: "08:00"),
                 "endTime" to (prefs[stringPreferencesKey("end_time")] ?: "22:00"),
+                "interval" to (prefs[intPreferencesKey("interval")] ?: 60), // Ambil Interval
                 "days" to (prefs[stringSetPreferencesKey("repeat_days")] ?: setOf("1","2","3","4","5","6","7")),
                 "sound" to (prefs[booleanPreferencesKey("is_sound")] ?: true),
                 "vibration" to (prefs[booleanPreferencesKey("is_vibration")] ?: true)
@@ -48,15 +51,18 @@ class WaterReminderWorker(
         if (settings["enabled"] as Boolean == false) return Result.success()
 
         val calendar = Calendar.getInstance()
-        val currentDay = calendar.get(Calendar.DAY_OF_WEEK).toString() // 1=Sun, 2=Mon...
+        val currentDay = calendar.get(Calendar.DAY_OF_WEEK).toString()
 
         // 2. Cek Hari
         val selectedDays = settings["days"] as Set<String>
         if (!selectedDays.contains(currentDay)) return Result.success()
 
         // 3. Cek Jam (Start - End)
-        val startTime = (settings["startTime"] as String).split(":")
-        val endTime = (settings["endTime"] as String).split(":")
+        val startTimeStr = settings["startTime"] as String
+        val endTimeStr = settings["endTime"] as String
+
+        val startTime = startTimeStr.split(":")
+        val endTime = endTimeStr.split(":")
 
         val nowMinutes = calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE)
         val startMinutes = startTime[0].toInt() * 60 + startTime[1].toInt()
@@ -65,14 +71,43 @@ class WaterReminderWorker(
         if (nowMinutes in startMinutes..endMinutes) {
             val withSound = settings["sound"] as Boolean
             val withVibration = settings["vibration"] as Boolean
-            showNotification(withSound, withVibration)
+            val interval = settings["interval"] as Int
+
+            // --- LOGIKA PESAN BARU ---
+            val message = generateNotificationMessage(calendar, interval, endMinutes)
+
+            showNotification(withSound, withVibration, message)
         }
 
         return Result.success()
     }
 
-    private fun showNotification(withSound: Boolean, withVibration: Boolean) {
-        val channelId = "water_channel_${withSound}_${withVibration}" // ID unik berdasarkan setting
+    private fun generateNotificationMessage(calendar: Calendar, intervalMinutes: Int, endLimitMinutes: Int): String {
+        val sdf = SimpleDateFormat("HH:mm", Locale.getDefault())
+
+        // 1. Ambil Jam Sekarang
+        val currentTimeStr = sdf.format(calendar.time)
+
+        // 2. Hitung Jam Berikutnya
+        // Clone kalender agar tidak merubah waktu asli saat ini
+        val nextCalendar = calendar.clone() as Calendar
+        nextCalendar.add(Calendar.MINUTE, intervalMinutes)
+
+        val nextMinutesTotal = nextCalendar.get(Calendar.HOUR_OF_DAY) * 60 + nextCalendar.get(Calendar.MINUTE)
+        val nextTimeStr = sdf.format(nextCalendar.time)
+
+        // 3. Tentukan Pesan
+        return if (nextMinutesTotal <= endLimitMinutes) {
+            // Jika jadwal berikutnya masih dalam jam operasional hari ini
+            "Now: $currentTimeStr • Next reminder: $nextTimeStr"
+        } else {
+            // Jika jadwal berikutnya sudah lewat jam tidur
+            "Now: $currentTimeStr • Last reminder for today. See you tomorrow!"
+        }
+    }
+
+    private fun showNotification(withSound: Boolean, withVibration: Boolean, messageBody: String) {
+        val channelId = "water_channel_${withSound}_${withVibration}"
         val notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         val intent = Intent(applicationContext, MainActivity::class.java).apply {
@@ -85,7 +120,6 @@ class WaterReminderWorker(
         )
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            // Cek apakah channel sudah ada, jika setting berubah kita buat channel baru
             if (notificationManager.getNotificationChannel(channelId) == null) {
                 val channel = NotificationChannel(
                     channelId,
@@ -105,8 +139,9 @@ class WaterReminderWorker(
 
         val notification = NotificationCompat.Builder(applicationContext, channelId)
             .setContentTitle("It's time to drink water!")
-            .setContentText("Keep up your streak and stay hydrated.")
-            .setSmallIcon(R.drawable.hydromate_logo) // Ganti icon sesuai resource kamu
+            .setContentText(messageBody) // Menggunakan pesan dinamis
+            .setStyle(NotificationCompat.BigTextStyle().bigText(messageBody)) // Agar teks panjang terlihat semua
+            .setSmallIcon(R.drawable.hydromate_logo)
             .setColor(android.graphics.Color.parseColor("#0061FF"))
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setContentIntent(pendingIntent)
@@ -122,7 +157,6 @@ class WaterReminderWorker(
             val workName = "WaterReminderWork"
 
             if (isEnabled) {
-                // Minimum interval WorkManager adalah 15 menit
                 val safeInterval = if (intervalMinutes < 15) 15 else intervalMinutes
 
                 val constraints = Constraints.Builder()
@@ -135,7 +169,6 @@ class WaterReminderWorker(
                     .setConstraints(constraints)
                     .build()
 
-                // REPLACE policy agar jika user ganti interval, worker lama dibuang ganti baru
                 workManager.enqueueUniquePeriodicWork(
                     workName,
                     ExistingPeriodicWorkPolicy.UPDATE,

@@ -1,12 +1,8 @@
 package com.example.testhydromate.ui.screens.onboarding
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Female
@@ -16,23 +12,18 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.platform.LocalContext 
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-//import com.example.testhydromate.ui.components.TopBarOnBoardingPage
 import com.example.testhydromate.ui.components.HydroPrimaryButton
 import com.example.testhydromate.ui.components.PrimaryBlue
 import com.example.testhydromate.ui.components.FemalePink
 import com.example.testhydromate.ui.components.GenderButton
-import com.example.testhydromate.ui.components.LightGrayBg
 import com.example.testhydromate.ui.components.MeasurementInput
 import com.example.testhydromate.ui.components.OnboardingTopBar
 import com.example.testhydromate.ui.components.TextGray
-
 
 @Composable
 fun InputPersonalScreen(
@@ -40,15 +31,32 @@ fun InputPersonalScreen(
     onContinueClicked: () -> Unit,
     onBackClicked: (() -> Unit)? = null
 ) {
-    var selectedGender by remember { mutableStateOf("") }
-//    var height by remember { mutableStateOf("") }
-//    var weight by remember { mutableStateOf("") }
-//    var age by remember { mutableStateOf("") }
+    // 1. Ambil Context untuk menampilkan Toast
+    val context = LocalContext.current
+
+    // Kita gunakan state langsung dari ViewModel
+    // viewModel.gender, viewModel.height, dll.
 
     Scaffold(
         containerColor = Color.White,
         bottomBar = {
-            HydroPrimaryButton(text = "Continue", onClick = onContinueClicked)
+            HydroPrimaryButton(
+                text = "Continue",
+                onClick = {
+                    // 2. LOGIKA VALIDASI
+                    if (viewModel.gender.isNotBlank() &&
+                        viewModel.height.isNotBlank() &&
+                        viewModel.weight.isNotBlank() &&
+                        viewModel.age.isNotBlank()
+                    ) {
+                        // Jika semua terisi, lanjut navigasi
+                        onContinueClicked()
+                    } else {
+                        // Jika ada yang kosong, munculkan pesan
+                        Toast.makeText(context, "Please complete all fields to continue", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            )
         }
     ) { innerPadding ->
         Column(
@@ -99,29 +107,24 @@ fun InputPersonalScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
+                // Perhatikan: viewModel.gender diupdate di onClick
                 GenderButton(
                     text = "Male",
                     icon = Icons.Default.Male,
-                    isSelected = selectedGender == "Male",
+                    isSelected = viewModel.gender == "Male",
                     color = PrimaryBlue,
                     scndColor = Color(0xFFD3EAFF),
                     modifier = Modifier.weight(1f),
-                    onClick = {
-                        selectedGender = "Male"
-                        viewModel.gender = "Male"
-                    }
+                    onClick = { viewModel.gender = "Male" }
                 )
                 GenderButton(
                     text = "Female",
                     icon = Icons.Default.Female,
-                    isSelected = selectedGender == "Female",
+                    isSelected = viewModel.gender == "Female",
                     color = FemalePink,
                     scndColor = Color(0xFFFFF1FA),
                     modifier = Modifier.weight(1f),
-                    onClick = {
-                        selectedGender = "Female"
-                        viewModel.gender = "Female"
-                    }
+                    onClick = { viewModel.gender = "Female" }
                 )
             }
 
@@ -132,7 +135,7 @@ fun InputPersonalScreen(
                 label = "Height",
                 value = viewModel.height,
                 unit = "cm",
-                onValueChange = { viewModel.height = it}
+                onValueChange = { if (it.length <= 3) viewModel.height = it } // Batasi panjang input biar rapi
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -141,7 +144,7 @@ fun InputPersonalScreen(
                 label = "Weight",
                 value = viewModel.weight,
                 unit = "kg",
-                onValueChange = { viewModel.weight = it}
+                onValueChange = { if (it.length <= 3) viewModel.weight = it }
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -150,21 +153,10 @@ fun InputPersonalScreen(
                 label = "Age",
                 value = viewModel.age,
                 unit = "y.o.",
-                onValueChange = { viewModel.age = it }
+                onValueChange = { if (it.length <= 3) viewModel.age = it }
             )
 
             Spacer(modifier = Modifier.height(24.dp))
         }
     }
 }
-
-
-
-
-
-// --- Preview ---
-//@Preview(showBackground = true, widthDp = 390, heightDp = 844)
-//@Composable
-//fun PersonalDetailScreenPreview() {
-//    InputPersonalScreen(viewModel = {  }, onContinueClicked = {})
-//}

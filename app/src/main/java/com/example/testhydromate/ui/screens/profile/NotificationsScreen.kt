@@ -37,7 +37,7 @@ fun NotificationsScreen(
     val context = LocalContext.current
 
     // State untuk Switch
-    var notificationsEnabled by remember { mutableStateOf(true) }
+    var notificationsEnabled by remember { mutableStateOf(false) }
 
     // Launcher untuk request permission (Android 13+)
     val permissionLauncher = rememberLauncherForActivityResult(

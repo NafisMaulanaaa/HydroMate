@@ -1,5 +1,6 @@
 package com.example.testhydromate.ui.screens.onboarding
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -8,13 +9,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext // Tambahkan ini
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.testhydromate.ui.components.HydroPrimaryButton
 import com.example.testhydromate.ui.components.OnboardingTopBar
-//import com.example.testhydromate.ui.components.TopBarOnBoardingPage
 import com.example.testhydromate.ui.components.OptionButton
 import com.example.testhydromate.ui.components.PrimaryBlue
 import com.example.testhydromate.ui.components.TextGray
@@ -24,21 +25,23 @@ fun InputHabitScreen(
     viewModel: OnboardingViewModel,
     onContinueClicked: () -> Unit,
     onBackClicked:() -> Unit,
-    ) {
-//    var wakeHour by remember { mutableStateOf("") }
-//    var wakeMinute by remember { mutableStateOf("") }
-//
-//    var bedHour by remember { mutableStateOf("") }
-//    var bedMinute by remember { mutableStateOf("") }
-//
-//    var selectedActivity by remember { mutableStateOf("") }
+) {
+    val context = LocalContext.current // 1. Ambil Context
 
     Scaffold(
         containerColor = Color.White,
         bottomBar = {
-
-            HydroPrimaryButton(text = "Continue", onClick = onContinueClicked)
-
+            HydroPrimaryButton(
+                text = "Continue",
+                onClick = {
+                    // 2. VALIDASI HABIT
+                    if (viewModel.activityLevel.isNotBlank()) {
+                        onContinueClicked()
+                    } else {
+                        Toast.makeText(context, "Please select your activity level", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            )
         }
     ) { innerPadding ->
         Column(
@@ -59,7 +62,7 @@ fun InputHabitScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // 2. Header
+            // Header
             Text(
                 text = "Input Your Habits",
                 fontSize = 26.sp,
@@ -77,7 +80,7 @@ fun InputHabitScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // 5. Activity Level
+            // Activity Level
             Text(
                 text = "What your activity level?",
                 fontSize = 16.sp,
@@ -115,12 +118,3 @@ fun InputHabitScreen(
         }
     }
 }
-
-
-
-
-//@Preview(showBackground = true, widthDp = 390, heightDp = 844)
-//@Composable
-//fun HabitsPreview() {
-//    InputHabitScreen(onContinueClicked = {}, onBackClicked = {})
-//}
