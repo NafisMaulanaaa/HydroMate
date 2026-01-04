@@ -1,26 +1,33 @@
 package com.example.testhydromate.ui.screens.profile
 
 import android.content.Context
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.WorkManager
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import com.example.testhydromate.data.model.User
 import com.example.testhydromate.data.repository.AuthRepository
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
+import com.example.testhydromate.data.repository.ReminderRepository
+import com.example.testhydromate.data.repository.ReminderSettings // Pastikan ini diimport
+import com.example.testhydromate.util.WaterReminderWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
-    private val repository: AuthRepository,
-    @ApplicationContext private val context: Context // 1. Tambahkan Inject Context
+    private val authRepository: AuthRepository,
+    private val reminderRepository: ReminderRepository, // Inject ReminderRepository
+    @ApplicationContext private val context: Context
 ) : ViewModel() {
 
     var userData by mutableStateOf<User?>(null)
@@ -29,6 +36,15 @@ class ProfileViewModel @Inject constructor(
     var isLoading by mutableStateOf(false)
         private set
 
+    // --- PERBAIKAN UTAMA DI SINI ---
+    // Tambahkan tipe eksplisit ": StateFlow<ReminderSettings?>" agar tidak error
+    val isReminderEnabled: StateFlow<ReminderSettings?> = reminderRepository.reminderSettings
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = null
+        )
+
     init {
         fetchUserProfile()
     }
@@ -36,7 +52,7 @@ class ProfileViewModel @Inject constructor(
     private fun fetchUserProfile() {
         viewModelScope.launch {
             isLoading = true
-            userData = repository.getUserProfile()
+            userData = authRepository.getUserProfile()
             isLoading = false
         }
     }
@@ -84,13 +100,20 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
-    // --- FUNGSI LOGOUT YANG DIPERBARUI ---
-    fun logout() {
-        // 1. Matikan Notifikasi Reminder (WorkManager)
-        // String "WaterReminderWork" harus SAMA PERSIS dengan yang ada di WaterReminderWorker.kt
-        WorkManager.getInstance(context).cancelUniqueWork("WaterReminderWork")
+    // Fungsi untuk mengubah status Toggle Reminder
+    fun setReminderEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            // 1. Simpan ke DataStore
+            reminderRepository.updateSwitch("enabled", enabled)
 
-        // 2. Logout dari Firebase
-        repository.logout()
+            // 2. Reschedule Worker (agar settingan baru langsung terbaca)
+            WaterReminderWorker.schedule(context, enabled)
+        }
+    }
+
+    fun logout() {
+        // Matikan notifikasi saat logout
+        WorkManager.getInstance(context).cancelUniqueWork("WaterReminderWork")
+        authRepository.logout()
     }
 }

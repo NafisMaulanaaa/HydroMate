@@ -4,13 +4,18 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
@@ -25,7 +30,8 @@ import com.example.testhydromate.R
 @Composable
 fun WaterProgress(
     current: Int,
-    target: Int
+    target: Int,
+    onTargetClick: () -> Unit // <--- Callback baru
 ) {
 
     // 🔥 ANIMATED PROGRESS
@@ -45,12 +51,9 @@ fun WaterProgress(
             .height(260.dp)
     ) {
 
-        Canvas(
-            modifier = Modifier.size(240.dp)
-        ) {
+        Canvas(modifier = Modifier.size(240.dp)) {
             val strokeWidth = 26.dp.toPx()
             val arcSize = Size(size.width, size.height)
-
             val startAngleVal = 147.5f
             val sweepAngleVal = 245f
 
@@ -65,7 +68,7 @@ fun WaterProgress(
                 style = Stroke(strokeWidth, cap = StrokeCap.Round)
             )
 
-            // Progress arc (SMOOTH)
+            // Progress arc
             drawArc(
                 color = PrimaryBlue,
                 startAngle = startAngleVal,
@@ -80,7 +83,6 @@ fun WaterProgress(
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
             Spacer(Modifier.height(64.dp))
 
             Icon(
@@ -99,11 +101,28 @@ fun WaterProgress(
                 color = PrimaryBlue
             )
 
-            Text(
-                text = "/$target mL",
-                fontSize = 15.sp,
-                color = Color.Gray
-            )
+            // BARIS TARGET YANG BISA DIKLIK
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .clip(RoundedCornerShape(8.dp))
+                    .clickable { onTargetClick() } // Klik trigger bottom sheet
+                    .padding(4.dp)
+            ) {
+                Text(
+                    text = "/$target mL",
+                    fontSize = 15.sp,
+                    color = Color.Gray,
+                    fontWeight = FontWeight.Medium
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Icon(
+                    imageVector = Icons.Outlined.Edit,
+                    contentDescription = "Edit Goal",
+                    tint = Color.Gray,
+                    modifier = Modifier.size(14.dp)
+                )
+            }
         }
     }
 }

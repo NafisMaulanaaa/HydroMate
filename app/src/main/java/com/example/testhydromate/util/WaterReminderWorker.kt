@@ -99,10 +99,10 @@ class WaterReminderWorker(
         // 3. Tentukan Pesan
         return if (nextMinutesTotal <= endLimitMinutes) {
             // Jika jadwal berikutnya masih dalam jam operasional hari ini
-            "Now: $currentTimeStr • Next reminder: $nextTimeStr"
+            "Keep up your streak and stay hydrated • Next reminder: $nextTimeStr"
         } else {
             // Jika jadwal berikutnya sudah lewat jam tidur
-            "Now: $currentTimeStr • Last reminder for today. See you tomorrow!"
+            "Keep up your streak and stay hydrated • Last reminder for today. See you tomorrow!"
         }
     }
 

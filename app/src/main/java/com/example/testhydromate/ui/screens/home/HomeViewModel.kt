@@ -195,6 +195,21 @@ class HomeViewModel @Inject constructor(
         savePreferredAmount(amount)
     }
 
+    fun updateDailyGoal(newGoal: Int) {
+        val uid = auth.currentUser?.uid ?: return
+
+        // 1. Update UI Lokal (Optimistic Update)
+        _dailyTarget.value = newGoal
+
+        // 2. Update ke Firestore (Hanya field dailyGoal agar aman)
+        db.collection("users").document(uid)
+            .update("dailyGoal", newGoal)
+            .addOnFailureListener {
+                // Jika gagal (misal internet mati), kembalikan UI (opsional)
+                // _dailyTarget.value = oldGoal
+            }
+    }
+
     private fun savePreferredAmount(amount: Int) {
         val uid = auth.currentUser?.uid ?: return
         db.collection("users").document(uid).set(mapOf("preferredAmount" to amount), SetOptions.merge())

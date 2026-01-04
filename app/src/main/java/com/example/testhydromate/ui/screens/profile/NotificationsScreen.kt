@@ -1,8 +1,11 @@
 package com.example.testhydromate.ui.screens.profile
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
+import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
@@ -12,21 +15,21 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.* // PENTING: Import ini mengatasi error 'getValue'
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import com.example.testhydromate.ui.components.PrimaryBlue
-import com.example.testhydromate.util.WaterReminderWorker
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -35,16 +38,65 @@ fun NotificationsScreen(
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
 
-    // State untuk Switch
-    var notificationsEnabled by remember { mutableStateOf(false) }
+    // 1. Ambil data dari ViewModel (DataStore)
+    // Menggunakan by collectAsState() sekarang aman karena import runtime.* sudah ada
+    val reminderSettings by viewModel.isReminderEnabled.collectAsState()
 
-    // Launcher untuk request permission (Android 13+)
+    // Default false jika data belum dimuat (null)
+    val isAppSwitchOn = reminderSettings?.isEnabled ?: false
+
+    // 2. Cek Izin Sistem Android
+    var isSystemPermissionGranted by remember {
+        mutableStateOf(
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                ContextCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) == PackageManager.PERMISSION_GRANTED
+            } else true
+        )
+    }
+
+    // 3. Launcher untuk meminta izin
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted ->
-        notificationsEnabled = isGranted
-        WaterReminderWorker.schedule(context, isGranted)
+        isSystemPermissionGranted = isGranted
+        if (isGranted) {
+            // Jika diizinkan, nyalakan switch di DataStore
+            viewModel.setReminderEnabled(true)
+        } else {
+            // Jika ditolak, matikan switch di DataStore
+            viewModel.setReminderEnabled(false)
+        }
+    }
+
+    // 4. Observer Lifecycle: Cek ulang izin saat user kembali ke aplikasi
+    // (Misal: User menyalakan izin lewat Settings HP lalu balik ke App)
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    val isGranted = ContextCompat.checkSelfPermission(
+                        context, Manifest.permission.POST_NOTIFICATIONS
+                    ) == PackageManager.PERMISSION_GRANTED
+
+                    isSystemPermissionGranted = isGranted
+
+                    // SINKRONISASI PENTING:
+                    // Jika izin sistem MATI tapi switch App NYALA, paksa switch App jadi MATI.
+                    if (!isGranted && isAppSwitchOn) {
+                        viewModel.setReminderEnabled(false)
+                    }
+                }
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
     }
 
     Scaffold(
@@ -71,7 +123,6 @@ fun NotificationsScreen(
                         )
                     }
                 }
-
                 Text(
                     text = "Notifications",
                     fontSize = 24.sp,
@@ -115,28 +166,26 @@ fun NotificationsScreen(
                     }
 
                     Switch(
-                        checked = notificationsEnabled,
-                        onCheckedChange = { checked ->
-                            if (checked) {
-                                // Cek Permission untuk Android 13+
+                        // Switch hanya ON jika user mau ON DAN Izin Sistem Diberikan
+                        checked = isAppSwitchOn && isSystemPermissionGranted,
+                        onCheckedChange = { shouldBeEnabled ->
+                            if (shouldBeEnabled) {
+                                // User ingin MENYALAKAN
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                    val isPermissionGranted = ContextCompat.checkSelfPermission(
-                                        context, Manifest.permission.POST_NOTIFICATIONS
-                                    ) == PackageManager.PERMISSION_GRANTED
-
-                                    if (isPermissionGranted) {
-                                        notificationsEnabled = true
-                                        WaterReminderWorker.schedule(context, true)
+                                    if (isSystemPermissionGranted) {
+                                        // Izin sudah ada, langsung nyalakan
+                                        viewModel.setReminderEnabled(true)
                                     } else {
+                                        // Izin belum ada, minta dulu
                                         permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
                                     }
                                 } else {
-                                    notificationsEnabled = true
-                                    WaterReminderWorker.schedule(context, true)
+                                    // Android < 13 tidak butuh izin runtime
+                                    viewModel.setReminderEnabled(true)
                                 }
                             } else {
-                                notificationsEnabled = false
-                                WaterReminderWorker.schedule(context, false)
+                                // User ingin MEMATIKAN
+                                viewModel.setReminderEnabled(false)
                             }
                         },
                         colors = SwitchDefaults.colors(
@@ -152,13 +201,41 @@ fun NotificationsScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
+            // Pesan Status di bawah Switch
+            val statusText = if (!isSystemPermissionGranted && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                "⚠️ Notifications are blocked by system settings. Tap below to enable them."
+            } else {
+                "HydroMate uses notifications to remind you to drink water based on your goal settings. You can turn this off anytime."
+            }
+
+            val statusColor = if (!isSystemPermissionGranted && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                Color.Red
+            } else {
+                Color.Gray
+            }
+
             Text(
-                text = "HydroMate uses notifications to remind you to drink water based on your goal settings. You can turn this off anytime.",
+                text = statusText,
                 fontSize = 13.sp,
-                color = Color.Gray,
-                lineHeight = 20.sp,
-                modifier = Modifier.padding(horizontal = 4.dp)
+                color = statusColor,
+                lineHeight = 20.sp
             )
+
+            // Tombol Pintasan ke Settings HP (Hanya muncul jika izin ditolak)
+            if (!isSystemPermissionGranted && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                Spacer(modifier = Modifier.height(16.dp))
+                OutlinedButton(
+                    onClick = {
+                        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                            data = Uri.fromParts("package", context.packageName, null)
+                        }
+                        context.startActivity(intent)
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Open System Settings")
+                }
+            }
         }
     }
 }
