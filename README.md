@@ -92,7 +92,7 @@ Logika perhitungan target air dalam aplikasi ini mengadaptasi rumus estimasi *Wa
 * **PAL (Physical Activity Level):** Tingkat aktivitas fisik harian.
 * **Faktor Lingkungan:** Suhu dan kelembapan (berdasarkan data cuaca).
 
-*Referensi: Penelitian kebutuhan hidrasi manusia (Yosuke Yamada et al.).*
+*Referensi: Variation in human water turnover associated with environmental and lifestyle factors ([Yosuke Yamada et al.](https://www.science.org/doi/10.1126/science.abm8668)).*
 
 **Link Demo:** [HydroMate by SNAP](https://youtu.be/oJNs1WrDBAI)
 
