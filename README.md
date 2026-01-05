@@ -83,7 +83,7 @@ com.example.testhydromate
 
 |                     Home                      |                     History                     |                  Report Charts                  |                     Profile                      |
 |:---------------------------------------------:|:-----------------------------------------------:|:-----------------------------------------------:|:------------------------------------------------:|
-| <img src="screenshots/Home.png" width="180"/> | <img src="screenshots/History.png" width="180"/> | <img src="screenshots/Report.png" width="180"/> | <img src="screenshots/Profile.png" width="180"/> |
+| <img src="app/screenshots/Home.png" width="180"/> | <img src="app/screenshots/History.png" width="180"/> | <img src="app/screenshots/Report.png" width="180"/> | <img src="app/screenshots/Profile.png" width="180"/> |
 
 ## 🔬 Dasar Ilmiah
 
@@ -93,6 +93,8 @@ Logika perhitungan target air dalam aplikasi ini mengadaptasi rumus estimasi *Wa
 * **Faktor Lingkungan:** Suhu dan kelembapan (berdasarkan data cuaca).
 
 *Referensi: Penelitian kebutuhan hidrasi manusia (Yosuke Yamada et al.).*
+
+**Link Demo:** [HydroMate by SNAP](https://youtu.be/oJNs1WrDBAI)
 
 ## 👥 Tim SNAP
 * [23523014] Nafis Ilyas Maulana 
