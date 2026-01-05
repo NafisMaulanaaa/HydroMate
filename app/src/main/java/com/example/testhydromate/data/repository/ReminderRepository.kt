@@ -2,22 +2,12 @@ package com.example.testhydromate.data.repository
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.*
+import com.example.testhydromate.data.model.ReminderSettings
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import java.io.IOException
 import javax.inject.Inject
-
-// Model sederhana untuk menampung semua setting
-data class ReminderSettings(
-    val isEnabled: Boolean = true,
-    val isVibration: Boolean = true,
-    val isSound: Boolean = true,
-    val startTime: String = "08:00",
-    val endTime: String = "22:00",
-    val interval: Int = 60, // Menit
-    val repeatDays: Set<String> = setOf("1","2","3","4","5","6","7") // 1=Sun, 2=Mon... (Calendar.SUNDAY format)
-)
 
 class ReminderRepository @Inject constructor(
     private val dataStore: DataStore<Preferences>

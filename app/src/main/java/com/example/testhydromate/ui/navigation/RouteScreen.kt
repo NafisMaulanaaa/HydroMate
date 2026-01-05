@@ -136,7 +136,7 @@ fun RouteScreen() {
                 )
             }
 
-            // ===== ONBOARDING GRAPH (SHARED VIEWMODEL) =====
+            // ===== ONBOARDING GRAPH =====
             navigation(
                 startDestination = Screen.INPUT_PERSONAL.route,
                 route = ONBOARDING_GRAPH_ROUTE

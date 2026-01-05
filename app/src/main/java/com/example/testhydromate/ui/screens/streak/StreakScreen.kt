@@ -72,7 +72,7 @@ fun StreakScreen(onBack: () -> Unit, streakCount: Int) {
             Spacer(modifier = Modifier.height(12.dp))
 
             Text(
-                text = "$streakCount Days",
+                text = "$streakCount Day(s)",
                 fontSize = 48.sp,
                 fontWeight = FontWeight.Bold,
                 color = PrimaryBlue
