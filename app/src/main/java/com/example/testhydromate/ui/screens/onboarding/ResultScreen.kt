@@ -78,7 +78,7 @@ fun ResultScreen(
                 onCancel = { showBottomSheet = false },
                 onSave = {
                     val newGoal = tempGoalValue.toIntOrNull() ?: return@EditGoalSheetContent
-                    viewModel.updateManualGoal(newGoal) // 🔥 UPDATE VIEWMODEL
+                    viewModel.updateManualGoal(newGoal)
                     showBottomSheet = false
                 }
             )
@@ -88,13 +88,3 @@ fun ResultScreen(
         }
     }
 }
-
-// MAIN SCREEN
-
-/*@Preview(showBackground = true, widthDp = 390, heightDp = 844)
-Composable
-fun MainDailyGoalPreview() {
-    ResultScreen(
-        onContinueToHome = {}
-    )
-}*/

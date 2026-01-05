@@ -26,7 +26,7 @@ fun InputWeatherScreen(
     onContinueClicked: () -> Unit,
     onBackClicked:() -> Unit
 ) {
-    val context = LocalContext.current // 1. Ambil Context
+    val context = LocalContext.current
 
     Scaffold(
         containerColor = Color.White,
@@ -34,7 +34,6 @@ fun InputWeatherScreen(
             HydroPrimaryButton(
                 text = "Generate plan!",
                 onClick = {
-                    // 2. VALIDASI CUACA
                     if (viewModel.weather.isNotBlank()) {
                         onContinueClicked()
                     } else {

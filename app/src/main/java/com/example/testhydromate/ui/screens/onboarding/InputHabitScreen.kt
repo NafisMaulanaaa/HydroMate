@@ -26,7 +26,7 @@ fun InputHabitScreen(
     onContinueClicked: () -> Unit,
     onBackClicked:() -> Unit,
 ) {
-    val context = LocalContext.current // 1. Ambil Context
+    val context = LocalContext.current
 
     Scaffold(
         containerColor = Color.White,
@@ -34,7 +34,6 @@ fun InputHabitScreen(
             HydroPrimaryButton(
                 text = "Continue",
                 onClick = {
-                    // 2. VALIDASI HABIT
                     if (viewModel.activityLevel.isNotBlank()) {
                         onContinueClicked()
                     } else {

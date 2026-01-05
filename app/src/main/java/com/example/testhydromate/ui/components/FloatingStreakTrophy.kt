@@ -71,13 +71,13 @@ fun FloatingStreakTrophy(
 
         // Tentukan pojok terdekat
         val targetX = if (centerX < screenWidthPx / 2) {
-            margin // Kiri
+            margin
         } else {
             screenWidthPx - trophySize - margin // Kanan
         }
 
         val targetY = if (centerY < screenHeightPx / 2) {
-            topMargin // Atas (dengan top margin)
+            topMargin
         } else {
             screenHeightPx - trophySize - margin // Bawah
         }
@@ -119,7 +119,6 @@ fun FloatingStreakTrophy(
             .pointerInput(Unit) {
                 detectDragGestures(
                     onDragEnd = {
-                        // Snap ke pojok saat drag selesai
                         snapToNearestCorner()
                     }
                 ) { change, dragAmount ->
@@ -138,7 +137,6 @@ fun FloatingStreakTrophy(
             .size(50.dp),
         contentAlignment = Alignment.Center
     ) {
-        // Efek Sinar (Hanya muncul jika isActive true)
         if (isActive) {
             Box(
                 modifier = Modifier

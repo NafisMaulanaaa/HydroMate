@@ -31,7 +31,6 @@ fun ReminderSettingScreen(
     val settings by viewModel.settings.collectAsState()
     val context = LocalContext.current
 
-    // Helper untuk TimePicker Dialog
     fun showTimePicker(current: String, onTimeSelected: (Int, Int) -> Unit) {
         val parts = current.split(":")
         val h = parts[0].toInt()
@@ -63,7 +62,7 @@ fun ReminderSettingScreen(
                 .fillMaxSize()
                 .padding(24.dp)
         ) {
-            // 1. MASTER SWITCH
+            // MASTER SWITCH
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -79,16 +78,15 @@ fun ReminderSettingScreen(
 
             HorizontalDivider(Modifier.padding(vertical = 16.dp))
 
-            // Disable section below if toggle is off
             Column(modifier = Modifier.fillMaxWidth().alpha(if(settings.isEnabled) 1f else 0.5f)) {
 
-                // 2. SOUND & VIBRATION
+                // SOUND & VIBRATION
                 SettingToggleItem("Vibration", settings.isVibration) { viewModel.toggleSwitch("vibration", settings.isVibration) }
                 SettingToggleItem("Sound", settings.isSound) { viewModel.toggleSwitch("sound", settings.isSound) }
 
                 Spacer(Modifier.height(24.dp))
 
-                // 3. SCHEDULE (First - Last - Interval)
+                // SCHEDULE (First - Last - Interval)
                 Text("Schedule", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.Gray)
                 Spacer(Modifier.height(12.dp))
 
@@ -106,12 +104,11 @@ fun ReminderSettingScreen(
 
                 Spacer(Modifier.height(24.dp))
 
-                // 4. REPEAT DAYS
+                // REPEAT DAYS
                 Text("Repeat", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.Gray)
                 Spacer(Modifier.height(12.dp))
 
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    // 1=Sun, 2=Mon... Java Calendar standard
                     val days = listOf("2" to "M", "3" to "T", "4" to "W", "5" to "T", "6" to "F", "7" to "S", "1" to "S")
                     days.forEach { (id, label) ->
                         DayCircle(
@@ -125,7 +122,7 @@ fun ReminderSettingScreen(
         }
     }
 
-    // Bottom Sheet untuk Interval
+    // Bottom Sheet Interval
     if (showIntervalSheet) {
         ModalBottomSheet(onDismissRequest = { showIntervalSheet = false }, containerColor = Color.White) {
             Column(Modifier.padding(bottom = 32.dp)) {

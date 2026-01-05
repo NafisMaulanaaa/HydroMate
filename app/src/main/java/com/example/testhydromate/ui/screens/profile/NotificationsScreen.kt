@@ -33,7 +33,6 @@ import com.example.testhydromate.ui.components.PrimaryBlue
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.collectAsState
-import com.example.testhydromate.data.model.ReminderSettings
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,14 +43,10 @@ fun NotificationsScreen(
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    // 1. Ambil data dari ViewModel (DataStore)
-    // Menggunakan by collectAsState() sekarang aman karena import runtime.* sudah ada
     val reminderSettings by viewModel.isReminderEnabled.collectAsState()
 
-    // Default false jika data belum dimuat (null)
     val isAppSwitchOn = reminderSettings?.isEnabled ?: false
 
-    // 2. Cek Izin Sistem Android
     var isSystemPermissionGranted by remember {
         mutableStateOf(
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -63,22 +58,17 @@ fun NotificationsScreen(
         )
     }
 
-    // 3. Launcher untuk meminta izin
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         isSystemPermissionGranted = isGranted
         if (isGranted) {
-            // Jika diizinkan, nyalakan switch di DataStore
             viewModel.setReminderEnabled(true)
         } else {
-            // Jika ditolak, matikan switch di DataStore
             viewModel.setReminderEnabled(false)
         }
     }
 
-    // 4. Observer Lifecycle: Cek ulang izin saat user kembali ke aplikasi
-    // (Misal: User menyalakan izin lewat Settings HP lalu balik ke App)
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
@@ -89,8 +79,6 @@ fun NotificationsScreen(
 
                     isSystemPermissionGranted = isGranted
 
-                    // SINKRONISASI PENTING:
-                    // Jika izin sistem MATI tapi switch App NYALA, paksa switch App jadi MATI.
                     if (!isGranted && isAppSwitchOn) {
                         viewModel.setReminderEnabled(false)
                     }
@@ -170,25 +158,19 @@ fun NotificationsScreen(
                     }
 
                     Switch(
-                        // Switch hanya ON jika user mau ON DAN Izin Sistem Diberikan
                         checked = isAppSwitchOn && isSystemPermissionGranted,
                         onCheckedChange = { shouldBeEnabled ->
                             if (shouldBeEnabled) {
-                                // User ingin MENYALAKAN
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                                     if (isSystemPermissionGranted) {
-                                        // Izin sudah ada, langsung nyalakan
                                         viewModel.setReminderEnabled(true)
                                     } else {
-                                        // Izin belum ada, minta dulu
                                         permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
                                     }
                                 } else {
-                                    // Android < 13 tidak butuh izin runtime
                                     viewModel.setReminderEnabled(true)
                                 }
                             } else {
-                                // User ingin MEMATIKAN
                                 viewModel.setReminderEnabled(false)
                             }
                         },
@@ -205,7 +187,6 @@ fun NotificationsScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Pesan Status di bawah Switch
             val statusText = if (!isSystemPermissionGranted && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 "⚠️ Notifications are blocked by system settings. Tap below to enable them."
             } else {
@@ -225,7 +206,6 @@ fun NotificationsScreen(
                 lineHeight = 20.sp
             )
 
-            // Tombol Pintasan ke Settings HP (Hanya muncul jika izin ditolak)
             if (!isSystemPermissionGranted && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 Spacer(modifier = Modifier.height(16.dp))
                 OutlinedButton(

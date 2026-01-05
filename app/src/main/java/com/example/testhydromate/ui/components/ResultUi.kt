@@ -160,7 +160,7 @@ fun EditGoalSheetContent(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        /* ===== INPUT BOX (Presisi Tengah & Baseline) ===== */
+        /* ===== INPUT BOX ===== */
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -170,10 +170,9 @@ fun EditGoalSheetContent(
                     color = Color(0xFFF8F9FA),
                     shape = RoundedCornerShape(16.dp)
                 ),
-            contentAlignment = Alignment.Center // INI yang membuat Row (Angka+mL) berada di tengah
+            contentAlignment = Alignment.Center
         ) {
             Row(
-                // wrapContentWidth memastikan lebar Row hanya pas seukuran teks
                 modifier = Modifier.wrapContentWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -188,21 +187,20 @@ fun EditGoalSheetContent(
                         fontSize = 44.sp,
                         fontWeight = FontWeight.Bold,
                         color = PrimaryBlue,
-                        textAlign = TextAlign.Center // Tetap Center agar angka tumbuh seimbang
+                        textAlign = TextAlign.Center
                     ),
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Number
                     ),
                     singleLine = true,
                     modifier = Modifier
-                        // wrapContentWidth() pada TextField sangat krusial agar tidak ada ruang kosong
                         .wrapContentWidth()
                         .alignByBaseline()
                         .focusRequester(focusRequester)
                         .focusable()
                 )
 
-                Spacer(modifier = Modifier.width(4.dp)) // Jarak nempel 4dp
+                Spacer(modifier = Modifier.width(4.dp))
 
                 Text(
                     text = "mL",

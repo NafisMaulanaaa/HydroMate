@@ -31,10 +31,9 @@ import com.example.testhydromate.R
 fun WaterProgress(
     current: Int,
     target: Int,
-    onTargetClick: () -> Unit // <--- Callback baru
+    onTargetClick: () -> Unit
 ) {
 
-    // 🔥 ANIMATED PROGRESS
     val animatedProgress by animateFloatAsState(
         targetValue = (current.toFloat() / target).coerceIn(0f, 1f),
         animationSpec = tween(
@@ -106,7 +105,7 @@ fun WaterProgress(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .clip(RoundedCornerShape(8.dp))
-                    .clickable { onTargetClick() } // Klik trigger bottom sheet
+                    .clickable { onTargetClick() }
                     .padding(4.dp)
             ) {
                 Text(

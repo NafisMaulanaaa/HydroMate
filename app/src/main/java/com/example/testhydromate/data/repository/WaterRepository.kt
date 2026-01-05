@@ -17,22 +17,19 @@ class WaterRepository @Inject constructor(
 
     private val userId get() = auth.currentUser?.uid
 
-    // Tetap suspend karena ini operasi satu kali (write)
     suspend fun addDrink(amount: Int) {
         val uid = userId ?: return
         val data = hashMapOf(
-            "amount" to amount.toInt(), // Pastikan dia Int
+            "amount" to amount.toInt(),
             "timestamp" to System.currentTimeMillis(),
             "userId" to uid
         )
 
-        // Tambahkan Logcat di sini buat ngintip di Android Studio
         println("REPOS_CHECK: Menulis ke Firestore amount = $amount")
 
         firestore.collection("water_logs").add(data).await()
     }
 
-    // DIUBAH MENJADI FLOW: Untuk history real-time
     fun getAllHistoryRealtime(): Flow<List<WaterLog>> = callbackFlow {
         val uid = userId
         if (uid == null) {
@@ -48,13 +45,12 @@ class WaterRepository @Inject constructor(
 
                 val logs = snapshot?.documents?.mapNotNull { doc ->
                     val log = doc.toObject(WaterLog::class.java)
-                    log?.copy(id = doc.id) // Pastikan ID dokumen ikut terbawa
+                    log?.copy(id = doc.id)
                 } ?: emptyList()
 
                 trySend(logs)
             }
 
-        // Penting: menutup listener saat tidak digunakan agar hemat baterai
         awaitClose { subscription.remove() }
     }
 

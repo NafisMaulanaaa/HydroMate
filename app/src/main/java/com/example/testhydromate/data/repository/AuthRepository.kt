@@ -64,8 +64,6 @@ class AuthRepository @Inject constructor(
                         "activityLevel" to user.activityLevel,
                         "weatherCondition" to user.weatherCondition,
                         "dailyGoal" to user.dailyGoal,
-//                        "wakeTime" to user.wakeTime,
-//                        "bedTime" to user.bedTime
                     )
                 ).await()
 

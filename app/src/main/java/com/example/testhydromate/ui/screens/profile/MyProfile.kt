@@ -32,7 +32,6 @@ fun MyProfile(
     onBackClick: () -> Unit,
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
-    // States untuk form input
     var fullName by remember { mutableStateOf("") }
     var selectedGender by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
@@ -40,7 +39,6 @@ fun MyProfile(
     var weight by remember { mutableStateOf("") }
     var height by remember { mutableStateOf("") }
 
-    // States untuk Notifikasi
     var showNotification by remember { mutableStateOf(false) }
     var notificationMessage by remember { mutableStateOf("") }
     var isError by remember { mutableStateOf(false) }
@@ -48,7 +46,6 @@ fun MyProfile(
     val user = viewModel.userData
     val isLoading = viewModel.isLoading
 
-    // Load data awal dari database
     LaunchedEffect(user) {
         user?.let {
             fullName = "${it.firstName} ${it.lastName}".trim()
@@ -166,7 +163,6 @@ fun MyProfile(
                             label = "Email",
                             value = email,
                             onValueChange = { }
-                            // Parameter readOnly dihapus karena tidak ada di komponen InputField kamu
                         )
                     }
 

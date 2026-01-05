@@ -33,13 +33,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 // WARNA
-val PrimaryBlue = Color(0xFF1565C0) // Warna biru utama
-//val teswarna = Color(0xFFFFF1FA)
-val FemalePink = Color(0xFFE91E63)  // Warna pink
-val LightGrayBg = Color(0xFFF5F5F5) // Background input field
-val TextGray =  Color(0xff6c7278)    // Warna teks deskripsi
+val PrimaryBlue = Color(0xFF1565C0)
+val FemalePink = Color(0xFFE91E63)
+val LightGrayBg = Color(0xFFF5F5F5)
+val TextGray =  Color(0xff6c7278)
 
-// untuk tombol "continue" sama "Let's hydrate!" (di OnBoarding (3) sama result screen)
 @Composable
 fun HydroPrimaryButton(text: String, onClick: () -> Unit){
     Button(
@@ -60,7 +58,7 @@ fun HydroPrimaryButton(text: String, onClick: () -> Unit){
     }
 }
 
-// INPUT TEXT BIASA (Nama, Email, Phone)
+// INPUT TEXT (Nama, Email, Phone)
 @Composable
 fun HydroTextField(
     label: String,

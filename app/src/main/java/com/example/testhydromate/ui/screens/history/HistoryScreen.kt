@@ -39,11 +39,9 @@ fun HistoryScreen(
     var selectedDelete by remember { mutableStateOf<WaterLog?>(null) }
     var selectedEdit by remember { mutableStateOf<WaterLog?>(null) }
 
-    // State untuk Custom Notification (Mature Green Notification)
     var showNotification by remember { mutableStateOf(false) }
     var notificationMessage by remember { mutableStateOf("") }
 
-    // Memproses data: Urutkan dari yang terbaru, lalu grupkan berdasarkan tanggal
     val groupedLogs = remember(logs) {
         logs.sortedByDescending { it.timestamp }
             .groupBy {
@@ -52,7 +50,6 @@ fun HistoryScreen(
             }
     }
 
-    // DIALOG KONFIRMASI HAPUS
     selectedDelete?.let { log ->
         val time = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(log.timestamp))
         ConfirmDeleteDialog(
@@ -61,7 +58,6 @@ fun HistoryScreen(
             onConfirm = {
                 viewModel.deleteLog(log)
 
-                // Trigger Notifikasi Custom
                 notificationMessage = "Drink record at $time has been deleted"
                 showNotification = true
 
@@ -79,7 +75,6 @@ fun HistoryScreen(
             onSave = { updatedLog ->
                 viewModel.updateLog(updatedLog)
 
-                // Trigger Notifikasi Custom saat Edit (Mature & Specific Message)
                 notificationMessage = "Drink record at $time updated to ${updatedLog.amount} mL"
                 showNotification = true
 
@@ -94,7 +89,7 @@ fun HistoryScreen(
                 .fillMaxSize()
                 .background(Color.White)
         ) {
-            // HEADER (Statik)
+            // HEADER
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -109,7 +104,7 @@ fun HistoryScreen(
                 )
             }
 
-            // DAFTAR RIWAYAT (Scrollable)
+            // DAFTAR RIWAYAT
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 100.dp)
@@ -139,20 +134,20 @@ fun HistoryScreen(
             }
         }
 
-        // --- CUSTOM NOTIFICATION (HIJAU DI ATAS) ---
+        // --- CUSTOM NOTIFICATION ---
         AnimatedVisibility(
             visible = showNotification,
             enter = fadeIn() + slideInVertically(initialOffsetY = { -it }),
             exit = fadeOut() + slideOutVertically(targetOffsetY = { -it }),
             modifier = Modifier
                 .align(Alignment.TopCenter)
-                .padding(top = 50.dp) // Jarak dari atas layar agar tidak tertutup notch
+                .padding(top = 50.dp)
         ) {
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp),
-                color = Color(0xFF4CAF50), // Warna Hijau Mature
+                color = Color(0xFF4CAF50),
                 shape = RoundedCornerShape(12.dp),
                 shadowElevation = 8.dp
             ) {
@@ -176,7 +171,6 @@ fun HistoryScreen(
                 }
             }
 
-            // Auto-hide notifikasi setelah 3 detik
             LaunchedEffect(showNotification) {
                 if (showNotification) {
                     delay(3000)
@@ -192,11 +186,12 @@ fun HistoryDateCard(
     date: String,
     logs: List<WaterLog>,
     onEdit: (WaterLog) -> Unit,
-    onDelete: (WaterLog) -> Unit
+    onDelete: (WaterLog) -> Unit,
+    viewModel: HistoryViewModel = hiltViewModel()
 ) {
     Column {
         Text(
-            text = formatDateHeader(date),
+            text = viewModel.formatDateHeader(date),
             fontSize = 13.sp,
             color = Color.Gray,
             modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
@@ -295,16 +290,4 @@ fun ConfirmDeleteDialog(time: String, onCancel: () -> Unit, onConfirm: () -> Uni
     }
 }
 
-fun formatDateHeader(date: String): String {
-    val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-    val dateObj = sdf.parse(date) ?: return date
-    val today = sdf.format(Date())
-    val cal = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, -1) }
-    val yesterday = sdf.format(cal.time)
 
-    return when (date) {
-        today -> "Today"
-        yesterday -> "Yesterday"
-        else -> SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(dateObj)
-    }
-}

@@ -17,20 +17,11 @@ class OnboardingViewModel @Inject constructor(
     private val repository: AuthRepository
 ) : ViewModel() {
 
-    // personal detail
     var gender by mutableStateOf("")
     var height by mutableStateOf("")
     var weight by mutableStateOf("")
     var age by mutableStateOf("")
-
-    // habit
-//    var wakeHour by mutableStateOf("")
-//    var wakeMinute by mutableStateOf("")
-//    var bedHour by mutableStateOf("")
-//    var bedMinute by mutableStateOf("")
     var activityLevel by mutableStateOf("")
-
-    // weather
     var weather by mutableStateOf("")
     var dailyGoal by mutableStateOf(0)
     var saveState by mutableStateOf<Resource<Boolean>?>(null)
@@ -89,7 +80,7 @@ class OnboardingViewModel @Inject constructor(
             else -> 25.0 to 50.0
         }
 
-        val altitude = 10.0 // dalam meter. diambil dari rata rata kemungkinan pengguna (perkotaan)
+        val altitude = 10.0 // dalam meter. diambil dari rata rata kemungkinan pengguna (perkotaan di Indonesia)
 
         // hitung water turnovernya atau jumlah total air yang diganti oleh tubuh dalam satu hari (ml/day)
         val wtMl = (861.9 * pal) +
@@ -104,17 +95,17 @@ class OnboardingViewModel @Inject constructor(
                 984.8
 
         // baru cari water intake nya
-        // untuk mengganti kebutuhan air itu, based on penelitian  yosuke yamada
+        // untuk mengganti kebutuhan air itu, based on penelitian yosuke yamada
         // - Metabolisme menyumbang ~10-15% (
         // - Makanan menyumbang ~20-30%
         // - Sisa yang harus diminum (Fluids) ~55-70%
-        // ini yang kita cari ambil di 65 untuk mastikan kebutuhan air benar benar terpenuhi)
+        // ini yang kita cari ambil di 70 untuk mastikan kebutuhan air benar benar terpenuhi)
 
         return (wtMl * 0.70).toInt()
     }
 
     fun submitOnboarding() {
-        if (saveState is Resource.Loading) return // Cegah double submit
+        if (saveState is Resource.Loading) return
 
         dailyGoal = calculateWaterGoal()
         saveOnboardingData()
@@ -122,7 +113,6 @@ class OnboardingViewModel @Inject constructor(
 
     fun updateManualGoal(newGoal: Int) {
         dailyGoal = newGoal
-        // Opsional: Simpan ulang ke firestore jika perlu update realtime
          saveOnboardingData()
     }
 
@@ -135,8 +125,6 @@ class OnboardingViewModel @Inject constructor(
                 height = height.toIntOrNull() ?: 0,
                 weight = weight.toIntOrNull() ?: 0,
                 age = age.toIntOrNull() ?: 0,
-//                wakeTime = "$wakeHour:$wakeMinute",
-//                bedTime = "$bedHour:$bedMinute",
                 activityLevel = activityLevel,
                 weatherCondition = weather,
                 dailyGoal = dailyGoal

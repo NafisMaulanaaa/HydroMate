@@ -36,7 +36,7 @@ class WaterReminderWorker(
                 "enabled" to (prefs[booleanPreferencesKey("is_enabled")] ?: true),
                 "startTime" to (prefs[stringPreferencesKey("start_time")] ?: "08:00"),
                 "endTime" to (prefs[stringPreferencesKey("end_time")] ?: "22:00"),
-                "interval" to (prefs[intPreferencesKey("interval")] ?: 60), // Ambil Interval
+                "interval" to (prefs[intPreferencesKey("interval")] ?: 60),
                 "days" to (prefs[stringSetPreferencesKey("repeat_days")] ?: setOf("1","2","3","4","5","6","7")),
                 "sound" to (prefs[booleanPreferencesKey("is_sound")] ?: true),
                 "vibration" to (prefs[booleanPreferencesKey("is_vibration")] ?: true)
@@ -47,17 +47,17 @@ class WaterReminderWorker(
     override fun doWork(): Result {
         val settings = getSettings()
 
-        // 1. Cek Master Switch
+        // Cek Master Switch
         if (settings["enabled"] as Boolean == false) return Result.success()
 
         val calendar = Calendar.getInstance()
         val currentDay = calendar.get(Calendar.DAY_OF_WEEK).toString()
 
-        // 2. Cek Hari
+        // Cek Hari
         val selectedDays = settings["days"] as Set<String>
         if (!selectedDays.contains(currentDay)) return Result.success()
 
-        // 3. Cek Jam (Start - End)
+        // Cek Jam (Start - End)
         val startTimeStr = settings["startTime"] as String
         val endTimeStr = settings["endTime"] as String
 
@@ -85,18 +85,14 @@ class WaterReminderWorker(
     private fun generateNotificationMessage(calendar: Calendar, intervalMinutes: Int, endLimitMinutes: Int): String {
         val sdf = SimpleDateFormat("HH:mm", Locale.getDefault())
 
-        // 1. Ambil Jam Sekarang
-        val currentTimeStr = sdf.format(calendar.time)
-
-        // 2. Hitung Jam Berikutnya
-        // Clone kalender agar tidak merubah waktu asli saat ini
+        // Jam Berikutnya
         val nextCalendar = calendar.clone() as Calendar
         nextCalendar.add(Calendar.MINUTE, intervalMinutes)
 
         val nextMinutesTotal = nextCalendar.get(Calendar.HOUR_OF_DAY) * 60 + nextCalendar.get(Calendar.MINUTE)
         val nextTimeStr = sdf.format(nextCalendar.time)
 
-        // 3. Tentukan Pesan
+        // Tentukan Pesan
         return if (nextMinutesTotal <= endLimitMinutes) {
             // Jika jadwal berikutnya masih dalam jam operasional hari ini
             "Keep up your streak and stay hydrated • Next reminder: $nextTimeStr"
@@ -139,8 +135,8 @@ class WaterReminderWorker(
 
         val notification = NotificationCompat.Builder(applicationContext, channelId)
             .setContentTitle("It's time to drink water!")
-            .setContentText(messageBody) // Menggunakan pesan dinamis
-            .setStyle(NotificationCompat.BigTextStyle().bigText(messageBody)) // Agar teks panjang terlihat semua
+            .setContentText(messageBody)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(messageBody))
             .setSmallIcon(R.drawable.hydromate_logo)
             .setColor(android.graphics.Color.parseColor("#0061FF"))
             .setPriority(NotificationCompat.PRIORITY_HIGH)

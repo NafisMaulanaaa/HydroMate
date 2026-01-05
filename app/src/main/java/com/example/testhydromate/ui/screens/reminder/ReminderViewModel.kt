@@ -26,7 +26,7 @@ class ReminderViewModel @Inject constructor(
     fun toggleSwitch(key: String, currentValue: Boolean) {
         viewModelScope.launch {
             repository.updateSwitch(key, !currentValue)
-            // Jika Master Switch berubah, reschedule worker
+
             if (key == "enabled") {
                 rescheduleWorker(!currentValue, settings.value.interval)
             }
@@ -51,7 +51,7 @@ class ReminderViewModel @Inject constructor(
     fun toggleDay(dayId: String) {
         val currentDays = settings.value.repeatDays.toMutableSet()
         if (currentDays.contains(dayId)) {
-            if (currentDays.size > 1) currentDays.remove(dayId) // Minimal 1 hari harus aktif
+            if (currentDays.size > 1) currentDays.remove(dayId)
         } else {
             currentDays.add(dayId)
         }

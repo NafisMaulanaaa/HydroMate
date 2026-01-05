@@ -31,11 +31,7 @@ fun InputPersonalScreen(
     onContinueClicked: () -> Unit,
     onBackClicked: (() -> Unit)? = null
 ) {
-    // 1. Ambil Context untuk menampilkan Toast
     val context = LocalContext.current
-
-    // Kita gunakan state langsung dari ViewModel
-    // viewModel.gender, viewModel.height, dll.
 
     Scaffold(
         containerColor = Color.White,
@@ -43,16 +39,13 @@ fun InputPersonalScreen(
             HydroPrimaryButton(
                 text = "Continue",
                 onClick = {
-                    // 2. LOGIKA VALIDASI
                     if (viewModel.gender.isNotBlank() &&
                         viewModel.height.isNotBlank() &&
                         viewModel.weight.isNotBlank() &&
                         viewModel.age.isNotBlank()
                     ) {
-                        // Jika semua terisi, lanjut navigasi
                         onContinueClicked()
                     } else {
-                        // Jika ada yang kosong, munculkan pesan
                         Toast.makeText(context, "Please complete all fields to continue", Toast.LENGTH_SHORT).show()
                     }
                 }
@@ -107,7 +100,6 @@ fun InputPersonalScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // Perhatikan: viewModel.gender diupdate di onClick
                 GenderButton(
                     text = "Male",
                     icon = Icons.Default.Male,

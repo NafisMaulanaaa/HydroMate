@@ -28,7 +28,7 @@ fun HydrationChart(
     var selectedIndex by remember { mutableStateOf(data.lastIndex) }
 
     val activeColor = PrimaryBlue
-    val inactiveColor = Color(0xFFE3F2FD) // Light Blue
+    val inactiveColor = Color(0xFFE3F2FD)
     val pathColor = PrimaryBlue
 
     Canvas(
@@ -56,9 +56,9 @@ fun HydrationChart(
                 val value = if (isPercentage) item.completionPercent else item.totalAmount.toFloat()
                 val drawValue = value.coerceAtMost(maxValue)
 
-                val barHeight = (drawValue / maxValue) * (h * 0.7f) // Pakai 70% tinggi canvas
+                val barHeight = (drawValue / maxValue) * (h * 0.7f) //  70% tinggi canvas
                 val x = (stepX * index) + (stepX / 2) - (barWidth / 2)
-                val y = h - barHeight - 40f // 40f padding bawah untuk label text
+                val y = h - barHeight - 40f
 
                 drawRoundRect(
                     color = if (index == selectedIndex) activeColor else inactiveColor,

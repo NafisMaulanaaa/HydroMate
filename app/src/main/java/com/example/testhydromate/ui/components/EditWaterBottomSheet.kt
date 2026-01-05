@@ -68,12 +68,12 @@ fun EditWaterBottomSheet(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 24.dp)
-                    .height(90.dp) // Box tetap tinggi
+                    .height(90.dp)
                     .background(color = Color(0xFFF8F9FA), shape = RoundedCornerShape(16.dp)),
-                contentAlignment = Alignment.Center // Memastikan Row tepat di tengah Box
+                contentAlignment = Alignment.Center
             ) {
                 Row(
-                    verticalAlignment = Alignment.CenterVertically, // Row-nya di tengah Box
+                    verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center
                 ) {
                     androidx.compose.foundation.text.BasicTextField(
@@ -82,13 +82,13 @@ fun EditWaterBottomSheet(
                         textStyle = androidx.compose.ui.text.TextStyle(
                             fontSize = 44.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF1976D2), // Ganti ke PrimaryBlue milikmu
+                            color = Color(0xFF1976D2),
                             textAlign = TextAlign.Center
                         ),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         modifier = Modifier
                             .width(IntrinsicSize.Min)
-                            .alignByBaseline() // Kunci pertama
+                            .alignByBaseline()
                     )
 
                     Spacer(Modifier.width(8.dp))
@@ -98,7 +98,7 @@ fun EditWaterBottomSheet(
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Medium,
                         color = Color.Gray,
-                        modifier = Modifier.alignByBaseline() // Kunci kedua: Sejajar bawah dengan angka
+                        modifier = Modifier.alignByBaseline()
                     )
                 }
             }

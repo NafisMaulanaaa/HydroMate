@@ -4,8 +4,8 @@ import java.util.Date
 
 // Model data khusus untuk Chart
 data class DailyChartData(
-    val dayName: String, // e.g., "Mon", "16"
+    val dayName: String,
     val dateFull: Date,
-    val totalAmount: Int, // Total ml
-    val completionPercent: Float // 0.0 - 1.0+
+    val totalAmount: Int,
+    val completionPercent: Float
 )

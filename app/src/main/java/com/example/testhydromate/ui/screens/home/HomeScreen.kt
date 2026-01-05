@@ -177,7 +177,7 @@ fun HomeScreen(
             }
         }
 
-        // --- BOTTOM SHEET 1: ADJUST DRINK AMOUNT (Gelas minum) ---
+        // --- ADJUST DRINK AMOUNT (Gelas minum) ---
         if (showAdjustDrinkSheet) {
             AdjustDrinkAmountBottomSheet(
                 initialAmount = viewModel.selectedAmount,
@@ -189,14 +189,13 @@ fun HomeScreen(
             )
         }
 
-        // --- BOTTOM SHEET 2: EDIT GOAL (Target Harian) ---
+        // --- EDIT GOAL (Target Harian) ---
         if (showEditGoalSheet) {
             ModalBottomSheet(
                 onDismissRequest = { showEditGoalSheet = false },
                 containerColor = Color.White,
                 dragHandle = { BottomSheetDefaults.DragHandle() }
             ) {
-                // Re-use komponen EditGoalSheetContent dari ui.components
                 EditGoalSheetContent(
                     tempValue = tempGoalValue,
                     onValueChange = { tempGoalValue = it },
@@ -204,10 +203,9 @@ fun HomeScreen(
                     onSave = {
                         val newGoal = tempGoalValue.toIntOrNull()
                         if (newGoal != null && newGoal > 0) {
-                            viewModel.updateDailyGoal(newGoal) // Panggil ViewModel
+                            viewModel.updateDailyGoal(newGoal)
                             showEditGoalSheet = false
 
-                            // Optional: Tampilkan notifikasi
                             notificationMessage = "Daily goal updated to $newGoal mL"
                             showNotification = true
                         }

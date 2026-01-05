@@ -22,16 +22,15 @@ fun StreakScreen(onBack: () -> Unit, streakCount: Int) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White) // Memastikan seluruh layar berwarna putih
+            .background(Color.White)
             .statusBarsPadding()
             .padding(16.dp)
     ) {
-        // Konten Tengah (Piala dan Teks)
         Column(
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Header: Tombol Back & Judul
+            // Header
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
@@ -82,11 +81,11 @@ fun StreakScreen(onBack: () -> Unit, streakCount: Int) {
         // Card diletakkan di bagian paling bawah
         Card(
             modifier = Modifier
-                .align(Alignment.BottomCenter) // MEMINDAHKAN KE BAWAH
+                .align(Alignment.BottomCenter)
                 .fillMaxWidth()
-                .padding(bottom = 32.dp), // Jarak dari bawah layar
+                .padding(bottom = 32.dp),
             colors = CardDefaults.cardColors(
-                containerColor = Color(0xFFF0F7FF) // Biru muda transparan
+                containerColor = Color(0xFFF0F7FF)
             ),
             shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
         ) {

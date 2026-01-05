@@ -29,7 +29,6 @@ fun ReportScreen(
     val chartData by viewModel.chartData.collectAsState()
     val selectedRange by viewModel.selectedTimeRange.collectAsState()
 
-    // Logic teks tanggal agar sesuai filter
     val dateRangeText = remember(chartData, selectedRange) {
         if (chartData.isNotEmpty()) {
             val firstDate = chartData.first().dateFull
@@ -60,8 +59,7 @@ fun ReportScreen(
             .background(Color.White)
     ) {
 
-        // --- BAGIAN 1: STATIK (HEADER + FILTER + NAVIGATOR) ---
-        // Semua di dalam Column ini tidak akan ikut bergeser saat scroll
+        // --- HEADER + FILTER + NAVIGATOR ---
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -92,7 +90,7 @@ fun ReportScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Date Navigator (Panah kiri-kanan)
+            // Date Navigator
             DateNavigator(
                 dateText = dateRangeText,
                 onPrevClick = { viewModel.previousPeriod() },
@@ -102,8 +100,7 @@ fun ReportScreen(
             Spacer(modifier = Modifier.height(24.dp))
         }
 
-        // --- BAGIAN 2: SCROLLABLE (HANYA CARD) ---
-        // Menggunakan weight(1f) agar Column ini mengambil sisa layar di bawah navigator
+        // --- CARD ---
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -127,7 +124,6 @@ fun ReportScreen(
                 isPercentage = false
             )
 
-            // Padding bawah ekstra agar card tidak tertutup Bottom Navigation Bar
             Spacer(modifier = Modifier.height(100.dp))
         }
     }

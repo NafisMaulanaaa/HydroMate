@@ -112,7 +112,6 @@ fun AboutApp(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Version Row (Gaya Mature)
             Surface(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),

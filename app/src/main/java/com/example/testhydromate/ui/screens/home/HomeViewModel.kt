@@ -77,15 +77,10 @@ class HomeViewModel @Inject constructor(
             totalDrink.collect { currentTotal ->
                 val target = _dailyTarget.value
 
-                // JIKA TARGET MINUM HARI INI TERCAPAI
                 if (currentTotal >= target && target > 0 && currentTotal > 0) {
-                    // 1. Munculkan piala Achievement jika belum di sesi ini
                     if (!hasAchievedInThisSession) {
                         checkAndTriggerAchievement()
                     }
-
-                    // 2. SIMPAN/UPDATE STREAK KE DB
-                    // Fungsi ini di dalam sudah ada proteksi "if lastDate != today"
                     updateStreakLogic()
                 }
             }
@@ -101,7 +96,6 @@ class HomeViewModel @Inject constructor(
                 val today = getCurrentDateString()
 
                 _streakCount.value = streak
-                // Sinar piala menyala jika target sudah tercapai hari ini
                 _isStreakActiveToday.value = (lastDate == today)
             }
         }
@@ -147,7 +141,6 @@ class HomeViewModel @Inject constructor(
             if (lastDate != today) {
                 val yesterday = getYesterdayDateString()
 
-                // Jika kemarin tercapai, streak +1. Jika bolong, reset ke 1.
                 val newStreakValue = if (lastDate == yesterday) currentStreak + 1 else 1
 
                 val updates = mapOf(
@@ -198,15 +191,13 @@ class HomeViewModel @Inject constructor(
     fun updateDailyGoal(newGoal: Int) {
         val uid = auth.currentUser?.uid ?: return
 
-        // 1. Update UI Lokal (Optimistic Update)
+        // Update UI Lokal
         _dailyTarget.value = newGoal
 
-        // 2. Update ke Firestore (Hanya field dailyGoal agar aman)
+        // Update ke Firestore (Hanya field dailyGoal)
         db.collection("users").document(uid)
             .update("dailyGoal", newGoal)
             .addOnFailureListener {
-                // Jika gagal (misal internet mati), kembalikan UI (opsional)
-                // _dailyTarget.value = oldGoal
             }
     }
 

@@ -8,14 +8,14 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember // Tambahan penting
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.navigation // Tambahan penting
+import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.example.testhydromate.ui.components.HydroBottomBar
 import com.example.testhydromate.ui.screens.achievement.AchievementScreen
@@ -32,7 +32,6 @@ import com.example.testhydromate.ui.screens.splash.SplashScreen
 import com.example.testhydromate.ui.screens.splash.SplashViewModel
 import com.example.testhydromate.ui.screens.streak.StreakScreen
 
-// Definisikan nama route untuk Graph Onboarding agar konsisten
 const val ONBOARDING_GRAPH_ROUTE = "onboarding_graph"
 
 @Composable
@@ -128,7 +127,6 @@ fun RouteScreen() {
                         }
                     },
                     onRegisterSuccess = {
-                        // Perubahan 1: Arahkan ke Graph Route, bukan screen pertama
                         navController.navigate(ONBOARDING_GRAPH_ROUTE) {
                             popUpTo(Screen.LOGIN.route) { inclusive = true }
                         }
@@ -142,9 +140,8 @@ fun RouteScreen() {
                 route = ONBOARDING_GRAPH_ROUTE
             ) {
 
-                // 1. INPUT PERSONAL
+                // INPUT PERSONAL
                 composable(Screen.INPUT_PERSONAL.route) { entry ->
-                    // Ambil ViewModel dari Parent Entry (Graph)
                     val parentEntry = remember(entry) {
                         navController.getBackStackEntry(ONBOARDING_GRAPH_ROUTE)
                     }
@@ -158,7 +155,7 @@ fun RouteScreen() {
                     )
                 }
 
-                // 2. INPUT HABIT
+                // INPUT HABIT
                 composable(Screen.INPUT_HABIT.route) { entry ->
                     val parentEntry = remember(entry) {
                         navController.getBackStackEntry(ONBOARDING_GRAPH_ROUTE)
@@ -174,7 +171,7 @@ fun RouteScreen() {
                     )
                 }
 
-                // 3. INPUT WEATHER
+                // INPUT WEATHER
                 composable(Screen.INPUT_WEATHER.route) { entry ->
                     val parentEntry = remember(entry) {
                         navController.getBackStackEntry(ONBOARDING_GRAPH_ROUTE)
@@ -190,7 +187,7 @@ fun RouteScreen() {
                     )
                 }
 
-                // 4. LOADING
+                // LOADING
                 composable(Screen.LOADING.route) { entry ->
                     val parentEntry = remember(entry) {
                         navController.getBackStackEntry(ONBOARDING_GRAPH_ROUTE)
@@ -200,7 +197,7 @@ fun RouteScreen() {
                     LoadingResultScreen(
                         viewModel = vm,
                         onFinished = {
-                            vm.submitOnboarding() // Submit data ke backend/local
+                            vm.submitOnboarding()
                             navController.navigate(Screen.RESULT.route) {
                                 // Hapus loading dari backstack agar user tidak bisa back ke loading
                                 popUpTo(Screen.LOADING.route) { inclusive = true }
@@ -209,7 +206,7 @@ fun RouteScreen() {
                     )
                 }
 
-                // 5. RESULT SCREEN
+                // RESULT SCREEN
                 composable(Screen.RESULT.route) { entry ->
                     val parentEntry = remember(entry) {
                         navController.getBackStackEntry(ONBOARDING_GRAPH_ROUTE)
@@ -217,7 +214,7 @@ fun RouteScreen() {
                     val vm = hiltViewModel<OnboardingViewModel>(parentEntry)
 
                     ResultScreen(
-                        viewModel = vm, // VM masih membawa data hasil kalkulasi
+                        viewModel = vm,
                         onContinueToHome = {
                             navController.navigate(Screen.HOME.route) {
                                 // Hapus SELURUH Graph Onboarding dari memori
@@ -257,10 +254,8 @@ fun RouteScreen() {
             composable(Screen.HISTORY.route) { HistoryScreen() }
 
             composable(Screen.REPORT.route) {
-                // Gunakan ReportScreen yang sudah kita buat tadi
                 ReportScreen(
                     onBackClick = {
-                        // Jika user klik back di header report, kembalikan ke Home
                         navController.navigate(Screen.HOME.route) {
                             popUpTo(Screen.HOME.route) { inclusive = true }
                         }

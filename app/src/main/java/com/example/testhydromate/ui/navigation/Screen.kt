@@ -29,5 +29,3 @@ sealed class Screen(val route: String) {
     // streak
     object STREAK : Screen("streak")
 }
-
-//data class Route(val route: String)

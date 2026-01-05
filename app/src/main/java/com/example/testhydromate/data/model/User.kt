@@ -17,7 +17,6 @@ data class User(
 
     val preferredAmount: Int = 100,
 
-    // Streak
     val currentStreak: Int = 0,
     val lastStreakDate: String = ""
 )

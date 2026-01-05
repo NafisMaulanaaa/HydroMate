@@ -26,7 +26,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val authRepository: AuthRepository,
-    private val reminderRepository: ReminderRepository, // Inject ReminderRepository
+    private val reminderRepository: ReminderRepository,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
@@ -36,8 +36,6 @@ class ProfileViewModel @Inject constructor(
     var isLoading by mutableStateOf(false)
         private set
 
-    // --- PERBAIKAN UTAMA DI SINI ---
-    // Tambahkan tipe eksplisit ": StateFlow<ReminderSettings?>" agar tidak error
     val isReminderEnabled: StateFlow<ReminderSettings?> = reminderRepository.reminderSettings
         .stateIn(
             scope = viewModelScope,
@@ -103,16 +101,14 @@ class ProfileViewModel @Inject constructor(
     // Fungsi untuk mengubah status Toggle Reminder
     fun setReminderEnabled(enabled: Boolean) {
         viewModelScope.launch {
-            // 1. Simpan ke DataStore
+            // Simpan ke DataStore
             reminderRepository.updateSwitch("enabled", enabled)
 
-            // 2. Reschedule Worker (agar settingan baru langsung terbaca)
             WaterReminderWorker.schedule(context, enabled)
         }
     }
 
     fun logout() {
-        // Matikan notifikasi saat logout
         WorkManager.getInstance(context).cancelUniqueWork("WaterReminderWork")
         authRepository.logout()
     }

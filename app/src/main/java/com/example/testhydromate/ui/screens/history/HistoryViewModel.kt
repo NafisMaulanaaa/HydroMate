@@ -9,6 +9,10 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
@@ -32,6 +36,20 @@ class HistoryViewModel @Inject constructor(
     fun updateLog(log: WaterLog) {
         viewModelScope.launch {
             repository.updateLog(log)
+        }
+    }
+
+    fun formatDateHeader(date: String): String {
+        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val dateObj = sdf.parse(date) ?: return date
+        val today = sdf.format(Date())
+        val cal = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, -1) }
+        val yesterday = sdf.format(cal.time)
+
+        return when (date) {
+            today -> "Today"
+            yesterday -> "Yesterday"
+            else -> SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(dateObj)
         }
     }
 }

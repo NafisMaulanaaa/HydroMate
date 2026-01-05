@@ -22,7 +22,6 @@ val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "re
 object AppModule {
 
     // FIREBASE
-
     @Provides
     @Singleton
     fun provideFirebaseAuth(): FirebaseAuth {
@@ -38,11 +37,9 @@ object AppModule {
     }
 
     // DATASTORE (Penyimpanan Lokal)
-
     @Provides
     @Singleton
     fun provideDataStore(@ApplicationContext context: Context): DataStore<Preferences> {
-        // 3. Inject Context
         // DataStore butuh "Context" (akses ke sistem Android) untuk membuat file.
         // Hilt menyediakan @ApplicationContext secara otomatis.
         return context.dataStore

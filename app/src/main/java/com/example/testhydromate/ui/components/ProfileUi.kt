@@ -52,7 +52,7 @@ fun InputField(label: String, value: String, onValueChange: (String) -> Unit) {
 @Composable
 fun ProfileGenderButton(
     text: String,
-    icon: androidx.compose.ui.graphics.vector.ImageVector, // Tambahkan ini
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
     isSelected: Boolean,
     color: Color,
     onClick: () -> Unit,
@@ -73,7 +73,6 @@ fun ProfileGenderButton(
                 indication = null
             ) { onClick() }
     ) {
-        // Tambahkan Row agar Icon dan Text berdampingan
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center

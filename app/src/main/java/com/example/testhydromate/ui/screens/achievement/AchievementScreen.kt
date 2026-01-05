@@ -111,9 +111,3 @@ fun AchievementScreen(
         }
     }
 }
-
-//@Preview(showBackground = true, widthDp = 390, heightDp = 844)
-//@Composable
-//private fun AchievementScreenPreview() {
-//    AchievementScreen()
-//}

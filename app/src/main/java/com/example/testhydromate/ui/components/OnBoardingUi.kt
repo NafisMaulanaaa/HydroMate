@@ -44,7 +44,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 // ===== ALL ON-BOARDING PAGE =====
-
 @Composable
 fun OnboardingTopBar(
     currentStep: Int,
@@ -126,10 +125,7 @@ fun OnboardingTopBar(
     }
 }
 
-// ========================
-// INPUT PERSONAL
-// ========================
-
+// =====INPUT PERSONAL =====
 @Composable
 fun MeasurementInput(
     label: String,
@@ -217,9 +213,7 @@ fun GenderButton(
     }
 }
 
-// ========================
-// INPUT HABIT AND WEATHER
-// ========================
+// ===== INPUT HABIT AND WEATHER =====
 @Composable
 fun OptionButton(
     text: String,
@@ -241,7 +235,6 @@ fun OptionButton(
             .padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Emoji Placeholder (Ganti dengan Image/Icon asli jika ada asset)
         Text(text = emoji, fontSize = 24.sp)
 
         Spacer(modifier = Modifier.width(16.dp))

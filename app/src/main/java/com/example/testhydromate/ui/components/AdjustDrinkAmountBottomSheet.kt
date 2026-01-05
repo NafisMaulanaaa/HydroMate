@@ -1,5 +1,6 @@
 package com.example.testhydromate.ui.components
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -10,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -25,11 +27,13 @@ fun AdjustDrinkAmountBottomSheet(
     onDismiss: () -> Unit,
     onSave: (Int) -> Unit
 ) {
-    // 1. Inisialisasi state
+    //  Ambil Context untuk menampilkan Toast
+    val context = LocalContext.current
+
+    // Inisialisasi state
     var amountText by remember { mutableStateOf(initialAmount.toString()) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-    // 2. PENTING: Jika initialAmount berubah dari server, update text field-nya
     LaunchedEffect(initialAmount) {
         amountText = initialAmount.toString()
     }
@@ -69,12 +73,12 @@ fun AdjustDrinkAmountBottomSheet(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 24.dp)
-                    .height(90.dp) // Box tetap tinggi
+                    .height(90.dp)
                     .background(color = Color(0xFFF8F9FA), shape = RoundedCornerShape(16.dp)),
-                contentAlignment = Alignment.Center // Memastikan Row tepat di tengah Box
+                contentAlignment = Alignment.Center
             ) {
                 Row(
-                    verticalAlignment = Alignment.CenterVertically, // Row-nya di tengah Box
+                    verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center
                 ) {
                     androidx.compose.foundation.text.BasicTextField(
@@ -83,13 +87,13 @@ fun AdjustDrinkAmountBottomSheet(
                         textStyle = androidx.compose.ui.text.TextStyle(
                             fontSize = 44.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF1976D2), // Ganti ke PrimaryBlue milikmu
+                            color = Color(0xFF1976D2),
                             textAlign = TextAlign.Center
                         ),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         modifier = Modifier
                             .width(IntrinsicSize.Min)
-                            .alignByBaseline() // Kunci pertama
+                            .alignByBaseline()
                     )
 
                     Spacer(Modifier.width(8.dp))
@@ -99,7 +103,7 @@ fun AdjustDrinkAmountBottomSheet(
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Medium,
                         color = Color.Gray,
-                        modifier = Modifier.alignByBaseline() // Kunci kedua: Sejajar bawah dengan angka
+                        modifier = Modifier.alignByBaseline()
                     )
                 }
             }
@@ -129,12 +133,17 @@ fun AdjustDrinkAmountBottomSheet(
                 Button(
                     modifier = Modifier.weight(1f).height(56.dp),
                     onClick = {
-                        // 3. Validasi angka sebelum dikirim
                         val finalAmount = amountText.toIntOrNull() ?: 0
+
                         if (finalAmount > 0) {
                             onSave(finalAmount)
                         } else {
-                            // Opsi: Berikan toast jika 0
+                            // Tampilkan Toast jika jumlahnya 0 atau kosong
+                            Toast.makeText(
+                                context,
+                                "Amount cannot be zero",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                     },
                     shape = RoundedCornerShape(28.dp),

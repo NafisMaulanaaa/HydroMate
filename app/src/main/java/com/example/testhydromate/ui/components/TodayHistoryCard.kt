@@ -31,7 +31,6 @@ fun TodayHistoryCard(
     onUpdate: (WaterLog) -> Unit,
     onDeleteConfirm: (WaterLog) -> Unit
 ) {
-    // Context tidak diperlukan lagi karena Toast dihapus
     var selectedEdit by remember { mutableStateOf<WaterLog?>(null) }
     var selectedDelete by remember { mutableStateOf<WaterLog?>(null) }
 
@@ -42,15 +41,12 @@ fun TodayHistoryCard(
             .sortedByDescending { it.timestamp }
     }
 
-    // DIALOG KONFIRMASI HAPUS
     selectedDelete?.let { log ->
         val time = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(log.timestamp))
         ConfirmDeleteDialog(
             time = time,
             onCancel = { selectedDelete = null },
             onConfirm = {
-                // Panggil callback ke HomeScreen.
-                // Di HomeScreen nanti yang akan memunculkan Notifikasi Hijau.
                 onDeleteConfirm(log)
                 selectedDelete = null
             }
@@ -86,7 +82,6 @@ fun TodayHistoryCard(
             } else {
                 LazyColumn(
                     modifier = Modifier.fillMaxWidth(),
-                    // Memberikan padding bawah agar tidak tertutup Navbar
                     contentPadding = PaddingValues(bottom = 80.dp)
                 ) {
                     itemsIndexed(todayLogs) { index, log ->
@@ -96,7 +91,6 @@ fun TodayHistoryCard(
                             onDelete = { selectedDelete = it }
                         )
                         if (index < todayLogs.lastIndex) {
-                            // Gunakan HorizontalDivider untuk Material3
                             HorizontalDivider(
                                 modifier = Modifier.padding(start = 72.dp),
                                 color = Color.LightGray.copy(alpha = 0.4f)

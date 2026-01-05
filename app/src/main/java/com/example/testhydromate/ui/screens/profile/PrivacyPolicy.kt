@@ -25,15 +25,13 @@ fun PrivacyPolicy(
     modifier: Modifier = Modifier
 ) {
     Scaffold(
-        // 1. Pastikan seluruh background Scaffold berwarna putih
         containerColor = Color.White,
         topBar = {
-            // 2. Custom Top Bar agar konsisten dengan My Profile & About App
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(Color.White)
-                    .statusBarsPadding() // Mencegah mepet ke atas
+                    .statusBarsPadding()
             ) {
                 IconButton(
                     onClick = onBackClick,
@@ -65,14 +63,12 @@ fun PrivacyPolicy(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White) // 3. Pastikan konten juga berlatar putih
+                .background(Color.White)
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 32.dp, vertical = 16.dp)
         ) {
-            // Spacer(modifier = Modifier.height(16.dp)) // Bisa dihapus karena sudah ada padding di judul
 
-            // --- Information we collect ---
             Text(
                 text = "Information we collect",
                 color = PrimaryBlue,
@@ -104,7 +100,6 @@ fun PrivacyPolicy(
                 modifier = Modifier.padding(bottom = 24.dp)
             )
 
-            // --- How we use the information ---
             Text(
                 text = "How we use the information we collect, and legal bases for use",
                 color = PrimaryBlue,

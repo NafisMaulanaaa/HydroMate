@@ -29,11 +29,11 @@ class ReportViewModel @Inject constructor(
     // State tanggal acuan (Default: Hari ini)
     private val _referenceDate = MutableStateFlow(System.currentTimeMillis())
 
-    // Flow kombinasi: Logs + Filter + Tanggal Acuan
+
     val chartData: StateFlow<List<DailyChartData>> = combine(
-        waterRepository.getAllHistoryRealtime(),
-        _selectedTimeRange,
-        _referenceDate
+        waterRepository.getAllHistoryRealtime(), // Logs
+        _selectedTimeRange,                     // Filter
+        _referenceDate                          // Tanggal Acuan
     ) { logs, range, refDate ->
 
         val userProfile = authRepository.getUserProfile()
@@ -52,7 +52,6 @@ class ReportViewModel @Inject constructor(
 
     fun setTimeRange(range: String) {
         _selectedTimeRange.value = range
-        // Reset tanggal ke hari ini setiap ganti filter agar UX-nya enak
         _referenceDate.value = System.currentTimeMillis()
     }
 
@@ -81,14 +80,12 @@ class ReportViewModel @Inject constructor(
     }
 
     // --- DATA GENERATION LOGIC ---
-
     private fun generateWeeklyData(logs: List<com.example.testhydromate.data.model.WaterLog>, goal: Int, refDate: Long): List<DailyChartData> {
         val data = ArrayList<DailyChartData>()
         val calendar = Calendar.getInstance()
 
-        // PENTING: Set waktu berdasarkan refDate, bukan hari ini
         calendar.timeInMillis = refDate
-        calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY) // Mundur ke hari Minggu terdekat
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY)
 
         for (i in 0 until 7) {
             val startOfDay = getStartOfDay(calendar)
@@ -115,9 +112,8 @@ class ReportViewModel @Inject constructor(
         val data = ArrayList<DailyChartData>()
         val calendar = Calendar.getInstance()
 
-        // Set ke Bulan & Tahun sesuai refDate
         calendar.timeInMillis = refDate
-        calendar.set(Calendar.DAY_OF_MONTH, 1) // Mulai tanggal 1
+        calendar.set(Calendar.DAY_OF_MONTH, 1)
 
         val maxDays = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
 

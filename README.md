@@ -38,14 +38,14 @@ Kode sumber diorganisir berdasarkan fitur dan layer untuk memudahkan pemeliharaa
 com.example.testhydromate
 ├── data
 │   ├── model          # Data class (User, WaterLog, DailyChartData, ReminderSettings)
-│   └── repository     # Sumber kebenaran data (AuthRepository, WaterRepository)
-├── di                 # Modul Dependency Injection (AppModule)
+│   └── repository     # Manajemen sumber data (Firebase/DataStore)
+├── di                 # Modul Dependency Injection
 ├── ui
-│   ├── components     # Komponen UI yang dapat digunakan kembali (BottomBar, Charts, Inputs)
+│   ├── components     # Komponen UI yang reusable (Tombol, Chart, dll)
 │   ├── navigation     # Konfigurasi NavHost dan Rute Layar
-│   ├── screens        # Layar per fitur (Home, Report, Profile, Onboarding, dll)
-│   └── theme          # Konfigurasi tema, warna, dan tipografi
-├── util               # Kelas pembantu (Resource wrapper, Workers, Formatters)
+│   ├── screens        # Layar aplikasi berdasarkan fitur (Home, Report, Profile, Onboarding, dll)
+│   └── theme          # Tema visual global (Warna, Font).
+├── util               # Fungsi bantuan
 ├── HydroMateApp.kt
 └── MainActivity.kt
 ```

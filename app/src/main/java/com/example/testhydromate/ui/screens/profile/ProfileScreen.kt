@@ -69,7 +69,7 @@ fun ProfileScreen(
                     .padding(horizontal = 18.dp)
             ) {
 
-                // ===== MY PROFILE (Icon: Person) =====
+                // ===== MY PROFILE =====
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
@@ -82,14 +82,14 @@ fun ProfileScreen(
                     Icon(
                         imageVector = Icons.Outlined.AccountCircle,
                         contentDescription = null,
-                        tint = PrimaryBlue, // Bisa diganti Color.Gray atau Color.Black
+                        tint = PrimaryBlue,
                         modifier = Modifier.size(24.dp)
                     )
                     Spacer(Modifier.width(24.dp))
                     Text("My Profile", fontSize = 17.sp)
                 }
 
-                // ===== NOTIFICATIONS (Icon: Notifications) =====
+                // ===== NOTIFICATIONS =====
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
@@ -111,7 +111,7 @@ fun ProfileScreen(
                     Text("Notifications", fontSize = 17.sp)
                 }
 
-                // ===== REMINDER SETTINGS (Icon: Alarm) =====
+                // ===== REMINDER SETTINGS =====
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
@@ -124,7 +124,7 @@ fun ProfileScreen(
                         }
                 ) {
                     Icon(
-                        imageVector = Icons.Outlined.Alarm, // Menggunakan icon Alarm/Jam
+                        imageVector = Icons.Outlined.Alarm,
                         contentDescription = null,
                         tint = PrimaryBlue,
                         modifier = Modifier.size(24.dp)
@@ -133,7 +133,7 @@ fun ProfileScreen(
                     Text("Reminder", fontSize = 17.sp)
                 }
 
-                // ===== ABOUT APP (Icon: Info) =====
+                // ===== ABOUT APP =====
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
@@ -153,7 +153,7 @@ fun ProfileScreen(
                     Text("About App", fontSize = 17.sp)
                 }
 
-                // ===== LOGOUT (Icon: Logout) =====
+                // ===== LOGOUT =====
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
@@ -164,14 +164,13 @@ fun ProfileScreen(
                         ) { showLogoutDialog = true }
                 ) {
                     Icon(
-                        // AutoMirrored: Icon otomatis membalik arah jika HP user pakai bahasa Arab/RTL
                         imageVector = Icons.AutoMirrored.Outlined.Logout,
                         contentDescription = null,
-                        tint = Color.Red, // Logout biasanya merah, atau ganti PrimaryBlue
+                        tint = Color.Red,
                         modifier = Modifier.size(24.dp)
                     )
                     Spacer(Modifier.width(24.dp))
-                    Text("Logout", fontSize = 17.sp, color = Color.Red) // Teks juga merah biar serasi
+                    Text("Logout", fontSize = 17.sp, color = Color.Red)
                 }
             }
         }

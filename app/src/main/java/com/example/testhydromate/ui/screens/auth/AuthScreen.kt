@@ -167,7 +167,6 @@ fun SignUpForm(viewModel: AuthViewModel) {
     var passwordError by remember { mutableStateOf<String?>(null) }
 
     Column(Modifier.fillMaxWidth()) {
-        // Baris Nama Depan & Belakang
         Row(Modifier.fillMaxWidth()) {
             HydroTextField(
                 label = "First Name",
