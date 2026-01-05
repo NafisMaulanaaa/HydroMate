@@ -1,4 +1,4 @@
-package com.example.testhydromate.ui.utils
+package com.example.testhydromate.util
 
 import java.text.SimpleDateFormat
 import java.util.Date

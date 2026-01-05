@@ -23,7 +23,7 @@ import com.example.testhydromate.ui.screens.auth.LoginScreen
 import com.example.testhydromate.ui.screens.history.HistoryScreen
 import com.example.testhydromate.ui.screens.home.HomeScreen
 import com.example.testhydromate.ui.screens.home.HomeViewModel
-import com.example.testhydromate.ui.screens.home.ResultScreen
+import com.example.testhydromate.ui.screens.onboarding.ResultScreen
 import com.example.testhydromate.ui.screens.onboarding.*
 import com.example.testhydromate.ui.screens.profile.*
 import com.example.testhydromate.ui.screens.reminder.ReminderSettingScreen

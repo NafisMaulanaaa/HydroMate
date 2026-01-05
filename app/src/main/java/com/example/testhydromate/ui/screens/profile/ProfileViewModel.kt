@@ -7,10 +7,10 @@ import androidx.work.WorkManager
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import com.example.testhydromate.data.model.ReminderSettings
 import com.example.testhydromate.data.model.User
 import com.example.testhydromate.data.repository.AuthRepository
 import com.example.testhydromate.data.repository.ReminderRepository
-import com.example.testhydromate.data.repository.ReminderSettings // Pastikan ini diimport
 import com.example.testhydromate.util.WaterReminderWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext

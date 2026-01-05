@@ -3,8 +3,8 @@ package com.example.testhydromate.ui.screens.reminder
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.testhydromate.data.model.ReminderSettings
 import com.example.testhydromate.data.repository.ReminderRepository
-import com.example.testhydromate.data.repository.ReminderSettings
 import com.example.testhydromate.util.WaterReminderWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext

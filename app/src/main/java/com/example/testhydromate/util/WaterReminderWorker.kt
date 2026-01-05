@@ -14,7 +14,7 @@ import com.example.testhydromate.MainActivity
 import com.example.testhydromate.R
 import com.example.testhydromate.di.dataStore
 import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.intPreferencesKey // Tambahan Import
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import kotlinx.coroutines.flow.first

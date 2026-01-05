@@ -37,7 +37,7 @@ Kode sumber diorganisir berdasarkan fitur dan layer untuk memudahkan pemeliharaa
 ```text
 com.example.testhydromate
 ├── data
-│   ├── model          # Data class (User, WaterLog, DailyChartData)
+│   ├── model          # Data class (User, WaterLog, DailyChartData, ReminderSettings)
 │   └── repository     # Sumber kebenaran data (AuthRepository, WaterRepository)
 ├── di                 # Modul Dependency Injection (AppModule)
 ├── ui

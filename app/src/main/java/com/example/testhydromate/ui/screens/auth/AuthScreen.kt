@@ -9,10 +9,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.testhydromate.ui.components.AuthHeader
 import com.example.testhydromate.ui.components.AuthTabSelector
 import com.example.testhydromate.ui.components.HydroTextField
@@ -27,7 +25,6 @@ import android.graphics.RenderEffect
 import android.graphics.Shader
 import androidx.compose.ui.graphics.asComposeRenderEffect
 import androidx.compose.ui.graphics.graphicsLayer
-//import com.example.testhydromate.data.model.southeastAsiaCountryList
 import com.example.testhydromate.ui.components.PrimaryBlue
 
 @Composable
