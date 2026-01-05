@@ -1,4 +1,4 @@
-# 💧 HydroMate - Pelacak Hidrasi Cerdas
+# 💧 HydroMate 
 
 **HydroMate** adalah aplikasi Android pelacak hidrasi modern yang dibangun menggunakan **Kotlin** dan **Jetpack Compose**. Aplikasi ini dirancang untuk membantu pengguna menjaga hidrasi tubuh dengan menghitung target minum harian secara personal—berdasarkan data biometrik, tingkat aktivitas fisik, dan kondisi cuaca lingkungan.
 
